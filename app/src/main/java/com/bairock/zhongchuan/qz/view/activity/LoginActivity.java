@@ -19,10 +19,6 @@ import com.bairock.zhongchuan.qz.R;
 import com.bairock.zhongchuan.qz.common.DES;
 import com.bairock.zhongchuan.qz.common.Utils;
 import com.bairock.zhongchuan.qz.view.BaseActivity;
-import com.easemob.EMCallBack;
-import com.easemob.chat.EMChatManager;
-import com.easemob.chat.EMGroupManager;
-import com.juns.health.net.loopj.android.http.RequestParams;
 
 //登陆
 public class LoginActivity extends BaseActivity implements OnClickListener {
@@ -89,9 +85,6 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 
 	private void getLogin(final String userName, final String password) {
 		if (!TextUtils.isEmpty(userName) && !TextUtils.isEmpty(password)) {
-			RequestParams params = new RequestParams();
-			params.put("username", userName);
-			params.put("password", DES.md5Pwd(password));
 			Intent intent = new Intent(LoginActivity.this,
 					MainActivity.class);
 			startActivity(intent);
@@ -101,50 +94,6 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 		} else {
 			Utils.showLongToast(LoginActivity.this, "请填写账号或密码！");
 		}
-	}
-
-	private void getChatserive(final String userName, final String password) {
-		EMChatManager.getInstance().login(userName, password, new EMCallBack() {// 回调
-					@Override
-					public void onSuccess() {
-						runOnUiThread(new Runnable() {
-							public void run() {
-								Utils.putBooleanValue(LoginActivity.this,
-										Constants.LoginState, true);
-								Utils.putValue(LoginActivity.this,
-										Constants.User_ID, userName);
-								Utils.putValue(LoginActivity.this,
-										Constants.PWD, password);
-								Log.d("main", "登陆聊天服务器成功！");
-								// 加载群组和会话
-								EMGroupManager.getInstance().loadAllGroups();
-								EMChatManager.getInstance()
-										.loadAllConversations();
-								Intent intent = new Intent(LoginActivity.this,
-										MainActivity.class);
-								startActivity(intent);
-								overridePendingTransition(R.anim.push_up_in,
-										R.anim.push_up_out);
-								finish();
-							}
-						});
-					}
-
-					@Override
-					public void onProgress(int progress, String status) {
-
-					}
-
-					@Override
-					public void onError(int code, String message) {
-						Log.d("main", "登陆聊天服务器失败！");
-						runOnUiThread(new Runnable() {
-							public void run() {
-								Utils.showLongToast(LoginActivity.this, "登陆失败！");
-							}
-						});
-					}
-				});
 	}
 
 	// EditText监听器

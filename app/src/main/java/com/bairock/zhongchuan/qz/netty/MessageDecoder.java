@@ -4,7 +4,9 @@ import android.util.Log;
 
 import com.bairock.zhongchuan.qz.bean.Location;
 import com.bairock.zhongchuan.qz.bean.MessageRoot;
+import com.bairock.zhongchuan.qz.bean.MessageRootType;
 import com.bairock.zhongchuan.qz.bean.ZCMessage;
+import com.bairock.zhongchuan.qz.utils.UserUtil;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -31,16 +33,34 @@ public class MessageDecoder extends MessageToMessageDecoder<DatagramPacket> {
 
         JsonObject jsonObject = JsonParser.parseString(strMsg).getAsJsonObject();
         String strType = jsonObject.get("type").getAsString();
-        Type type = new TypeToken<MessageRoot<Location>>(){}.getType();
-        if(strType.equals("HEART")){
-            type = new TypeToken<MessageRoot<Location>>(){}.getType();
-        }else if(strType.equals("VIDEO")){
-            type = new TypeToken<MessageRoot<byte[]>>(){}.getType();
-        }
-
         Gson gson = new Gson();
-        MessageRoot zcMessage = gson.fromJson(strMsg, type);
-        out.add(zcMessage);
+        switch (strType) {
+            case "HEART": {
+                Type type = new TypeToken<MessageRoot<Location>>() {
+                }.getType();
+                MessageRoot<Location> zcMessage = gson.fromJson(strMsg, type);
+                UserUtil.setHeartInfo(msg.sender(), zcMessage);
+                out.add(zcMessage);
+                break;
+            }
+            case "CHAT": {
+                Type type = new TypeToken<MessageRoot<ZCMessage>>() {
+                }.getType();
+                MessageRoot<ZCMessage> zcMessage = gson.fromJson(strMsg, type);
+                out.add(zcMessage);
+                break;
+            }
+            case "VIDEO": {
+                Type type = new TypeToken<MessageRoot<byte[]>>() {
+                }.getType();
+                MessageRoot<byte[]> zcMessage = gson.fromJson(strMsg, type);
+                out.add(zcMessage);
+                break;
+            }
+            default:
+                out.add(null);
+                break;
+        }
         Log.e("MessageDecoder", msg.sender().toString());
     }
 }

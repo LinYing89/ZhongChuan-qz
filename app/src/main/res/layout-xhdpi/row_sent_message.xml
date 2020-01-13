@@ -80,12 +80,12 @@
             android:id="@+id/pb_sending"
             android:layout_width="25dp"
             android:layout_height="25dp"
-                android:indeterminateDrawable="@drawable/small_prograssbar"
-				android:indeterminateOnly="true"
-				android:indeterminateBehavior="repeat"
             android:layout_centerVertical="true"
             android:layout_toLeftOf="@id/tv_chatcontent"
-            android:visibility="visible" />
+            android:indeterminateBehavior="repeat"
+            android:indeterminateDrawable="@drawable/small_prograssbar"
+            android:indeterminateOnly="true"
+            android:visibility="gone" />
     </RelativeLayout>
 
 </LinearLayout>

@@ -26,12 +26,12 @@ import com.bairock.zhongchuan.qz.R;
 import com.bairock.zhongchuan.qz.adapter.NewMsgAdpter;
 import com.bairock.zhongchuan.qz.bean.MessageRoot;
 import com.bairock.zhongchuan.qz.bean.MessageRootType;
-import com.bairock.zhongchuan.qz.bean.ZCChatManager;
 import com.bairock.zhongchuan.qz.bean.ZCConversation;
 import com.bairock.zhongchuan.qz.bean.ZCMessage;
 import com.bairock.zhongchuan.qz.bean.ZCMessageDirect;
 import com.bairock.zhongchuan.qz.bean.ZCMessageType;
 import com.bairock.zhongchuan.qz.common.NetUtil;
+import com.bairock.zhongchuan.qz.utils.ConversationUtil;
 import com.bairock.zhongchuan.qz.view.ChatActivity;
 
 //消息
@@ -92,13 +92,15 @@ public class FragmentMsg extends Fragment implements OnClickListener,
      * @return +
      */
     private List<ZCConversation> loadConversationsWithRecentChat() {
-        List<ZCConversation> list = new ArrayList<>();
-        ZCConversation zcConversation = new ZCConversation("8080");
+
+        if(ConversationUtil.conversations.size() > 0){
+            return ConversationUtil.conversations;
+        }
 
         MessageRoot<ZCMessage> messageRoot = new MessageRoot<>();
         messageRoot.setType(MessageRootType.CHAT);
-        messageRoot.setFrom("8080");
-        messageRoot.setTo("8081");
+        messageRoot.setFrom("8081");
+        messageRoot.setTo("8080");
         messageRoot.setTime(new Date().getTime());
         messageRoot.setMsgId(UUID.randomUUID().toString());
 
@@ -107,12 +109,11 @@ public class FragmentMsg extends Fragment implements OnClickListener,
         message.setDirect(ZCMessageDirect.RECEIVE);
         message.setMessageType(ZCMessageType.TXT);
         messageRoot.setData(message);
-        zcConversation.addMessage(messageRoot);
-        ZCChatManager.getInstance().addConversation(zcConversation);
+        ConversationUtil.addReceivedMessage(messageRoot);
 
         MessageRoot<ZCMessage> messageRoot1 = new MessageRoot<>();
         messageRoot1.setType(MessageRootType.CHAT);
-        messageRoot1.setFrom("8081");
+        messageRoot1.setFrom("8082");
         messageRoot1.setTo("8080");
         messageRoot1.setTime(new Date().getTime());
         messageRoot1.setMsgId(UUID.randomUUID().toString());
@@ -122,12 +123,10 @@ public class FragmentMsg extends Fragment implements OnClickListener,
         message1.setDirect(ZCMessageDirect.SEND);
         message1.setMessageType(ZCMessageType.TXT);
         messageRoot1.setData(message1);
-        zcConversation.addMessage(messageRoot1);
-        ZCChatManager.getInstance().addConversation(zcConversation);
-        list.add(zcConversation);
+        ConversationUtil.addReceivedMessage(messageRoot1);
         // 排序
-        sortConversationByLastChatTime(list);
-        return list;
+        sortConversationByLastChatTime(ConversationUtil.conversations);
+        return ConversationUtil.conversations;
     }
 
     /**

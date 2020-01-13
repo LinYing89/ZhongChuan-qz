@@ -19,13 +19,7 @@ import android.widget.ProgressBar;
 
 import com.bairock.zhongchuan.qz.R;
 import com.bairock.zhongchuan.qz.utils.ImageCache;
-import com.bairock.zhongchuan.qz.utils.LoadLocalBigImgTask;
 import com.bairock.zhongchuan.qz.widght.TouchImageView.TouchImageView;
-import com.easemob.chat.EMChatConfig;
-import com.easemob.cloud.CloudOperationCallback;
-import com.easemob.cloud.HttpFileManager;
-import com.easemob.util.ImageUtils;
-import com.easemob.util.PathUtil;
 
 /**
  * 下载显示大图
@@ -65,15 +59,6 @@ public class ShowBigImage extends BaseActivity {
 			// int screenHeight =metrics.heightPixels;
 			bitmap = ImageCache.getInstance().get(uri.getPath());
 			if (bitmap == null) {
-				LoadLocalBigImgTask task = new LoadLocalBigImgTask(this,
-						uri.getPath(), image, loadLocalPb,
-						ImageUtils.SCALE_IMAGE_WIDTH,
-						ImageUtils.SCALE_IMAGE_HEIGHT);
-				if (android.os.Build.VERSION.SDK_INT > 10) {
-					task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-				} else {
-					task.execute();
-				}
 			} else {
 				image.setImageBitmap(bitmap);
 			}
@@ -83,7 +68,6 @@ public class ShowBigImage extends BaseActivity {
 			if (!TextUtils.isEmpty(secret)) {
 				maps.put("share-secret", secret);
 			}
-			downloadImage(remotepath, maps);
 		} else {
 			image.setImageResource(default_res);
 		}
@@ -123,97 +107,8 @@ public class ShowBigImage extends BaseActivity {
 	 * @return
 	 */
 	public String getLocalFilePath(String remoteUrl) {
-		String localPath;
-		if (remoteUrl.contains("/")) {
-			localPath = PathUtil.getInstance().getImagePath().getAbsolutePath()
-					+ "/" + remoteUrl.substring(remoteUrl.lastIndexOf("/") + 1);
-		} else {
-			localPath = PathUtil.getInstance().getImagePath().getAbsolutePath()
-					+ "/" + remoteUrl;
-		}
+		String localPath = "";
 		return localPath;
-	}
-
-	/**
-	 * 下载图片
-	 * 
-	 * @param remoteFilePath
-	 */
-	private void downloadImage(final String remoteFilePath,
-			final Map<String, String> headers) {
-		String str1 = getResources().getString(R.string.Download_the_pictures);
-		pd = new ProgressDialog(this);
-		pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-		pd.setCanceledOnTouchOutside(false);
-		pd.setMessage(str1);
-		pd.show();
-		localFilePath = getLocalFilePath(remoteFilePath);
-		final HttpFileManager httpFileMgr = new HttpFileManager(this,
-				EMChatConfig.getInstance().getStorageUrl());
-		final CloudOperationCallback callback = new CloudOperationCallback() {
-			public void onSuccess(String resultMsg) {
-
-				runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						DisplayMetrics metrics = new DisplayMetrics();
-						getWindowManager().getDefaultDisplay().getMetrics(
-								metrics);
-						int screenWidth = metrics.widthPixels;
-						int screenHeight = metrics.heightPixels;
-
-						bitmap = ImageUtils.decodeScaleImage(localFilePath,
-								screenWidth, screenHeight);
-						if (bitmap == null) {
-							image.setImageResource(default_res);
-						} else {
-							image.setImageBitmap(bitmap);
-							ImageCache.getInstance().put(localFilePath, bitmap);
-							isDownloaded = true;
-						}
-						if (pd != null) {
-							pd.dismiss();
-						}
-					}
-				});
-			}
-
-			public void onError(String msg) {
-				Log.e("###", "offline file transfer error:" + msg);
-				File file = new File(localFilePath);
-				if (file.exists() && file.isFile()) {
-					file.delete();
-				}
-				runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						pd.dismiss();
-						image.setImageResource(default_res);
-					}
-				});
-			}
-
-			public void onProgress(final int progress) {
-				Log.d("ease", "Progress: " + progress);
-				final String str2 = getResources().getString(
-						R.string.Download_the_pictures_new);
-				runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-
-						pd.setMessage(str2 + progress + "%");
-					}
-				});
-			}
-		};
-
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				httpFileMgr.downloadFile(remoteFilePath, localFilePath,
-						headers, callback);
-			}
-		}).start();
 	}
 
 	@Override

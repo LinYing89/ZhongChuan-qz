@@ -1,8 +1,10 @@
 package com.bairock.zhongchuan.qz.adapter;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Locale;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -19,10 +21,8 @@ import com.bairock.zhongchuan.qz.bean.MessageRoot;
 import com.bairock.zhongchuan.qz.bean.ZCConversation;
 import com.bairock.zhongchuan.qz.bean.ZCMessage;
 import com.bairock.zhongchuan.qz.utils.SmileUtils;
-import com.bairock.zhongchuan.qz.common.UserUtils;
 import com.bairock.zhongchuan.qz.common.ViewHolder;
 import com.bairock.zhongchuan.qz.widght.SwipeLayout;
-import com.easemob.util.DateUtils;
 
 import static com.bairock.zhongchuan.qz.bean.ZCMessageDirect.RECEIVE;
 
@@ -37,7 +37,6 @@ public class NewMsgAdpter extends BaseAdapter {
 	public NewMsgAdpter(Context ctx, List<ZCConversation> objects) {
 		context = ctx;
 		conversationList = objects;
-		userid = UserUtils.getUserID(context);
 	}
 
 	public Hashtable<String, String> getChatRecord() {
@@ -94,8 +93,9 @@ public class NewMsgAdpter extends BaseAdapter {
 						SmileUtils.getSmiledText(context,
 								getMessageDigest(lastMessage, context)),
 						BufferType.SPANNABLE);
-				txt_time.setText(DateUtils.getTimestampString(new Date(
-						lastMessage.getTime())));
+				Date date = new Date(lastMessage.getTime());
+				SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm", Locale.CHINESE);
+				txt_time.setText(dateFormat.format(date));
 			}
 
 			txt_del.setOnClickListener(new OnClickListener() {

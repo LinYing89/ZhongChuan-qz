@@ -9,9 +9,6 @@ import android.util.Log;
 
 import com.bairock.zhongchuan.qz.common.Utils;
 import com.bairock.zhongchuan.qz.view.activity.LoginActivity;
-import com.easemob.EMCallBack;
-import com.easemob.chat.EMChatManager;
-import com.easemob.chat.EMGroupManager;
 
 public class SplashActivity extends Activity {
 
@@ -66,41 +63,7 @@ public class SplashActivity extends Activity {
 	};
 
 	private void getChatserive(final String userName, final String password) {
-		EMChatManager.getInstance().login(userName, password, new EMCallBack() {// 回调
-					@Override
-					public void onSuccess() {
-						runOnUiThread(new Runnable() {
-							public void run() {
-								// TODO 保存用户信息
-								Utils.putBooleanValue(SplashActivity.this,
-										Constants.LoginState, true);
-								Utils.putValue(SplashActivity.this,
-										Constants.User_ID, userName);
-								Utils.putValue(SplashActivity.this,
-										Constants.PWD, password);
-
-								Log.e("Token", EMChatManager.getInstance()
-										.getAccessToken());
-								Log.d("main", "登陆聊天服务器成功！");
-								// 加载群组和会话
-								EMGroupManager.getInstance().loadAllGroups();
-								EMChatManager.getInstance()
-										.loadAllConversations();
-								mHandler.sendEmptyMessage(0);
-							}
-						});
-					}
-
-					@Override
-					public void onProgress(int progress, String status) {
-
-					}
-
-					@Override
-					public void onError(int code, String message) {
-						Log.d("main", "登陆聊天服务器失败！");
-					}
-				});
+		
 	}
 
 }

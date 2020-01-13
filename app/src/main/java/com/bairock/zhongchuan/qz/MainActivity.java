@@ -33,14 +33,6 @@ import com.bairock.zhongchuan.qz.view.fragment.FragmentVoiceUpload;
 import com.bairock.zhongchuan.qz.view.fragment.FragmentContact;
 import com.bairock.zhongchuan.qz.view.fragment.FragmentMsg;
 import com.bairock.zhongchuan.qz.view.fragment.FragmentVideoUpload;
-import com.easemob.EMConnectionListener;
-import com.easemob.EMError;
-import com.easemob.chat.CmdMessageBody;
-import com.easemob.chat.EMChatManager;
-import com.easemob.chat.EMConversation;
-import com.easemob.chat.EMMessage;
-import com.easemob.chat.EMMessage.ChatType;
-import com.easemob.util.EMLog;
 
 public class MainActivity extends FragmentActivity implements OnClickListener {
     private TextView txt_title;
@@ -69,8 +61,8 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
         initViews();
         initTabView();
         setOnListener();
-        initPopWindow();
-        initReceiver();
+//        initPopWindow();
+//        initReceiver();
 
         UserUtil.initUsers();
         MessageBroadcaster messageBroadcaster = new MessageBroadcaster();
@@ -240,7 +232,6 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
                     }, 3000);
                     break;
                 case 1:
-                    EMChatManager.getInstance().logout();// 退出环信聊天
                     App.getInstance2().exit();
                     finish();
                     overridePendingTransition(R.anim.push_up_in, R.anim.push_up_out);
@@ -334,50 +325,6 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
     }
 
     /**
-     * 连接监听listener
-     *
-     */
-    private class MyConnectionListener implements EMConnectionListener {
-
-        @Override
-        public void onConnected() {
-            runOnUiThread(new Runnable() {
-
-                @Override
-                public void run() {
-                    connectMsg = getString(R.string.message);
-                    txt_title.setText(connectMsg);
-                }
-            });
-        }
-
-        @Override
-        public void onDisconnected(final int error) {
-            connectMsg = "微信(未连接)";
-            txt_title.setText(connectMsg);
-            final String st1 = getResources().getString(
-                    R.string.Less_than_chat_server_connection);
-            final String st2 = getResources().getString(
-                    R.string.the_current_network);
-            runOnUiThread(new Runnable() {
-
-                @Override
-                public void run() {
-                    if (error == EMError.USER_REMOVED) {
-                        // 显示帐号已经被移除
-                        // showAccountRemovedDialog();
-                    } else if (error == EMError.CONNECTION_CONFLICT) {
-                        // 显示帐号在其他设备登陆dialog
-                        // showConflictDialog();
-                    } else {
-                    }
-                }
-
-            });
-        }
-    }
-
-    /**
      * 新消息广播接收者
      *
      *
@@ -390,18 +337,6 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
             String from = intent.getStringExtra("from");
             // 消息id
             String msgId = intent.getStringExtra("msgid");
-            EMMessage message = EMChatManager.getInstance().getMessage(msgId);
-            if (ChatActivity.activityInstance != null) {
-                if (message.getChatType() == ChatType.GroupChat) {
-                    if (message.getTo().equals(
-                            ChatActivity.activityInstance.getToChatUsername()))
-                        return;
-                } else {
-                    if (from.equals(ChatActivity.activityInstance
-                            .getToChatUsername()))
-                        return;
-                }
-            }
 
             // 注销广播接收者，否则在ChatActivity中会收到这个广播
             abortBroadcast();
@@ -417,76 +352,11 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
     }
 
     /**
-     * 消息回执BroadcastReceiver
-     */
-    private BroadcastReceiver ackMessageReceiver = new BroadcastReceiver() {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            abortBroadcast();
-            // 刷新bottom bar消息未读数
-            updateUnreadLabel();
-            String msgid = intent.getStringExtra("msgid");
-            String from = intent.getStringExtra("from");
-
-            EMConversation conversation = EMChatManager.getInstance()
-                    .getConversation(from);
-            if (conversation != null) {
-                // 把message设为已读
-                EMMessage msg = conversation.getMessage(msgid);
-
-                if (msg != null) {
-
-                    if (ChatActivity.activityInstance != null) {
-                        if (msg.getChatType() == ChatType.Chat) {
-                            if (from.equals(ChatActivity.activityInstance
-                                    .getToChatUsername()))
-                                return;
-                        }
-                    }
-
-                    msg.isAcked = true;
-                }
-            }
-        }
-    };
-
-    /**
-     * 透传消息BroadcastReceiver
-     */
-    private BroadcastReceiver cmdMessageReceiver = new BroadcastReceiver() {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            abortBroadcast();
-            // 刷新bottom bar消息未读数
-            updateUnreadLabel();
-            EMLog.d(TAG, "收到透传消息");
-            // 获取cmd message对象
-            String msgId = intent.getStringExtra("msgid");
-            EMMessage message = intent.getParcelableExtra("message");
-            // 获取消息body
-            CmdMessageBody cmdMsgBody = (CmdMessageBody) message.getBody();
-            String action = cmdMsgBody.action;// 获取自定义action
-
-            // 获取扩展属性 此处省略
-            // message.getStringAttribute("");
-            EMLog.d(TAG,
-                    String.format("透传消息：action:%s,message:%s", action,
-                            message.toString()));
-            String st9 = getResources().getString(
-                    R.string.receive_the_passthrough);
-            Toast.makeText(MainActivity.this, st9 + action, Toast.LENGTH_SHORT)
-                    .show();
-        }
-    };
-
-    /**
      * 获取未读消息数
      */
     public void updateUnreadLabel() {
         int count = 0;
-        count = EMChatManager.getInstance().getUnreadMsgsCount();
+//        count = EMChatManager.getInstance().getUnreadMsgsCount();
         if (count > 0) {
             unreaMsgdLabel.setText(String.valueOf(count));
             unreaMsgdLabel.setVisibility(View.VISIBLE);

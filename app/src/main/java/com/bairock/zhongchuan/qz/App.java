@@ -8,6 +8,7 @@ import java.util.List;
 
 import android.app.Activity;
 import android.app.ActivityManager;
+import android.app.Application;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -15,17 +16,9 @@ import android.content.pm.PackageManager;
 import android.os.Environment;
 import android.text.TextUtils;
 
-import com.baidu.frontia.FrontiaApplication;
 import com.bairock.zhongchuan.qz.view.ChatActivity;
-import com.easemob.chat.EMChat;
-import com.easemob.chat.EMChatManager;
-import com.easemob.chat.EMChatOptions;
-import com.easemob.chat.EMMessage;
-import com.easemob.chat.EMMessage.ChatType;
-import com.easemob.chat.OnMessageNotifyListener;
-import com.easemob.chat.OnNotificationClickListener;
 
-public class App extends FrontiaApplication {
+public class App extends Application {
 
 	private static Context _context;
 
@@ -33,12 +26,7 @@ public class App extends FrontiaApplication {
 	public void onCreate() {
 		super.onCreate();
 		_context = getApplicationContext();
-		initEMChat();
-		EMChat.getInstance().init(_context);
-		EMChat.getInstance().setDebugMode(true);
-		EMChat.getInstance().setAutoLogin(true);
-		EMChatManager.getInstance().getChatOptions().setUseRoster(true);
-		FrontiaApplication.initFrontiaApplication(this);
+//		initEMChat();
 		// CrashHandler crashHandler = CrashHandler.getInstance();// 全局异常捕捉
 		// crashHandler.init(_context);
 	}
@@ -50,53 +38,7 @@ public class App extends FrontiaApplication {
 				|| !processAppName.equalsIgnoreCase("com.juns.wechat")) {
 			return;
 		}
-		EMChatOptions options = EMChatManager.getInstance().getChatOptions();
-		// 获取到EMChatOptions对象
-		// 设置自定义的文字提示
-		options.setNotifyText(new OnMessageNotifyListener() {
 
-			@Override
-			public String onNewMessageNotify(EMMessage message) {
-				return "你的好友发来了一条消息哦";
-			}
-
-			@Override
-			public String onLatestMessageNotify(EMMessage message,
-					int fromUsersNum, int messageNum) {
-				return fromUsersNum + "个好友，发来了" + messageNum + "条消息";
-			}
-
-			@Override
-			public String onSetNotificationTitle(EMMessage arg0) {
-				return null;
-			}
-
-			@Override
-			public int onSetSmallIcon(EMMessage arg0) {
-				return 0;
-			}
-		});
-		options.setOnNotificationClickListener(new OnNotificationClickListener() {
-
-			@Override
-			public Intent onNotificationClick(EMMessage message) {
-				Intent intent = new Intent(_context, MainActivity.class);
-				ChatType chatType = message.getChatType();
-				if (chatType == ChatType.Chat) { // 单聊信息
-					intent.putExtra("userId", message.getFrom());
-					intent.putExtra("chatType", ChatActivity.CHATTYPE_SINGLE);
-				} else { // 群聊信息
-					// message.getTo()为群聊id
-					intent.putExtra("groupId", message.getTo());
-					intent.putExtra("chatType", ChatActivity.CHATTYPE_GROUP);
-				}
-				return intent;
-			}
-		});
-		// IntentFilter callFilter = new
-		// IntentFilter(EMChatManager.getInstance()
-		// .getIncomingCallBroadcastAction());
-		// registerReceiver(new CallReceiver(), callFilter);
 	}
 
 	private class CallReceiver extends BroadcastReceiver {

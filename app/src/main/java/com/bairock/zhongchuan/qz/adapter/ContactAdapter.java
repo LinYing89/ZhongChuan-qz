@@ -1,6 +1,5 @@
 package com.bairock.zhongchuan.qz.adapter;
 
-import java.util.Collections;
 import java.util.List;
 
 import android.content.Context;
@@ -15,8 +14,6 @@ import android.widget.TextView;
 
 import com.bairock.zhongchuan.qz.R;
 import com.bairock.zhongchuan.qz.bean.User;
-import com.bairock.zhongchuan.qz.common.PingYinUtil;
-import com.bairock.zhongchuan.qz.common.PinyinComparator;
 import com.bairock.zhongchuan.qz.common.ViewHolder;
 
 public class ContactAdapter extends BaseAdapter implements SectionIndexer {
@@ -59,9 +56,6 @@ public class ContactAdapter extends BaseAdapter implements SectionIndexer {
 		String catalog = "";
 		if (TextUtils.isEmpty(user.getUserName()))
 			catalog = "#";
-		else
-			catalog = PingYinUtil.converterToFirstSpell(user.getUserName())
-					.substring(0, 1);
 		if (position == 0) {
 			tvCatalog.setVisibility(View.VISIBLE);
 			tvCatalog.setText(catalog);
@@ -70,9 +64,6 @@ public class ContactAdapter extends BaseAdapter implements SectionIndexer {
 			String lastCatalog = "";
 			if (TextUtils.isEmpty(Nextuser.getUserName()))
 				lastCatalog = "#";
-			else
-				lastCatalog = PingYinUtil.converterToFirstSpell(
-						Nextuser.getUserName()).substring(0, 1);
 			if (catalog.equals(lastCatalog)) {
 				tvCatalog.setVisibility(View.GONE);
 			} else {
@@ -93,9 +84,6 @@ public class ContactAdapter extends BaseAdapter implements SectionIndexer {
 			String catalog = "";
 			if (TextUtils.isEmpty(user.getUserName()))
 				catalog = "#";
-			else
-				catalog = PingYinUtil.converterToFirstSpell(user.getUserName())
-						.substring(0, 1);
 			char firstChar = catalog.toUpperCase().charAt(0);
 			if (firstChar == section) {
 				return i;

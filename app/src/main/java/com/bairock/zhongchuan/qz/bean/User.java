@@ -2,15 +2,19 @@ package com.bairock.zhongchuan.qz.bean;
 
 import com.bairock.zhongchuan.qz.enums.UserStatus;
 
+import java.net.InetSocketAddress;
+
 public class User {
 	private String id;//
 	private String password;
 	private String number;
 	private String userName;// 用户名
 	private String headUrl;// 头像保存路径
-	private String location;// 位置信息
+	private Location location;// 位置信息
 	private String ip;
 	private UserStatus userStatus = UserStatus.ONLINE;
+
+	private InetSocketAddress inetSocketAddress;
 
 	public String getPassword() {
 		return password;
@@ -44,11 +48,11 @@ public class User {
 		this.headUrl = headUrl;
 	}
 
-	public String getLocation() {
+	public Location getLocation() {
 		return location;
 	}
 
-	public void setLocation(String location) {
+	public void setLocation(Location location) {
 		this.location = location;
 	}
 
@@ -74,5 +78,13 @@ public class User {
 
 	public void setUserStatus(UserStatus userStatus) {
 		this.userStatus = userStatus;
+	}
+
+	public InetSocketAddress getInetSocketAddress() {
+		return inetSocketAddress;
+	}
+
+	public void setInetSocketAddress(InetSocketAddress inetSocketAddress) {
+		this.inetSocketAddress = inetSocketAddress;
 	}
 }

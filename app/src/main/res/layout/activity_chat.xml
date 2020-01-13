@@ -5,6 +5,11 @@
     android:layout_height="match_parent"
     android:background="#f2f0eb" >
 
+
+    <include
+        android:id="@+id/top_bar"
+        layout="@layout/layout_title" />
+
     <LinearLayout
         android:id="@+id/bar_bottom"
         android:layout_width="match_parent"
@@ -184,6 +189,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@id/top_bar"
         android:layout_above="@id/bar_bottom"  >
 
         <ProgressBar
@@ -235,9 +241,5 @@
                 android:textSize="14sp" />
         </LinearLayout>
     </RelativeLayout>
-
-    <include
-        android:id="@+id/top_bar"
-        layout="@layout/layout_title" />
 
 </RelativeLayout>
