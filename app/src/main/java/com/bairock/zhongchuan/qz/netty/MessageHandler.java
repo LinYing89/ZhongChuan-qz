@@ -1,7 +1,9 @@
 package com.bairock.zhongchuan.qz.netty;
 
+import android.content.Intent;
 import android.util.Log;
 
+import com.bairock.zhongchuan.qz.App;
 import com.bairock.zhongchuan.qz.bean.MessageRoot;
 import com.bairock.zhongchuan.qz.bean.MessageRootType;
 import com.bairock.zhongchuan.qz.bean.ZCMessage;
@@ -26,9 +28,10 @@ public class MessageHandler extends SimpleChannelInboundHandler<MessageRoot<?>> 
                 MessageRoot<ZCMessage> messageRoot = (MessageRoot<ZCMessage>) msg;
                 messageRoot.getData().setDirect(ZCMessageDirect.RECEIVE);
                 ConversationUtil.addReceivedMessage(messageRoot);
+                Intent i = new Intent(ConversationUtil.CHAT_ACTION);
+                i.putExtra("from", msg.getFrom());
+                App.getInstance().sendBroadcast(i);
             }
-//            Intent i = new Intent(ConversationUtil.CHAT_ACTION);
-//            App.getInstance().sendBroadcast(i);
         }
         Gson gson = new Gson();
         String json = gson.toJson(msg);

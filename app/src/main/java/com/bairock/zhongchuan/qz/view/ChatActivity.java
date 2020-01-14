@@ -61,6 +61,7 @@ import com.bairock.zhongchuan.qz.bean.MessageRoot;
 import com.bairock.zhongchuan.qz.bean.ZCConversation;
 import com.bairock.zhongchuan.qz.bean.ZCMessage;
 import com.bairock.zhongchuan.qz.bean.ZCMessageType;
+import com.bairock.zhongchuan.qz.netty.MessageBroadcaster;
 import com.bairock.zhongchuan.qz.utils.CommonUtils;
 import com.bairock.zhongchuan.qz.utils.ConversationUtil;
 import com.bairock.zhongchuan.qz.common.Utils;
@@ -179,22 +180,22 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 		micImage = findViewById(R.id.mic_image);
 		animationDrawable = (AnimationDrawable) micImage.getBackground();
 		animationDrawable.setOneShot(false);
-		recordingHint = (TextView) findViewById(R.id.recording_hint);
-		listView = (ListView) findViewById(R.id.list);
-		mEditTextContent = (PasteEditText) findViewById(R.id.et_sendmessage);
+		recordingHint = findViewById(R.id.recording_hint);
+		listView = findViewById(R.id.list);
+		mEditTextContent = findViewById(R.id.et_sendmessage);
 		buttonSetModeKeyboard = findViewById(R.id.btn_set_mode_keyboard);
-		edittext_layout = (RelativeLayout) findViewById(R.id.edittext_layout);
+		edittext_layout = findViewById(R.id.edittext_layout);
 		buttonSetModeVoice = findViewById(R.id.btn_set_mode_voice);
 		buttonSend = findViewById(R.id.btn_send);
 		buttonPressToSpeak = findViewById(R.id.btn_press_to_speak);
-		expressionViewpager = (ViewPager) findViewById(R.id.vPager);
-		emojiIconContainer = (LinearLayout) findViewById(R.id.ll_face_container);
-		btnContainer = (LinearLayout) findViewById(R.id.ll_btn_container);
+		expressionViewpager = findViewById(R.id.vPager);
+		emojiIconContainer = findViewById(R.id.ll_face_container);
+		btnContainer = findViewById(R.id.ll_btn_container);
 		// locationImgview = (ImageView) findViewById(R.id.btn_location);
-		iv_emoticons_normal = (ImageView) findViewById(R.id.iv_emoticons_normal);
-		iv_emoticons_checked = (ImageView) findViewById(R.id.iv_emoticons_checked);
-		loadmorePB = (ProgressBar) findViewById(R.id.pb_load_more);
-		btnMore = (Button) findViewById(R.id.btn_more);
+		iv_emoticons_normal = findViewById(R.id.iv_emoticons_normal);
+		iv_emoticons_checked = findViewById(R.id.iv_emoticons_checked);
+		loadmorePB = findViewById(R.id.pb_load_more);
+		btnMore = findViewById(R.id.btn_more);
 		iv_emoticons_normal.setVisibility(View.VISIBLE);
 		iv_emoticons_checked.setVisibility(View.INVISIBLE);
 		more = findViewById(R.id.more);
@@ -586,9 +587,10 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 	 */
 	private void sendText(String content) {
 		if (content.length() > 0) {
-			MessageRoot<ZCMessage> messageRoot = ConversationUtil.createSendMessage(ZCMessageType.TXT, "8080", "8090");
-			messageRoot.getData().setContent("test");
+			MessageRoot<ZCMessage> messageRoot = ConversationUtil.createSendMessage(ZCMessageType.TXT, "8080", "8083");
+			messageRoot.getData().setContent(content);
 			conversation.addMessage(messageRoot);
+			MessageBroadcaster.send(messageRoot);
 			adapter.refresh();
 			listView.setSelection(listView.getCount() - 1);
 			mEditTextContent.setText("");
@@ -627,8 +629,10 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 	 */
 	private void sendPicture(final String filePath) {
 		String to = toChatUsername;
-		final MessageRoot<ZCMessage> message = ConversationUtil.createSendMessage(ZCMessageType.IMAGE, "8090", "8090");
+		final MessageRoot<ZCMessage> message = ConversationUtil.createSendMessage(ZCMessageType.IMAGE, "8080", "8083");
 		conversation.addMessage(message);
+		ConversationUtil.addSendMessage(message);
+		MessageBroadcaster.send(message);
 
 		listView.setAdapter(adapter);
 		adapter.refresh();
@@ -874,14 +878,14 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 
 			Log.e("ChatActivity", "receiver");
 			String username = intent.getStringExtra("from");
-			String msgid = intent.getStringExtra("msgid");
+//			String msgid = intent.getStringExtra("msgid");
 			// 收到这个广播的时候，message已经在db和内存里了，可以通过id获取mesage对象
 //			EMMessage message = EMChatManager.getInstance().getMessage(msgid);
-//			if (!username.equals(toChatUsername)) {
-//				// 消息不是发给当前会话，return
-//				// notifyNewMessage(message);
-//				return;
-//			}
+			if (!username.equals(toChatUsername)) {
+				// 消息不是发给当前会话，return
+				// notifyNewMessage(message);
+				return;
+			}
 			// 通知adapter有新消息，更新ui
 			adapter.refresh();
 			listView.setSelection(listView.getCount() - 1);

@@ -57,10 +57,10 @@
                 style="?android:attr/progressBarStyleSmall"
                 android:layout_width="28dp"
                 android:layout_height="28dp"
+                android:indeterminateBehavior="repeat"
                 android:indeterminateDrawable="@drawable/small_prograssbar"
-				android:indeterminateOnly="true"
-				android:indeterminateBehavior="repeat"
-                android:visibility="visible" />
+                android:indeterminateOnly="true"
+                android:visibility="gone" />
 
             <TextView
                 android:id="@+id/percentage"
@@ -68,7 +68,7 @@
                 android:layout_height="wrap_content"
                 android:text="0%"
                 android:textColor="@android:color/black"
-                android:visibility="visible" />
+                android:visibility="gone" />
         </LinearLayout>
 
         <ImageView

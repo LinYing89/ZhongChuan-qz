@@ -90,7 +90,7 @@
     <color name="sunday_saturday_color">#ffff0000</color>
     <color name="sunday_saturday_prev_next_month_day_color">#ff990000</color>
     <color name="bgcolor">#ffffffff</color>
-    <color name="txtcolor">#ff000000</color>
+    <color name="txtcolor">#000000</color>
     <color name="Calendar_WeekBgColor">#ffefe7de</color>
     <color name="Calendar_WeekFontColor">#ff8c8a8c</color>
     <color name="Calendar_DayBgColor">#fff7f7f7</color>

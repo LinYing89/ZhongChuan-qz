@@ -16,7 +16,7 @@ public class HeartThread extends Thread {
     public void run() {
         while (!interrupted()) {
             chatTest();
-
+            heartTest();
             try {
                 sleep(3000);
             } catch (InterruptedException e) {
@@ -27,13 +27,19 @@ public class HeartThread extends Thread {
 
     private void heartTest() {
         MessageRoot<Location> messageRoot = new MessageRoot<>();
-        messageRoot.setFrom("8080");
+        messageRoot.setFrom("8083");
         messageRoot.setTo("0");
         messageRoot.setType(MessageRootType.HEART);
         messageRoot.setMsgId(UUID.randomUUID().toString());
         messageRoot.setTime(new Date().getTime());
 
-        Location location = new Location(119.23117988388064, 34.60552436039501);
+        double lng = 0;
+        if(i == 0){
+            lng = 119.25745697692036;
+        }else {
+            lng = 119.25945697692036;
+        }
+        Location location = new Location(lng, 34.73371279664106);
         messageRoot.setData(location);
 //            messageRoot.setData(new byte[]{0, 1, 0, 1});
         messageRoot.setData(location);

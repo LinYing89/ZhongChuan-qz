@@ -1,5 +1,7 @@
 package com.bairock.zhongchuan.qz.bean;
 
+import com.amap.api.maps.model.LatLng;
+import com.amap.api.maps.model.Marker;
 import com.bairock.zhongchuan.qz.enums.UserStatus;
 
 import java.net.InetSocketAddress;
@@ -13,6 +15,7 @@ public class User {
 	private Location location;// 位置信息
 	private String ip;
 	private UserStatus userStatus = UserStatus.ONLINE;
+	private Marker marker;
 
 	private InetSocketAddress inetSocketAddress;
 
@@ -54,6 +57,9 @@ public class User {
 
 	public void setLocation(Location location) {
 		this.location = location;
+		if(null != marker){
+			marker.setPosition(new LatLng(location.getLat(), location.getLng()));
+		}
 	}
 
 	public String getId() {
@@ -86,5 +92,13 @@ public class User {
 
 	public void setInetSocketAddress(InetSocketAddress inetSocketAddress) {
 		this.inetSocketAddress = inetSocketAddress;
+	}
+
+	public Marker getMarker() {
+		return marker;
+	}
+
+	public void setMarker(Marker marker) {
+		this.marker = marker;
 	}
 }

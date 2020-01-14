@@ -21,14 +21,12 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.bairock.zhongchuan.qz.bean.User;
 import com.bairock.zhongchuan.qz.common.Utils;
 import com.bairock.zhongchuan.qz.dialog.ActionItem;
 import com.bairock.zhongchuan.qz.dialog.TitlePopup;
 import com.bairock.zhongchuan.qz.netty.MessageBroadcaster;
 import com.bairock.zhongchuan.qz.utils.HeartThread;
 import com.bairock.zhongchuan.qz.utils.UserUtil;
-import com.bairock.zhongchuan.qz.view.ChatActivity;
 import com.bairock.zhongchuan.qz.view.fragment.FragmentVoiceUpload;
 import com.bairock.zhongchuan.qz.view.fragment.FragmentContact;
 import com.bairock.zhongchuan.qz.view.fragment.FragmentMsg;

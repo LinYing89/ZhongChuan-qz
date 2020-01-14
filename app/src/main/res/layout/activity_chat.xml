@@ -92,10 +92,11 @@
                     android:maxLines="3"
                     android:minHeight="40dp"
                     android:onClick="editClick"
-                    android:paddingBottom="3dp"
                     android:paddingLeft="1dp"
-                    android:paddingRight="1dp"
                     android:paddingTop="3dp"
+                    android:paddingRight="1dp"
+                    android:paddingBottom="3dp"
+                    android:textColor="@color/txtcolor"
                     android:textSize="18sp" />
 
                 <ImageView
