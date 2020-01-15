@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.bairock.zhongchuan.qz">
 
+    <permission android:protectionLevel="normal" android:name="qz.permission.MY_BROADCAST_PERMISSION"/>
+
+    <uses-permission android:name="qz.permission.MY_BROADCAST_PERMISSION"/>
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />

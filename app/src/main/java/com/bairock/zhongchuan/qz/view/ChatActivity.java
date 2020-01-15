@@ -65,6 +65,8 @@ import com.bairock.zhongchuan.qz.netty.MessageBroadcaster;
 import com.bairock.zhongchuan.qz.utils.CommonUtils;
 import com.bairock.zhongchuan.qz.utils.ConversationUtil;
 import com.bairock.zhongchuan.qz.common.Utils;
+import com.bairock.zhongchuan.qz.utils.FileUtil;
+import com.bairock.zhongchuan.qz.utils.UserUtil;
 import com.bairock.zhongchuan.qz.widght.PasteEditText;
 
 //聊天页面
@@ -628,11 +630,14 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 	 * @param filePath
 	 */
 	private void sendPicture(final String filePath) {
-		String to = toChatUsername;
-		final MessageRoot<ZCMessage> message = ConversationUtil.createSendMessage(ZCMessageType.IMAGE, "8080", "8083");
-		conversation.addMessage(message);
-		ConversationUtil.addSendMessage(message);
-		MessageBroadcaster.send(message);
+		final MessageRoot<ZCMessage> messageRoot = ConversationUtil.createSendMessage(ZCMessageType.IMAGE, UserUtil.user.getNumber(), toChatUsername);
+		ZCMessage message = messageRoot.getData();
+		message.setContent(filePath);
+		byte[] bytes = FileUtil.getImageStream(filePath);
+		message.setStream(bytes);
+		conversation.addMessage(messageRoot);
+		ConversationUtil.addSendMessage(messageRoot);
+		MessageBroadcaster.send(messageRoot);
 
 		listView.setAdapter(adapter);
 		adapter.refresh();
@@ -889,7 +894,6 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 			// 通知adapter有新消息，更新ui
 			adapter.refresh();
 			listView.setSelection(listView.getCount() - 1);
-
 		}
 	}
 

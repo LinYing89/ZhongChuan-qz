@@ -7,6 +7,7 @@ public class ZCMessage {
 
     //消息内容, 如果是文件, 则为文件路径
     private String content;
+    private byte[] stream;
     private boolean unread;
     //消息类型
     private ZCMessageType messageType;
@@ -43,5 +44,13 @@ public class ZCMessage {
 
     public void setDirect(ZCMessageDirect direct) {
         this.direct = direct;
+    }
+
+    public byte[] getStream() {
+        return stream;
+    }
+
+    public void setStream(byte[] stream) {
+        this.stream = stream;
     }
 }

@@ -27,7 +27,7 @@ public class HeartThread extends Thread {
 
     private void heartTest() {
         MessageRoot<Location> messageRoot = new MessageRoot<>();
-        messageRoot.setFrom("8083");
+        messageRoot.setFrom("8080");
         messageRoot.setTo("0");
         messageRoot.setType(MessageRootType.HEART);
         messageRoot.setMsgId(UUID.randomUUID().toString());
@@ -61,7 +61,7 @@ public class HeartThread extends Thread {
     private void sendSendMessageTest() {
         MessageRoot<ZCMessage> messageRoot = new MessageRoot<>();
         messageRoot.setFrom("8080");
-        messageRoot.setTo("8083");
+        messageRoot.setTo("8080");
         messageRoot.setType(MessageRootType.CHAT);
         messageRoot.setMsgId(UUID.randomUUID().toString());
         messageRoot.setTime(new Date().getTime());
@@ -75,7 +75,7 @@ public class HeartThread extends Thread {
 
     private void sendReceiveMessageTest() {
         MessageRoot<ZCMessage> messageRoot = new MessageRoot<>();
-        messageRoot.setFrom("8083");
+        messageRoot.setFrom("8080");
         messageRoot.setTo("8080");
         messageRoot.setType(MessageRootType.CHAT);
         messageRoot.setMsgId(UUID.randomUUID().toString());

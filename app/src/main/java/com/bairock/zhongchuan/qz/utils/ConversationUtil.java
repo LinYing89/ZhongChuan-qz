@@ -16,6 +16,7 @@ import java.util.UUID;
 public class ConversationUtil {
 
     public static String CHAT_ACTION = "com.bairock.zhongchuan.qz.chat";
+    public static String CHAT_BROADCAST_PERMISSION = "qz.permission.MY_BROADCAST_PERMISSION";
 
     public static ZCConversation activeConversation = null;
 

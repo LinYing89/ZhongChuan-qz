@@ -28,9 +28,10 @@ public class MessageHandler extends SimpleChannelInboundHandler<MessageRoot<?>> 
                 MessageRoot<ZCMessage> messageRoot = (MessageRoot<ZCMessage>) msg;
                 messageRoot.getData().setDirect(ZCMessageDirect.RECEIVE);
                 ConversationUtil.addReceivedMessage(messageRoot);
+
                 Intent i = new Intent(ConversationUtil.CHAT_ACTION);
                 i.putExtra("from", msg.getFrom());
-                App.getInstance().sendBroadcast(i);
+                App.getInstance().sendOrderedBroadcast(i, ConversationUtil.CHAT_BROADCAST_PERMISSION);
             }
         }
         Gson gson = new Gson();
