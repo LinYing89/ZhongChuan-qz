@@ -41,6 +41,7 @@ public class MessageDecoder extends MessageToMessageDecoder<DatagramPacket> {
                 MessageRoot<Location> zcMessage = gson.fromJson(strMsg, type);
                 UserUtil.setHeartInfo(msg.sender(), zcMessage);
                 out.add(zcMessage);
+//                Log.e("MessageDecoder", msg.sender().toString());
                 break;
             }
             case "CHAT": {
@@ -51,16 +52,16 @@ public class MessageDecoder extends MessageToMessageDecoder<DatagramPacket> {
                 break;
             }
             case "VIDEO": {
-                Type type = new TypeToken<MessageRoot<byte[]>>() {
-                }.getType();
-                MessageRoot<byte[]> zcMessage = gson.fromJson(strMsg, type);
-                out.add(zcMessage);
-                break;
+//                Type type = new TypeToken<MessageRoot<byte[]>>() {
+//                }.getType();
+//                MessageRoot<byte[]> zcMessage = gson.fromJson(strMsg, type);
+//                out.add(zcMessage);
+//                break;
             }
             default:
                 out.add(null);
                 break;
         }
-        Log.e("MessageDecoder", msg.sender().toString());
+
     }
 }

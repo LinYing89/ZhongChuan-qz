@@ -66,6 +66,7 @@ import com.bairock.zhongchuan.qz.utils.CommonUtils;
 import com.bairock.zhongchuan.qz.utils.ConversationUtil;
 import com.bairock.zhongchuan.qz.common.Utils;
 import com.bairock.zhongchuan.qz.utils.FileUtil;
+import com.bairock.zhongchuan.qz.utils.TcpClientUtil;
 import com.bairock.zhongchuan.qz.utils.UserUtil;
 import com.bairock.zhongchuan.qz.widght.PasteEditText;
 
@@ -589,10 +590,11 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 	 */
 	private void sendText(String content) {
 		if (content.length() > 0) {
-			MessageRoot<ZCMessage> messageRoot = ConversationUtil.createSendMessage(ZCMessageType.TXT, "8080", "8083");
+			MessageRoot<ZCMessage> messageRoot = ConversationUtil.createSendMessage(ZCMessageType.TXT, UserUtil.user.getUsername(), toChatUsername);
 			messageRoot.getData().setContent(content);
 			conversation.addMessage(messageRoot);
-			MessageBroadcaster.send(messageRoot);
+			TcpClientUtil.send(messageRoot);
+//			MessageBroadcaster.send(messageRoot);
 			adapter.refresh();
 			listView.setSelection(listView.getCount() - 1);
 			mEditTextContent.setText("");
@@ -630,14 +632,15 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 	 * @param filePath
 	 */
 	private void sendPicture(final String filePath) {
-		final MessageRoot<ZCMessage> messageRoot = ConversationUtil.createSendMessage(ZCMessageType.IMAGE, UserUtil.user.getNumber(), toChatUsername);
+		final MessageRoot<ZCMessage> messageRoot = ConversationUtil.createSendMessage(ZCMessageType.IMAGE, UserUtil.user.getUsername(), toChatUsername);
 		ZCMessage message = messageRoot.getData();
 		message.setContent(filePath);
 		byte[] bytes = FileUtil.getImageStream(filePath);
 		message.setStream(bytes);
 		conversation.addMessage(messageRoot);
 		ConversationUtil.addSendMessage(messageRoot);
-		MessageBroadcaster.send(messageRoot);
+		TcpClientUtil.send(messageRoot);
+//		MessageBroadcaster.send(messageRoot);
 
 		listView.setAdapter(adapter);
 		adapter.refresh();

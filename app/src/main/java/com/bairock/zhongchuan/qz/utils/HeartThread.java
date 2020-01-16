@@ -49,12 +49,13 @@ public class HeartThread extends Thread {
     private int i = 0;
 
     private void chatTest() {
+        sendSendMessageTest();
         if (i == 0) {
             i = 1;
-            sendSendMessageTest();
+//            sendSendMessageTest();
         } else {
             i = 0;
-            sendReceiveMessageTest();
+//            sendReceiveMessageTest();
         }
     }
 
@@ -69,7 +70,8 @@ public class HeartThread extends Thread {
         message.setMessageType(ZCMessageType.TXT);
         message.setContent("test send");
         messageRoot.setData(message);
-        MessageBroadcaster.send(messageRoot);
+        TcpClientUtil.send(messageRoot);
+//        MessageBroadcaster.send(messageRoot);
         ConversationUtil.addSendMessage(messageRoot);
     }
 

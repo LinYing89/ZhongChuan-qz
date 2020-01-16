@@ -19,24 +19,24 @@ public class MessageHandler extends SimpleChannelInboundHandler<MessageRoot<?>> 
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, MessageRoot<?> msg) {
-        if(msg == null || (!msg.getTo().equals("0") && !msg.getTo().equals(UserUtil.user.getNumber()))){
+        if(msg == null || (!msg.getTo().equals("0") && !msg.getTo().equals(UserUtil.user.getUsername()))){
             return;
         }
 
-        if(msg.getType() == MessageRootType.CHAT){
-            if(msg.getTo().equals(UserUtil.user.getNumber())) {
-                MessageRoot<ZCMessage> messageRoot = (MessageRoot<ZCMessage>) msg;
-                messageRoot.getData().setDirect(ZCMessageDirect.RECEIVE);
-                ConversationUtil.addReceivedMessage(messageRoot);
-
-                Intent i = new Intent(ConversationUtil.CHAT_ACTION);
-                i.putExtra("from", msg.getFrom());
-                App.getInstance().sendOrderedBroadcast(i, ConversationUtil.CHAT_BROADCAST_PERMISSION);
-            }
-        }
-        Gson gson = new Gson();
-        String json = gson.toJson(msg);
-        Log.e("MessageHandler", json);
+//        if(msg.getType() == MessageRootType.CHAT){
+//            if(msg.getTo().equals(UserUtil.user.getUsername())) {
+//                MessageRoot<ZCMessage> messageRoot = (MessageRoot<ZCMessage>) msg;
+//                messageRoot.getData().setDirect(ZCMessageDirect.RECEIVE);
+//                ConversationUtil.addReceivedMessage(messageRoot);
+//
+//                Intent i = new Intent(ConversationUtil.CHAT_ACTION);
+//                i.putExtra("from", msg.getFrom());
+//                App.getInstance().sendOrderedBroadcast(i, ConversationUtil.CHAT_BROADCAST_PERMISSION);
+//            }
+//        }
+//        Gson gson = new Gson();
+//        String json = gson.toJson(msg);
+//        Log.e("MessageHandler", json);
     }
 
     @Override

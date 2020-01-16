@@ -54,7 +54,7 @@ public class ContactAdapter extends BaseAdapter implements SectionIndexer {
 				R.id.contactitem_catalog);
 		TextView tvNick = ViewHolder.get(convertView, R.id.contactitem_nick);
 		String catalog = "";
-		if (TextUtils.isEmpty(user.getUserName()))
+		if (TextUtils.isEmpty(user.getRealName()))
 			catalog = "#";
 		if (position == 0) {
 			tvCatalog.setVisibility(View.VISIBLE);
@@ -62,7 +62,7 @@ public class ContactAdapter extends BaseAdapter implements SectionIndexer {
 		} else {
 			User Nextuser = UserInfos.get(position - 1);
 			String lastCatalog = "";
-			if (TextUtils.isEmpty(Nextuser.getUserName()))
+			if (TextUtils.isEmpty(Nextuser.getRealName()))
 				lastCatalog = "#";
 			if (catalog.equals(lastCatalog)) {
 				tvCatalog.setVisibility(View.GONE);
@@ -73,7 +73,7 @@ public class ContactAdapter extends BaseAdapter implements SectionIndexer {
 		}
 
 		ivAvatar.setImageResource(R.drawable.head);
-		tvNick.setText(user.getUserName());
+		tvNick.setText(user.getRealName());
 		return convertView;
 	}
 
@@ -82,7 +82,7 @@ public class ContactAdapter extends BaseAdapter implements SectionIndexer {
 		for (int i = 0; i < UserInfos.size(); i++) {
 			User user = UserInfos.get(i);
 			String catalog = "";
-			if (TextUtils.isEmpty(user.getUserName()))
+			if (TextUtils.isEmpty(user.getRealName()))
 				catalog = "#";
 			char firstChar = catalog.toUpperCase().charAt(0);
 			if (firstChar == section) {

@@ -57,21 +57,21 @@ public class ZCConversation {
     }
 
     public void addMessage(MessageRoot<ZCMessage> message) {
-        if (this.messages.size() > 0) {
-            MessageRoot messageLast = this.messages.get(this.messages.size() - 1);
-            if (message.getMsgId() != null && messageLast.getMsgId() != null && message.getMsgId().equals(messageLast.getMsgId())) {
-                return;
-            }
-        }
+//        if (this.messages.size() > 0) {
+//            MessageRoot messageLast = this.messages.get(this.messages.size() - 1);
+//            if (message.getMsgId() != null && messageLast.getMsgId() != null && message.getMsgId().equals(messageLast.getMsgId())) {
+//                return;
+//            }
+//        }
 
         boolean haved = false;
 
-        for (MessageRoot zcMessage : messages) {
-            if (zcMessage.getMsgId().equals(message.getMsgId())) {
-                haved = true;
-                break;
-            }
-        }
+//        for (MessageRoot zcMessage : messages) {
+//            if (zcMessage.getMsgId().equals(message.getMsgId())) {
+//                haved = true;
+//                break;
+//            }
+//        }
 
         if (!haved) {
             this.messages.add(message);

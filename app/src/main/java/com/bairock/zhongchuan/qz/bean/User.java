@@ -9,8 +9,8 @@ import java.net.InetSocketAddress;
 public class User {
 	private String id;//
 	private String password;
-	private String number;
-	private String userName;// 用户名
+	private String username;
+	private String realName;// 用户名
 	private String headUrl;// 头像保存路径
 	private Location location;// 位置信息
 	private String ip;
@@ -27,20 +27,20 @@ public class User {
 		this.password = password;
 	}
 
-	public String getNumber() {
-		return number;
+	public String getUsername() {
+		return username;
 	}
 
-	public void setNumber(String number) {
-		this.number = number;
+	public void setUsername(String username) {
+		this.username = username;
 	}
 
-	public String getUserName() {
-		return userName;
+	public String getRealName() {
+		return realName;
 	}
 
-	public void setUserName(String userName) {
-		this.userName = userName;
+	public void setRealName(String realName) {
+		this.realName = realName;
 	}
 
 	public String getHeadUrl() {

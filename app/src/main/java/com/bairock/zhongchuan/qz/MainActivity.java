@@ -30,6 +30,7 @@ import com.bairock.zhongchuan.qz.common.Utils;
 import com.bairock.zhongchuan.qz.dialog.ActionItem;
 import com.bairock.zhongchuan.qz.dialog.TitlePopup;
 import com.bairock.zhongchuan.qz.netty.MessageBroadcaster;
+import com.bairock.zhongchuan.qz.netty.TcpServer;
 import com.bairock.zhongchuan.qz.utils.HeartThread;
 import com.bairock.zhongchuan.qz.utils.UserUtil;
 import com.bairock.zhongchuan.qz.view.fragment.FragmentVoiceUpload;
@@ -72,6 +73,11 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
         messageBroadcaster.bind();
 
         new HeartThread().start();
+        try {
+            new TcpServer().run();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
 
         if (Build.VERSION.SDK_INT >= 23) {
