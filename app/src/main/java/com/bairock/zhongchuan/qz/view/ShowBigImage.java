@@ -45,10 +45,6 @@ public class ShowBigImage extends BaseActivity {
 		loadLocalPb = (ProgressBar) findViewById(R.id.pb_load_local);
 		default_res = getIntent().getIntExtra("default_image", R.drawable.head);
 		Uri uri = getIntent().getParcelableExtra("uri");
-		String remotepath = getIntent().getExtras().getString("remotepath");
-		String secret = getIntent().getExtras().getString("secret");
-		System.err.println("show big image uri:" + uri + " remotepath:"
-				+ remotepath);
 
 		// 本地存在，直接显示本地的图片
 		if (uri != null && new File(uri.getPath()).exists()) {
@@ -58,15 +54,8 @@ public class ShowBigImage extends BaseActivity {
 			// int screenWidth = metrics.widthPixels;
 			// int screenHeight =metrics.heightPixels;
 			bitmap = ImageCache.getInstance().get(uri.getPath());
-			if (bitmap == null) {
-			} else {
+			if (bitmap != null) {
 				image.setImageBitmap(bitmap);
-			}
-		} else if (remotepath != null) { // 去服务器下载图片
-			System.err.println("download remote image");
-			Map<String, String> maps = new HashMap<String, String>();
-			if (!TextUtils.isEmpty(secret)) {
-				maps.put("share-secret", secret);
 			}
 		} else {
 			image.setImageResource(default_res);

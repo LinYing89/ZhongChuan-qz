@@ -1,5 +1,7 @@
 package com.bairock.zhongchuan.qz.utils;
 
+import android.os.Environment;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -56,6 +58,62 @@ public class FileUtil {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+            }
+        }
+    }
+
+    public static String getSDPath(){
+        File sdDir = null;
+        boolean sdCardExist = Environment.getExternalStorageState()
+                .equals(Environment.MEDIA_MOUNTED);
+        if (sdCardExist) {
+            sdDir = Environment.getExternalStorageDirectory();
+            return sdDir.toString() + File.separator;
+        }
+        return null;
+    }
+
+    public static String getZhongchuanPath(){
+        String sdDir = getSDPath();
+        String zhiboFilePath = null;
+        if(null != sdDir){
+            zhiboFilePath = sdDir+"zhongchuan" + File.separator;
+        }
+        return zhiboFilePath;
+    }
+
+    public static String getPolicePath(){
+        String sdDir = getZhongchuanPath();
+        String policePath = null;
+        if(null != sdDir){
+            String policeNum;
+            if(UserUtil.user.getUsername() != null && !UserUtil.user.getUsername().isEmpty()){
+                policeNum = UserUtil.user.getUsername();
+            }else{
+                policeNum = "0000";
+            }
+            policePath = sdDir+ policeNum+ File.separator;
+        }
+        return policePath;
+    }
+
+    public static String getSubPolicePath(){
+        String policePath = null;
+            String policeNum;
+            if(UserUtil.user.getUsername() != null && !UserUtil.user.getUsername().isEmpty()){
+                policeNum = UserUtil.user.getUsername();
+            }else{
+                policeNum = "0000";
+            }
+            policePath = "zhongchuan" + File.separator + policeNum + File.separator;
+        return policePath;
+    }
+
+    public static void createPolicePath(){
+        if(UserUtil.user.getUsername() != null && !UserUtil.user.getUsername().isEmpty()){
+            File policeFile = new File(getPolicePath());
+            if(!policeFile.exists()){
+                policeFile.mkdirs();
             }
         }
     }

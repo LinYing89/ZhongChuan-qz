@@ -51,6 +51,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
 import androidx.viewpager.widget.ViewPager;
 
 import com.bairock.zhongchuan.qz.Constants;
@@ -538,12 +539,19 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 			return;
 		}
 
-//		cameraFile = new File(PathUtil.getInstance().getImagePath(), "Walk"
-//				+ System.currentTimeMillis() + ".jpg");
+		cameraFile = new File(FileUtil.getSDPath(), FileUtil.getSubPolicePath()
+				+ System.currentTimeMillis() + ".jpg");
 		cameraFile.getParentFile().mkdirs();
+        Uri uri;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            String authority = "com.bairock.zhongchuan.qz.fileprovider"; //【清单文件中provider的authorities属性的值】
+            uri = FileProvider.getUriForFile(this, authority, cameraFile);
+        } else {
+            uri = Uri.fromFile(cameraFile);
+        }
 		startActivityForResult(
 				new Intent(MediaStore.ACTION_IMAGE_CAPTURE).putExtra(
-						MediaStore.EXTRA_OUTPUT, Uri.fromFile(cameraFile)),
+						MediaStore.EXTRA_OUTPUT, uri),
 				REQUEST_CODE_CAMERA);
 	}
 
@@ -552,16 +560,20 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 	 */
 	private void selectFileFromLocal() {
 		Intent intent = null;
-		if (Build.VERSION.SDK_INT < 19) {
-			intent = new Intent(Intent.ACTION_GET_CONTENT);
-			intent.setType("*/*");
-			intent.addCategory(Intent.CATEGORY_OPENABLE);
+//		if (Build.VERSION.SDK_INT < 19) {
+//			intent = new Intent(Intent.ACTION_GET_CONTENT);
+//			intent.setType("*/*");
+//			intent.addCategory(Intent.CATEGORY_OPENABLE);
+//            intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
 
-		} else {
-			intent = new Intent(
-					Intent.ACTION_PICK,
-					MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-		}
+//		} else {
+//			intent = new Intent(
+//					Intent.ACTION_PICK,
+//					MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+//		}
+        intent = new Intent(
+                Intent.ACTION_PICK,
+                MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
 		startActivityForResult(intent, REQUEST_CODE_SELECT_FILE);
 	}
 
@@ -637,9 +649,9 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 		message.setContent(filePath);
 		byte[] bytes = FileUtil.getImageStream(filePath);
 		message.setStream(bytes);
-		conversation.addMessage(messageRoot);
-		ConversationUtil.addSendMessage(messageRoot);
+//		conversation.addMessage(messageRoot);
 		TcpClientUtil.send(messageRoot);
+		ConversationUtil.addSendMessage(messageRoot);
 //		MessageBroadcaster.send(messageRoot);
 
 		listView.setAdapter(adapter);
@@ -736,16 +748,19 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 	private void sendFile(Uri uri) {
 		String filePath = null;
 		if ("content".equalsIgnoreCase(uri.getScheme())) {
-			String[] projection = { "_data" };
-			Cursor cursor = null;
+			String[] projection = {MediaStore.Images.Media.DATA};
+			Cursor cursor;
 
 			try {
 				cursor = getContentResolver().query(uri, projection, null,
 						null, null);
-				int column_index = cursor.getColumnIndexOrThrow("_data");
-				if (cursor.moveToFirst()) {
-					filePath = cursor.getString(column_index);
-				}
+                if (cursor != null) {
+                    int column_index = cursor.getColumnIndex(MediaStore.Images.Media.DATA);
+                    if (cursor.moveToFirst()) {
+                        filePath = cursor.getString(column_index);
+                    }
+                    cursor.close();
+                }
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -753,7 +768,7 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 			filePath = uri.getPath();
 		}
 		File file = new File(filePath);
-		if (file == null || !file.exists()) {
+		if (!file.exists()) {
 			String st7 = getResources().getString(R.string.File_does_not_exist);
 			Toast.makeText(getApplicationContext(), st7, Toast.LENGTH_LONG).show();
 			return;
@@ -766,12 +781,18 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 		}
 
 		// 创建一个文件消息
-		final MessageRoot<ZCMessage> message = ConversationUtil.createSendMessage(ZCMessageType.FILE, "8090", "8090");
-		conversation.addMessage(message);
+		final MessageRoot<ZCMessage> messageRoot = ConversationUtil.createSendMessage(ZCMessageType.VIDEO, UserUtil.user.getUsername(), toChatUsername);
+        ZCMessage message = messageRoot.getData();
+        message.setContent(filePath);
+        byte[] bytes = FileUtil.getImageStream(filePath);
+        message.setStream(bytes);
+        TcpClientUtil.send(messageRoot);
+		conversation.addMessage(messageRoot);
 		listView.setAdapter(adapter);
 		adapter.refresh();
 		listView.setSelection(listView.getCount() - 1);
 		setResult(RESULT_OK);
+
 	}
 
 	/**
@@ -1037,15 +1058,6 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 	}
 
 	/**
-	 * 返回
-	 * 
-	 * @param view
-	 */
-	public void back(View view) {
-		finish();
-	}
-
-	/**
 	 * 覆盖手机返回键
 	 */
 	@Override
@@ -1128,9 +1140,4 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 		}
 
 	}
-
-	public String getToChatUsername() {
-		return toChatUsername;
-	}
-
 }

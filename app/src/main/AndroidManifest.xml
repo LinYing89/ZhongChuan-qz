@@ -2,9 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.bairock.zhongchuan.qz">
 
-    <permission android:protectionLevel="normal" android:name="qz.permission.MY_BROADCAST_PERMISSION"/>
+    <permission
+        android:name="qz.permission.MY_BROADCAST_PERMISSION"
+        android:protectionLevel="normal" />
 
-    <uses-permission android:name="qz.permission.MY_BROADCAST_PERMISSION"/>
+    <uses-permission android:name="qz.permission.MY_BROADCAST_PERMISSION" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
@@ -37,16 +39,28 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
+        android:name=".App"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:name=".App"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".view.activity.SettingsActivity"
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.bairock.zhongchuan.qz.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
+        <activity
+            android:name=".view.activity.SettingsActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat"/>
+            android:theme="@style/Theme.AppCompat" />
         <activity
             android:name=".view.activity.VoiceUploadActivity"
             android:screenOrientation="portrait"
@@ -80,6 +94,9 @@
             android:name=".view.ChatActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat" />
+        <activity
+            android:name=".view.ShowBigImage"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

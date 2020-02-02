@@ -16,7 +16,7 @@ import android.content.pm.PackageManager;
 import android.os.Environment;
 import android.text.TextUtils;
 
-import com.bairock.zhongchuan.qz.view.ChatActivity;
+import com.bairock.zhongchuan.qz.utils.FileUtil;
 
 public class App extends Application {
 

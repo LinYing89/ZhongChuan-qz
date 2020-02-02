@@ -4,17 +4,22 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.bairock.zhongchuan.qz.App;
+import com.bairock.zhongchuan.qz.adapter.MessageAdapter;
 import com.bairock.zhongchuan.qz.bean.MessageRoot;
 import com.bairock.zhongchuan.qz.bean.MessageRootType;
 import com.bairock.zhongchuan.qz.bean.ZCMessage;
 import com.bairock.zhongchuan.qz.bean.ZCMessageDirect;
+import com.bairock.zhongchuan.qz.bean.ZCMessageType;
 import com.bairock.zhongchuan.qz.utils.ConversationUtil;
+import com.bairock.zhongchuan.qz.utils.FileUtil;
 import com.bairock.zhongchuan.qz.utils.UserUtil;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
+import java.util.Date;
+import java.util.UUID;
 
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
@@ -48,6 +53,14 @@ public class TcpClientHandler extends ChannelInboundHandlerAdapter {
         if(messageRoot.getType() == MessageRootType.CHAT){
             if(messageRoot.getTo().equals(UserUtil.user.getUsername())) {
                 messageRoot.getData().setDirect(ZCMessageDirect.RECEIVE);
+                ZCMessage message = messageRoot.getData();
+                if(message.getMessageType() == ZCMessageType.IMAGE){
+                    String flePath =  message.getContent();
+                    String appPath = App.getInstance().getFilesDir().getAbsolutePath();
+                    String newPath = appPath + MessageAdapter.IMAGE_DIR + new Date().getTime() + flePath.substring(flePath.lastIndexOf("."));
+                    FileUtil.readBin2Image(message.getStream(), newPath);
+                    message.setStream(null);
+                }
                 ConversationUtil.addReceivedMessage(messageRoot);
 
                 Intent i = new Intent(ConversationUtil.CHAT_ACTION);

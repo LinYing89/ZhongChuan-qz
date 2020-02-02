@@ -31,6 +31,7 @@ import com.bairock.zhongchuan.qz.dialog.ActionItem;
 import com.bairock.zhongchuan.qz.dialog.TitlePopup;
 import com.bairock.zhongchuan.qz.netty.MessageBroadcaster;
 import com.bairock.zhongchuan.qz.netty.TcpServer;
+import com.bairock.zhongchuan.qz.utils.FileUtil;
 import com.bairock.zhongchuan.qz.utils.HeartThread;
 import com.bairock.zhongchuan.qz.utils.UserUtil;
 import com.bairock.zhongchuan.qz.view.fragment.FragmentVoiceUpload;
@@ -79,6 +80,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
             e.printStackTrace();
         }
 
+        FileUtil.createPolicePath();
 
         if (Build.VERSION.SDK_INT >= 23) {
             int REQUEST_CODE_CONTACT = 101;
@@ -92,9 +94,9 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
             }
         }
 
-//        if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-//            ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},200);
-//        }
+        if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.CAMERA},200);
+        }
 
         if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 || ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED

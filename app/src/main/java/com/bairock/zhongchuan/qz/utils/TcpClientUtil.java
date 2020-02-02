@@ -3,6 +3,7 @@ package com.bairock.zhongchuan.qz.utils;
 import com.bairock.zhongchuan.qz.bean.MessageRoot;
 import com.bairock.zhongchuan.qz.bean.User;
 import com.bairock.zhongchuan.qz.bean.ZCMessage;
+import com.bairock.zhongchuan.qz.bean.ZCMessageType;
 import com.bairock.zhongchuan.qz.netty.TcpClient;
 import com.google.gson.Gson;
 
@@ -39,12 +40,22 @@ public class TcpClientUtil {
         }
     }
 
-    public static void send(MessageRoot<ZCMessage> messageRoot){
+    public static void send(final MessageRoot<ZCMessage> messageRoot){
         String username = messageRoot.getTo();
-        TcpClient tcpClient = findByUsername(username);
+        final TcpClient tcpClient = findByUsername(username);
         if(null != tcpClient){
-            Gson gson = new Gson();
-            tcpClient.send(gson.toJson(messageRoot));
+            Thread thread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    Gson gson = new Gson();
+                    tcpClient.send(gson.toJson(messageRoot));
+                    ZCMessage message = messageRoot.getData();
+                    if(message.getMessageType() != ZCMessageType.TXT){
+                        message.setStream(null);
+                    }
+                }
+            });
+            CommonUtils.executeThread(thread);
         }
     }
 }

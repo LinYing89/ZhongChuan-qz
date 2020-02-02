@@ -18,7 +18,7 @@ public class HeartThread extends Thread {
             chatTest();
             heartTest();
             try {
-                sleep(3000);
+                sleep(30000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

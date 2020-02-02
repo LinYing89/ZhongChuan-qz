@@ -1,6 +1,8 @@
 package com.bairock.zhongchuan.qz.utils;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningTaskInfo;
@@ -11,6 +13,8 @@ import android.net.NetworkInfo;
 import com.bairock.zhongchuan.qz.R;
 
 public class CommonUtils {
+
+	private static final ExecutorService exec = Executors.newCachedThreadPool();
 
 	/**
 	 * 检测网络是否可用
@@ -58,6 +62,14 @@ public class CommonUtils {
 			return runningTaskInfos.get(0).topActivity.getClassName();
 		else
 			return "";
+	}
+
+	public static void executeThread(Runnable thread){
+		exec.execute(thread);
+	}
+
+	public static void shutDown(){
+		exec.shutdownNow();
 	}
 
 }

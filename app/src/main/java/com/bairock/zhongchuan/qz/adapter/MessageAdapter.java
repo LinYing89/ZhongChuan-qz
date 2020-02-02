@@ -1,5 +1,6 @@
 package com.bairock.zhongchuan.qz.adapter;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Hashtable;
@@ -12,6 +13,9 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.Build;
 import android.text.Spannable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,15 +28,21 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.TextView.BufferType;
 
+import androidx.core.content.FileProvider;
+
 import com.bairock.zhongchuan.qz.R;
 import com.bairock.zhongchuan.qz.bean.MessageRoot;
 import com.bairock.zhongchuan.qz.bean.ZCConversation;
 import com.bairock.zhongchuan.qz.bean.ZCMessage;
 import com.bairock.zhongchuan.qz.bean.ZCMessageDirect;
 import com.bairock.zhongchuan.qz.bean.ZCMessageType;
+import com.bairock.zhongchuan.qz.chat.LoadImageTask;
+import com.bairock.zhongchuan.qz.chat.LoadVideoImageTask;
 import com.bairock.zhongchuan.qz.utils.ConversationUtil;
+import com.bairock.zhongchuan.qz.utils.ImageCache;
 import com.bairock.zhongchuan.qz.utils.SmileUtils;
 import com.bairock.zhongchuan.qz.view.ChatActivity;
+import com.bairock.zhongchuan.qz.view.ShowBigImage;
 
 public class MessageAdapter extends BaseAdapter {
 
@@ -307,25 +317,6 @@ public class MessageAdapter extends BaseAdapter {
             holder.tv_ack = (TextView) convertView.findViewById(R.id.tv_ack);
             holder.tv_delivered = (TextView) convertView
                     .findViewById(R.id.tv_delivered);
-            if (holder.tv_ack != null) {
-//				if (message.isAcked) {
-//					if (holder.tv_delivered != null) {
-//						holder.tv_delivered.setVisibility(View.INVISIBLE);
-//					}
-//					holder.tv_ack.setVisibility(View.VISIBLE);
-//				} else {
-//					holder.tv_ack.setVisibility(View.INVISIBLE);
-//
-//					// check and display msg delivered ack status
-//					if (holder.tv_delivered != null) {
-//						if (message.isDelivered) {
-//							holder.tv_delivered.setVisibility(View.VISIBLE);
-//						} else {
-//							holder.tv_delivered.setVisibility(View.INVISIBLE);
-//						}
-//					}
-//				}
-            }
         } else {
             // 如果是文本或者地图消息并且不是group messgae，显示的时候给对方发送已读回执
             if ((message.getMessageType() == ZCMessageType.TXT || message.getMessageType() == ZCMessageType.LOCATION)) {
@@ -336,7 +327,7 @@ public class MessageAdapter extends BaseAdapter {
         switch (message.getMessageType()) {
             // 根据消息type显示item
             case IMAGE: // 图片
-//			handleImageMessage(message, holder, position, convertView);
+			    handleImageMessage(messageRoot, holder, position);
                 break;
             case TXT: // 文本
                 handleTextMessage(message, holder, position);
@@ -347,7 +338,7 @@ public class MessageAdapter extends BaseAdapter {
             case VOICE: // 语音
                 break;
             case VIDEO: // 视频
-//			handleVideoMessage(message, holder, position, convertView);
+			    handleVideoMessage(messageRoot, holder);
                 break;
             case FILE: // 一般文件
                 handleFileMessage(message, holder, position, convertView);
@@ -445,6 +436,60 @@ public class MessageAdapter extends BaseAdapter {
 //				// 发送消息
 //				sendMsgInBackground(message, holder);
 //			}
+        }
+    }
+
+    private void handleImageMessage(MessageRoot<ZCMessage> messageRoot, ViewHolder holder,
+                                   final int position) {
+        final ZCMessage message = messageRoot.getData();
+        Bitmap bitmap = ImageCache.getInstance().get(message.getContent());
+        if (bitmap != null) {
+            holder.iv.setImageBitmap(bitmap);
+            holder.iv.setClickable(true);
+            holder.iv.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // TODO 查看大图
+                    System.err.println("image view on click");
+                    Intent intent = new Intent(activity, ShowBigImage.class);
+                    File file = new File(message.getContent());
+                    if (file.exists()) {
+                        Uri uri = Uri.fromFile(file);
+                        intent.putExtra("uri", uri);
+                    }
+                    activity.startActivity(intent);
+                }
+            });
+        }else{
+            new LoadImageTask().execute(message.getContent(), holder.iv);
+        }
+    }
+
+    private void handleVideoMessage(MessageRoot<ZCMessage> messageRoot, ViewHolder holder){
+        final ZCMessage message = messageRoot.getData();
+        Bitmap bitmap = ImageCache.getInstance().get(message.getContent());
+        if (bitmap != null) {
+            holder.iv.setImageBitmap(bitmap);
+            holder.iv.setClickable(true);
+            holder.iv.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    File videoFile = new File(message.getContent());
+                    Uri uri;
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        String authority = "com.bairock.zhongchuan.qz.fileprovider"; //【清单文件中provider的authorities属性的值】
+                        uri = FileProvider.getUriForFile(activity, authority, videoFile);
+                    } else {
+                        uri = Uri.fromFile(videoFile);
+                    }
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    intent.setDataAndType(uri, "video/*");
+                    activity.startActivity(intent);
+                }
+            });
+        }else{
+            new LoadVideoImageTask().execute(message.getContent(), holder.iv);
         }
     }
 
