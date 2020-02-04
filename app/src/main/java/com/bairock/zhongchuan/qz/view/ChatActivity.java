@@ -67,9 +67,11 @@ import com.bairock.zhongchuan.qz.utils.CommonUtils;
 import com.bairock.zhongchuan.qz.utils.ConversationUtil;
 import com.bairock.zhongchuan.qz.common.Utils;
 import com.bairock.zhongchuan.qz.utils.FileUtil;
+import com.bairock.zhongchuan.qz.utils.MyVoiceRecorder;
 import com.bairock.zhongchuan.qz.utils.TcpClientUtil;
 import com.bairock.zhongchuan.qz.utils.UserUtil;
 import com.bairock.zhongchuan.qz.widght.PasteEditText;
+import com.easemob.EMError;
 
 //聊天页面
 public class ChatActivity extends AppCompatActivity implements OnClickListener {
@@ -153,6 +155,7 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 	public String playMsgId;
 	private AnimationDrawable animationDrawable;
 
+	private MyVoiceRecorder voiceRecorder;
 	// private EMGroup group;
 
 	@Override
@@ -211,6 +214,7 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 		List<View> views = new ArrayList<>();
 		expressionViewpager.setAdapter(new ExpressionPagerAdapter(views));
 		edittext_layout.requestFocus();
+		voiceRecorder = new MyVoiceRecorder();
 		buttonPressToSpeak.setOnTouchListener(new PressToSpeakListen());
 		mEditTextContent.setOnFocusChangeListener(new OnFocusChangeListener() {
 
@@ -618,24 +622,25 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 	 * 发送语音
 	 * 
 	 * @param filePath
-	 * @param fileName
 	 * @param length
-	 * @param isResend
 	 */
-	private void sendVoice(String filePath, String fileName, String length,
-			boolean isResend) {
+	private void sendVoice(String filePath, String length) {
 		if (!(new File(filePath).exists())) {
 			return;
 		}
-		try {
-			final MessageRoot<ZCMessage> message = ConversationUtil.createSendMessage(ZCMessageType.VOICE, "8090", "8090");
-			conversation.addMessage(message);
-			adapter.refresh();
-			listView.setSelection(listView.getCount() - 1);
-			setResult(RESULT_OK);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+
+		final MessageRoot<ZCMessage> messageRoot = ConversationUtil.createSendMessage(ZCMessageType.VOICE, UserUtil.user.getUsername(), toChatUsername);
+		ZCMessage message = messageRoot.getData();
+		message.setContent(filePath);
+		byte[] bytes = FileUtil.getImageStream(filePath);
+		message.setStream(bytes);
+		TcpClientUtil.send(messageRoot);
+		ConversationUtil.addSendMessage(messageRoot);
+
+		listView.setAdapter(adapter);
+		adapter.refresh();
+		listView.setSelection(listView.getCount() - 1);
+		setResult(RESULT_OK);
 	}
 
 	/**
@@ -942,17 +947,20 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 				}
 				try {
 					v.setPressed(true);
-					wakeLock.acquire();
+					wakeLock.acquire(60000);
 					recordingContainer.setVisibility(View.VISIBLE);
-					recordingHint
-							.setText(getString(R.string.move_up_to_cancel));
+					recordingHint.setText(getString(R.string.move_up_to_cancel));
 					recordingHint.setBackgroundColor(Color.TRANSPARENT);
+					voiceRecorder.startRecording();
 				} catch (Exception e) {
 					e.printStackTrace();
 					v.setPressed(false);
 					if (wakeLock.isHeld())
 						wakeLock.release();
 					recordingContainer.setVisibility(View.INVISIBLE);
+					if (voiceRecorder != null) {
+						voiceRecorder.discardRecording();
+					}
 					Toast.makeText(ChatActivity.this, R.string.recoding_fail,
 							Toast.LENGTH_SHORT).show();
 					return false;
@@ -961,13 +969,10 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 				return true;
 			case MotionEvent.ACTION_MOVE: {
 				if (event.getY() < 0) {
-					recordingHint
-							.setText(getString(R.string.release_to_cancel));
-					recordingHint
-							.setBackgroundResource(R.drawable.recording_text_hint_bg);
+					recordingHint.setText(getString(R.string.release_to_cancel));
+					recordingHint.setBackgroundResource(R.drawable.recording_text_hint_bg);
 				} else {
-					recordingHint
-							.setText(getString(R.string.move_up_to_cancel));
+					recordingHint.setText(getString(R.string.move_up_to_cancel));
 					recordingHint.setBackgroundColor(Color.TRANSPARENT);
 					animationDrawable.start();
 				}
@@ -983,6 +988,7 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 					wakeLock.release();
 				if (event.getY() < 0) {
 					// discard the recorded audio.
+					voiceRecorder.discardRecording();
 
 				} else {
 					// stop recording and send voice file
@@ -993,6 +999,16 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 					String st3 = getResources().getString(
 							R.string.send_failure_please);
 					try {
+						int length = voiceRecorder.stopRecoding();
+						if (length > 0) {
+							sendVoice(voiceRecorder.getVoiceFilePath(), Integer.toString(length));
+						} else if (length == EMError.INVALID_FILE) {
+							Toast.makeText(getApplicationContext(), st1,
+									Toast.LENGTH_SHORT).show();
+						} else {
+							Toast.makeText(getApplicationContext(), st2,
+									Toast.LENGTH_SHORT).show();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						Toast.makeText(ChatActivity.this, st3,

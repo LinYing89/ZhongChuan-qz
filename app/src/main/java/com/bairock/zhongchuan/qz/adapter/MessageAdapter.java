@@ -14,6 +14,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.drawable.AnimationDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.text.Spannable;
@@ -38,6 +39,7 @@ import com.bairock.zhongchuan.qz.bean.ZCMessageDirect;
 import com.bairock.zhongchuan.qz.bean.ZCMessageType;
 import com.bairock.zhongchuan.qz.chat.LoadImageTask;
 import com.bairock.zhongchuan.qz.chat.LoadVideoImageTask;
+import com.bairock.zhongchuan.qz.chat.VoicePlayClickListener;
 import com.bairock.zhongchuan.qz.utils.ConversationUtil;
 import com.bairock.zhongchuan.qz.utils.ImageCache;
 import com.bairock.zhongchuan.qz.utils.SmileUtils;
@@ -336,6 +338,7 @@ public class MessageAdapter extends BaseAdapter {
 //			handleLocationMessage(message, holder, position, convertView);
                 break;
             case VOICE: // 语音
+                handleVoiceMessage(messageRoot, holder);
                 break;
             case VIDEO: // 视频
 			    handleVideoMessage(messageRoot, holder);
@@ -462,6 +465,43 @@ public class MessageAdapter extends BaseAdapter {
             });
         }else{
             new LoadImageTask().execute(message.getContent(), holder.iv);
+        }
+    }
+
+    private void handleVoiceMessage(final MessageRoot<ZCMessage> messageRoot,
+                                    final ViewHolder holder) {
+        ZCMessage message = messageRoot.getData();
+//        holder.tv.setText(voiceBody.getLength() + "\"");
+        holder.iv.setOnClickListener(new VoicePlayClickListener(messageRoot,
+                holder.iv, holder.iv_read_status, this, activity));
+        if (((ChatActivity) activity).playMsgId != null
+                && ((ChatActivity) activity).playMsgId.equals(messageRoot
+                .getMsgId()) && VoicePlayClickListener.isPlaying) {
+            AnimationDrawable voiceAnimation;
+            if (message.getDirect() == ZCMessageDirect.RECEIVE) {
+                holder.iv.setImageResource(R.drawable.voice_from_icon);
+            } else {
+                holder.iv.setImageResource(R.drawable.voice_to_icon);
+            }
+            voiceAnimation = (AnimationDrawable) holder.iv.getDrawable();
+            voiceAnimation.start();
+        } else {
+            if (message.getDirect() == ZCMessageDirect.RECEIVE) {
+                holder.iv.setImageResource(R.drawable.chatfrom_voice_playing);
+            } else {
+                holder.iv.setImageResource(R.drawable.chatto_voice_playing);
+            }
+        }
+
+        if (message.getDirect() == ZCMessageDirect.RECEIVE) {
+//            if (messageRoot.isListened()) {
+//                // 隐藏语音未听标志
+//                holder.iv_read_status.setVisibility(View.INVISIBLE);
+//            } else {
+//                holder.iv_read_status.setVisibility(View.VISIBLE);
+//            }
+            System.err.println("it is receive msg");
+            return;
         }
     }
 

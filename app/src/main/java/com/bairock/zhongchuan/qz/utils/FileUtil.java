@@ -92,9 +92,33 @@ public class FileUtil {
             }else{
                 policeNum = "0000";
             }
-            policePath = sdDir+ policeNum+ File.separator;
+            policePath = sdDir + policeNum + File.separator;
         }
         return policePath;
+    }
+
+    public static String getPoliceImagePath(){
+        String path = getPolicePath();
+        if(null != path){
+            return path + "image" + File.separator;
+        }
+        return null;
+    }
+
+    public static String getPoliceVoicePath(){
+        String path = getPolicePath();
+        if(null != path){
+            return path + "voice" + File.separator;
+        }
+        return null;
+    }
+
+    public static String getPoliceVideoPath(){
+        String path = getPolicePath();
+        if(null != path){
+            return path + "video" + File.separator;
+        }
+        return null;
     }
 
     public static String getSubPolicePath(){
@@ -114,6 +138,21 @@ public class FileUtil {
             File policeFile = new File(getPolicePath());
             if(!policeFile.exists()){
                 policeFile.mkdirs();
+            }
+
+            File fileImage = new File(getPoliceImagePath());
+            if(!fileImage.exists()){
+                fileImage.mkdir();
+            }
+
+            File file = new File(getPoliceVoicePath());
+            if(!file.exists()){
+                file.mkdir();
+            }
+
+            File file1 = new File(getPoliceVideoPath());
+            if(!file1.exists()){
+                file1.mkdir();
             }
         }
     }

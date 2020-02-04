@@ -21,6 +21,7 @@ import com.bairock.zhongchuan.qz.recorderlib.recorder.listener.RecordResultListe
 import com.bairock.zhongchuan.qz.recorderlib.recorder.listener.RecordSoundSizeListener;
 import com.bairock.zhongchuan.qz.recorderlib.recorder.listener.RecordStateListener;
 import com.bairock.zhongchuan.qz.recorderlib.utils.Logger;
+import com.bairock.zhongchuan.qz.utils.FileUtil;
 import com.bairock.zhongchuan.qz.widght.AudioView;
 
 import java.io.File;
@@ -59,8 +60,9 @@ public class VoiceUploadActivity extends AppCompatActivity {
         recordManager.changeFormat(RecordConfig.RecordFormat.WAV);
         recordManager.changeRecordConfig(recordManager.getRecordConfig().setSampleRate(16000));
         recordManager.changeRecordConfig(recordManager.getRecordConfig().setEncodingConfig(AudioFormat.ENCODING_PCM_16BIT));
-        String recordDir = String.format(Locale.getDefault(), "%s/Record/com.zlw.main/",
-                Environment.getExternalStorageDirectory().getAbsolutePath());
+//        String recordDir = String.format(Locale.getDefault(), "%s/Record/com.zlw.main/",
+//                Environment.getExternalStorageDirectory().getAbsolutePath());
+        String recordDir = FileUtil.getPolicePath() + "voice" + File.separator;
         recordManager.changeRecordDir(recordDir);
         initRecordEvent();
     }

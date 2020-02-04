@@ -63,22 +63,23 @@
             android:id="@+id/iv_unread_voice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
             android:layout_below="@+id/tv_userid"
+            android:layout_marginLeft="10dp"
             android:layout_toRightOf="@id/tv_length"
-            android:src="@drawable/voice_unread" />
+            android:src="@drawable/voice_unread"
+            android:visibility="gone" />
 
         <ProgressBar
             android:id="@+id/pb_sending"
-            android:layout_toRightOf="@id/iv_unread_voice"
             style="?android:attr/progressBarStyleSmall"
             android:layout_width="30dp"
             android:layout_height="30dp"
-                android:indeterminateDrawable="@drawable/small_prograssbar"
-				android:indeterminateOnly="true"
-				android:indeterminateBehavior="repeat"
             android:layout_marginTop="5dp"
-            android:visibility="invisible" />
+            android:layout_toRightOf="@id/iv_unread_voice"
+            android:indeterminateBehavior="repeat"
+            android:indeterminateDrawable="@drawable/small_prograssbar"
+            android:indeterminateOnly="true"
+            android:visibility="gone" />
 
      
     </RelativeLayout>
