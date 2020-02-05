@@ -22,9 +22,12 @@ public class FragmentVideoUpload extends Fragment {
 	private Button btnTelescope;
 	private Button btnDrone;
 
+//	private String username = "";
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
+//		username = savedInstanceState.getString("username");
 		if (layout == null) {
 			ctx = this.getActivity();
 			layout = ctx.getLayoutInflater().inflate(R.layout.fragment_video_upload_choose,
@@ -63,6 +66,8 @@ public class FragmentVideoUpload extends Fragment {
 				case R.id.btnDrone:
 					break;
 			}
+//			Intent intent = new Intent(ctx, VideoUploadActivity.class);
+//			intent.putExtra("username", username);
 			startActivity(new Intent(ctx, VideoUploadActivity.class));
 		}
 	};

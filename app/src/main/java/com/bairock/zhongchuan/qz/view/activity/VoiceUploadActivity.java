@@ -5,12 +5,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Context;
 import android.media.AudioFormat;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Chronometer;
 import android.widget.Toast;
 
+import com.bairock.zhongchuan.qz.App;
 import com.bairock.zhongchuan.qz.R;
 import com.bairock.zhongchuan.qz.recorderlib.RecordManager;
 import com.bairock.zhongchuan.qz.recorderlib.recorder.RecordConfig;
@@ -33,6 +34,7 @@ public class VoiceUploadActivity extends AppCompatActivity {
     private Context context;
     private Button btnStart;
     private AudioView audioView;
+    private Chronometer chronometer;
 
     private boolean isStart = false;
     final RecordManager recordManager = RecordManager.getInstance();
@@ -45,11 +47,14 @@ public class VoiceUploadActivity extends AppCompatActivity {
         findViews();
         setOnListener();
         initRecord();
+        chronometer.start();
     }
 
     private void findViews() {
         btnStart = findViewById(R.id.btnStart);
         audioView = findViewById(R.id.audioView);
+        audioView.setStyle(AudioView.ShowStyle.getStyle("STYLE_ALL"), audioView.getDownStyle());
+        audioView.setStyle(audioView.getUpStyle(), AudioView.ShowStyle.getStyle("STYLE_ALL"));
     }
 
     private void setOnListener() {
@@ -57,6 +62,7 @@ public class VoiceUploadActivity extends AppCompatActivity {
     }
 
     private void initRecord() {
+        recordManager.init(App.getInstance2(), false);
         recordManager.changeFormat(RecordConfig.RecordFormat.WAV);
         recordManager.changeRecordConfig(recordManager.getRecordConfig().setSampleRate(16000));
         recordManager.changeRecordConfig(recordManager.getRecordConfig().setEncodingConfig(AudioFormat.ENCODING_PCM_16BIT));

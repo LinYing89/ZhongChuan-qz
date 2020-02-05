@@ -21,11 +21,15 @@ import com.bairock.zhongchuan.qz.utils.FileUtil;
 public class App extends Application {
 
 	private static Context _context;
+	// 运用list来保存们每一个activity是关键
+	private List<Activity> mList = new LinkedList<Activity>();
+	private static App instance;
 
 	@Override
 	public void onCreate() {
 		super.onCreate();
 		_context = getApplicationContext();
+		instance = this;
 //		initEMChat();
 		// CrashHandler crashHandler = CrashHandler.getInstance();// 全局异常捕捉
 		// crashHandler.init(_context);
@@ -93,16 +97,7 @@ public class App extends Application {
 		return _context;
 	}
 
-	// 运用list来保存们每一个activity是关键
-	private List<Activity> mList = new LinkedList<Activity>();
-	private static App instance;
-
-	// 构造方法
-	// 实例化一次
-	public synchronized static App getInstance2() {
-		if (null == instance) {
-			instance = new App();
-		}
+	public static App getInstance2() {
 		return instance;
 	}
 

@@ -58,9 +58,8 @@
 				android:text="@string/attach_take_pic"
 				android:textColor="@color/black1" />
 		</LinearLayout>
-	
 		<LinearLayout
-		    android:id="@+id/view_location"
+			android:id="@+id/view_video"
 			android:layout_width="0dp"
 			android:layout_height="wrap_content"
 			android:layout_weight="1"
@@ -71,15 +70,17 @@
 				android:layout_width="60.0dip"
 				android:layout_height="60.0dip"
 				android:contentDescription="@string/app_name"
-				android:src="@drawable/chat_tool_location" />
+				android:src="@drawable/chat_tool_video" />
+
 			<TextView
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:gravity="center"
-				android:textSize="12sp"
-				android:text="@string/attach_location"
-				android:textColor="@color/black1" />
+				android:text="视频"
+				android:textColor="@color/black1"
+				android:textSize="12sp" />
 		</LinearLayout>
+
 	</LinearLayout>
 	<LinearLayout
 		    android:id="@+id/view_location_video"
@@ -110,47 +111,55 @@
 				android:text="@string/attach_file"
 				android:textColor="@color/black1" />
 		</LinearLayout>
+
 		<LinearLayout
-		    android:id="@+id/view_audio"
+			android:id="@+id/view_audio"
 			android:layout_width="0dp"
 			android:layout_height="wrap_content"
 			android:layout_weight="1"
 			android:gravity="center"
-			android:orientation="vertical">
+			android:orientation="vertical"
+			android:visibility="invisible">
+
 			<ImageView
-				android:layout_margin="5dp"
 				android:layout_width="60.0dip"
 				android:layout_height="60.0dip"
+				android:layout_margin="5dp"
 				android:contentDescription="@string/app_name"
 				android:src="@drawable/chat_tool_audio" />
+
 			<TextView
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:gravity="center"
-				android:textSize="12sp"
 				android:text="@string/attach_voice_call"
-				android:textColor="@color/black1" />
+				android:textColor="@color/black1"
+				android:textSize="12sp" />
 		</LinearLayout>
+
 		<LinearLayout
-		    android:id="@+id/view_video"
+			android:id="@+id/view_location"
 			android:layout_width="0dp"
 			android:layout_height="wrap_content"
 			android:layout_weight="1"
 			android:gravity="center"
-			android:orientation="vertical">
+			android:orientation="vertical"
+			android:visibility="invisible">
+
 			<ImageView
-				android:layout_margin="5dp"
 				android:layout_width="60.0dip"
 				android:layout_height="60.0dip"
+				android:layout_margin="5dp"
 				android:contentDescription="@string/app_name"
-				android:src="@drawable/chat_tool_video" />
+				android:src="@drawable/chat_tool_location" />
+
 			<TextView
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:gravity="center"
-				android:textSize="12sp"
-				android:text="@string/attach_video_call"
-				android:textColor="@color/black1" />
+				android:text="@string/attach_location"
+				android:textColor="@color/black1"
+				android:textSize="12sp" />
 		</LinearLayout>
 	</LinearLayout>
 </LinearLayout>
