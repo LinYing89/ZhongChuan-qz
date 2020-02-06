@@ -397,7 +397,7 @@ public class MessageAdapter extends BaseAdapter {
             timestamp.setVisibility(View.VISIBLE);
         } else {
             // 两条消息时间离得如果稍长，显示时间
-            if (messageRoot.getTime() - conversation.getMessage(position - 1).getTime() < 10000) {
+            if (messageRoot.getTime() - conversation.getMessage(position - 1).getTime() < 60000) {
                 timestamp.setVisibility(View.GONE);
             } else {
                 timestamp.setText(dateFormat.format(new Date(messageRoot.getTime())));

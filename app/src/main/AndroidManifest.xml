@@ -47,6 +47,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".view.activity.ChatVideoActivity"
+            android:theme="@style/Theme.AppCompat"></activity>
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -59,7 +61,7 @@
         </provider>
 
         <service
-            android:name="com.bairock.zhongchuan.qz.recorderlib.recorder.RecordService"
+            android:name=".recorderlib.recorder.RecordService"
             android:enabled="true"
             android:exported="false" />
 

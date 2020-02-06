@@ -70,6 +70,7 @@ import com.bairock.zhongchuan.qz.utils.FileUtil;
 import com.bairock.zhongchuan.qz.utils.MyVoiceRecorder;
 import com.bairock.zhongchuan.qz.utils.TcpClientUtil;
 import com.bairock.zhongchuan.qz.utils.UserUtil;
+import com.bairock.zhongchuan.qz.view.activity.ChatVideoActivity;
 import com.bairock.zhongchuan.qz.widght.PasteEditText;
 import com.easemob.EMError;
 
@@ -369,46 +370,13 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 			} else if (requestCode == REQUEST_CODE_CAMERA) { // 发送照片
 				if (cameraFile != null && cameraFile.exists())
 					sendPicture(cameraFile.getAbsolutePath());
-			} else if (requestCode == REQUEST_CODE_SELECT_VIDEO) { // 发送本地选择的视频
-
-				int duration = data.getIntExtra("dur", 0);
-				String videoPath = data.getStringExtra("path");
-				File file = new File("",
-						"thvideo" + System.currentTimeMillis());
-				Bitmap bitmap = null;
-				FileOutputStream fos = null;
-				try {
-					if (!file.getParentFile().exists()) {
-						file.getParentFile().mkdirs();
+			} else if (requestCode == REQUEST_CODE_VIDEO) { // 发送本地选择的视频
+				if (data != null) {
+					String filePath = data.getStringExtra("filePath");
+					if (filePath != null) {
+						sendFile(filePath);
 					}
-					bitmap = ThumbnailUtils.createVideoThumbnail(videoPath, 3);
-					if (bitmap == null) {
-						bitmap = BitmapFactory.decodeResource(getResources(),
-								R.drawable.app_panel_video_icon);
-					}
-					fos = new FileOutputStream(file);
-
-					bitmap.compress(CompressFormat.JPEG, 100, fos);
-
-				} catch (Exception e) {
-					e.printStackTrace();
-				} finally {
-					if (fos != null) {
-						try {
-							fos.close();
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-						fos = null;
-					}
-					if (bitmap != null) {
-						bitmap.recycle();
-						bitmap = null;
-					}
-
 				}
-				sendVideo(videoPath, file.getAbsolutePath(), duration / 1000);
-
 			} else if (requestCode == REQUEST_CODE_LOCAL) { // 发送本地图片
 				if (data != null) {
 					Uri selectedImage = data.getData();
@@ -479,11 +447,6 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 //								toChatUsername), new BasicNameValuePair(
 //								Constants.NAME, Name));
 			} else {
-				// TODO 打开群组详情页面
-//				Utils.start_Activity(this, GroupSettingActivity.class,
-//						new BasicNameValuePair(Constants.GROUP_ID,
-//								toChatUsername), new BasicNameValuePair(
-//								Constants.NAME, Name));
 			}
 			break;
 		case R.id.view_camera:
@@ -494,14 +457,12 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 			selectFileFromLocal();
 			break;
 		case R.id.view_video:
+			startActivityForResult(new Intent(this, ChatVideoActivity.class), REQUEST_CODE_VIDEO);
 			break;
 		case R.id.view_photo:
 			selectPicFromLocal(); // 点击图片图标
 			break;
 		case R.id.view_location:
-			// TODO 位置
-//			startActivityForResult(new Intent(this, BaiduMapActivity.class),
-//					REQUEST_CODE_MAP);
 			break;
 		case R.id.view_audio:
 			// 语音通话
@@ -786,18 +747,21 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 		}
 
 		// 创建一个文件消息
+		sendFile(filePath);
+	}
+
+	private void sendFile(String filePath){
 		final MessageRoot<ZCMessage> messageRoot = ConversationUtil.createSendMessage(ZCMessageType.VIDEO, UserUtil.user.getUsername(), toChatUsername);
-        ZCMessage message = messageRoot.getData();
-        message.setContent(filePath);
-        byte[] bytes = FileUtil.getImageStream(filePath);
-        message.setStream(bytes);
-        TcpClientUtil.send(messageRoot);
+		ZCMessage message = messageRoot.getData();
+		message.setContent(filePath);
+		byte[] bytes = FileUtil.getImageStream(filePath);
+		message.setStream(bytes);
+		TcpClientUtil.send(messageRoot);
 		conversation.addMessage(messageRoot);
 		listView.setAdapter(adapter);
 		adapter.refresh();
 		listView.setSelection(listView.getCount() - 1);
 		setResult(RESULT_OK);
-
 	}
 
 	/**
