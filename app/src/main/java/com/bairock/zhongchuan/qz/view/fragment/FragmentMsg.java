@@ -8,7 +8,10 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.UUID;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,10 +41,10 @@ import com.bairock.zhongchuan.qz.view.ChatActivity;
 public class FragmentMsg extends Fragment implements OnClickListener,
         OnItemClickListener {
     private View layout, layout_head;
-    ;
     private ListView lvContact;
     private NewMsgAdpter adpter;
     private List<ZCConversation> conversationList = new ArrayList<>();
+    private NewMessageBroadcastReceiver msgReceiver;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -57,6 +60,7 @@ public class FragmentMsg extends Fragment implements OnClickListener,
                 parent.removeView(layout);
             }
         }
+//        initReceiver();
         return layout;
     }
 
@@ -71,8 +75,9 @@ public class FragmentMsg extends Fragment implements OnClickListener,
      * 刷新页面
      */
     public void refresh() {
-        conversationList.clear();
-        initViews();
+        adpter.notifyDataSetChanged();
+//        conversationList.clear();
+//        initViews();
     }
 
     private void initViews() {
@@ -155,8 +160,9 @@ public class FragmentMsg extends Fragment implements OnClickListener,
     @Override
     public void onItemClick(AdapterView<?> arg0, View arg1, int position,
                             long arg3) {
-        ((MainActivity) getActivity()).updateUnreadLabel();
         ZCConversation conversation = conversationList.get(position);
+        conversation.setUnreadCount(0);
+        ((MainActivity) getActivity()).updateUnreadLabel();
         Intent intent = new Intent(getActivity(), ChatActivity.class);
         Hashtable<String, String> ChatRecord = adpter.getChatRecord();
         if (ChatRecord != null) {
@@ -175,6 +181,35 @@ public class FragmentMsg extends Fragment implements OnClickListener,
                 break;
             default:
                 break;
+        }
+    }
+
+    private void initReceiver() {
+        // 注册接收消息广播
+        msgReceiver = new NewMessageBroadcastReceiver();
+        IntentFilter intentFilter = new IntentFilter(ConversationUtil.CHAT_ACTION);
+        // 设置广播的优先级别大于Mainacitivity,这样如果消息来的时候正好在chat页面，直接显示消息，而不是提示消息未读
+        intentFilter.setPriority(4);
+        this.getActivity().registerReceiver(msgReceiver, intentFilter);
+    }
+
+    /**
+     * 新消息广播接收者
+     *
+     */
+    private class NewMessageBroadcastReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // 主页面收到消息后，主要为了提示未读，实际消息内容需要到chat页面查看
+
+            String from = intent.getStringExtra("from");
+            // 消息id
+            String msgId = intent.getStringExtra("msgid");
+
+            // 注销广播接收者，否则在ChatActivity中会收到这个广播
+            abortBroadcast();
+            // 刷新bottom bar消息未读数
+            adpter.notifyDataSetChanged();
         }
     }
 

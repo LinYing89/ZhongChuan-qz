@@ -6,6 +6,7 @@ import com.bairock.zhongchuan.qz.bean.ZCConversation;
 import com.bairock.zhongchuan.qz.bean.ZCMessage;
 import com.bairock.zhongchuan.qz.bean.ZCMessageDirect;
 import com.bairock.zhongchuan.qz.bean.ZCMessageType;
+import com.bairock.zhongchuan.qz.view.ChatActivity;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -77,6 +78,10 @@ public class ConversationUtil {
         conversations.remove(conversation);
     }
 
+    public static void addConversation(ZCConversation conversation){
+        conversations.add(conversation);
+    }
+
     public static MessageRoot<ZCMessage> createSendMessage(ZCMessageType zcMessageType, String from, String to) {
         MessageRoot<ZCMessage> messageRoot = new MessageRoot<>();
         messageRoot.setMsgId(UUID.randomUUID().toString());
@@ -92,5 +97,13 @@ public class ConversationUtil {
 
         messageRoot.setData(message);
         return messageRoot;
+    }
+
+    public static int getUnreadCount(){
+        int unreadCount = 0;
+        for(ZCConversation conversation : conversations){
+            unreadCount += conversation.getUnreadCount();
+        }
+        return unreadCount;
     }
 }

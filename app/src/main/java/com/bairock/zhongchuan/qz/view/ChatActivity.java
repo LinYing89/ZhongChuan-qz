@@ -293,7 +293,7 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 		txt_title.setText(Name);
 		conversation = ConversationUtil.activeConversation(toChatUsername);
 		// 把此会话的未读数置为0
-		conversation.setUnreadCount(0);
+//		conversation.setUnreadCount(0);
 		adapter = new MessageAdapter(this, toChatUsername, chatType);
 		// 显示消息
 		listView.setAdapter(adapter);
@@ -884,6 +884,7 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 				// notifyNewMessage(message);
 				return;
 			}
+			conversation.setUnreadCount(0);
 			// 通知adapter有新消息，更新ui
 			adapter.refresh();
 			listView.setSelection(listView.getCount() - 1);

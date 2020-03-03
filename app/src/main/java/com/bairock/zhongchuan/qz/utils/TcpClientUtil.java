@@ -1,5 +1,6 @@
 package com.bairock.zhongchuan.qz.utils;
 
+import com.bairock.zhongchuan.qz.bean.ClientBase;
 import com.bairock.zhongchuan.qz.bean.MessageRoot;
 import com.bairock.zhongchuan.qz.bean.User;
 import com.bairock.zhongchuan.qz.bean.ZCMessage;
@@ -13,12 +14,12 @@ import java.util.List;
 public class TcpClientUtil {
     public static List<TcpClient> tcpClients = new ArrayList<>();
 
-    public static void add(User user){
+    public static void add(ClientBase user){
         TcpClient tcpClient = new TcpClient(user);
         tcpClients.add(tcpClient);
     }
 
-    private static TcpClient findByUser(User user){
+    private static TcpClient findByUser(ClientBase user){
         return findByUsername(user.getUsername());
     }
 
@@ -31,7 +32,7 @@ public class TcpClientUtil {
         return null;
     }
 
-    public static void tryLink(User user){
+    public static void tryLink(ClientBase user){
         TcpClient tcpClient = findByUser(user);
         if(null != tcpClient){
             if(!tcpClient.isLinked()){

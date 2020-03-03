@@ -48,6 +48,16 @@ public class ZCConversation {
         this.unreadCount = unreadCount;
     }
 
+    public void unreadCountPlus(){
+        unreadCount++;
+    }
+
+    public void unreadCountSub(){
+        if(unreadCount > 0) {
+            unreadCount--;
+        }
+    }
+
     public String getUsername() {
         return username;
     }
@@ -75,7 +85,7 @@ public class ZCConversation {
 
         if (!haved) {
             this.messages.add(message);
-            if (message.getData().getDirect() == ZCMessageDirect.RECEIVE && message.getData().isUnread()) {
+            if (message.getData().getDirect() == ZCMessageDirect.RECEIVE) {
                 ++this.unreadCount;
             }
         }

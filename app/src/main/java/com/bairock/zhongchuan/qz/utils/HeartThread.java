@@ -3,6 +3,7 @@ package com.bairock.zhongchuan.qz.utils;
 import com.bairock.zhongchuan.qz.bean.Location;
 import com.bairock.zhongchuan.qz.bean.MessageRoot;
 import com.bairock.zhongchuan.qz.bean.MessageRootType;
+import com.bairock.zhongchuan.qz.bean.MessageSource;
 import com.bairock.zhongchuan.qz.bean.ZCMessage;
 import com.bairock.zhongchuan.qz.bean.ZCMessageType;
 import com.bairock.zhongchuan.qz.netty.MessageBroadcaster;
@@ -18,7 +19,7 @@ public class HeartThread extends Thread {
             chatTest();
             heartTest();
             try {
-                sleep(30000);
+                sleep(10000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -41,9 +42,42 @@ public class HeartThread extends Thread {
         }
         Location location = new Location(lng, 34.73371279664106);
         messageRoot.setData(location);
-//            messageRoot.setData(new byte[]{0, 1, 0, 1});
-        messageRoot.setData(location);
         MessageBroadcaster.send(messageRoot);
+
+        MessageRoot<Location> messageRoot1 = new MessageRoot<>();
+        messageRoot1.setFrom("9081");
+        messageRoot1.setTo("0");
+        messageRoot1.setSource(MessageSource.TELESCOPE);
+        messageRoot1.setType(MessageRootType.HEART);
+        messageRoot1.setMsgId(UUID.randomUUID().toString());
+        messageRoot1.setTime(new Date().getTime());
+        double lng1 = 0;
+        if(i == 0){
+            lng1 = 119.25745697692036;
+        }else {
+            lng1 = 119.25995697692036;
+        }
+        Location location1 = new Location(lng1, 34.73371279664106);
+        messageRoot1.setData(location1);
+        MessageBroadcaster.send(messageRoot1);
+
+        MessageRoot<Location> messageRoot2 = new MessageRoot<>();
+        messageRoot2.setFrom("7081");
+        messageRoot2.setTo("0");
+        messageRoot2.setSource(MessageSource.UAV);
+        messageRoot2.setType(MessageRootType.HEART);
+        messageRoot2.setMsgId(UUID.randomUUID().toString());
+        messageRoot2.setTime(new Date().getTime());
+
+        double lng2 = 0;
+        if(i == 0){
+            lng2 = 119.25745697692036;
+        }else {
+            lng2 = 119.25445697692036;
+        }
+        Location location2 = new Location(lng2, 34.73371279664106);
+        messageRoot2.setData(location2);
+        MessageBroadcaster.send(messageRoot2);
     }
 
     private int i = 0;

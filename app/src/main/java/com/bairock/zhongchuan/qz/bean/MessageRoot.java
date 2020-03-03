@@ -4,6 +4,7 @@ public class MessageRoot<T> {
 
     private String msgId;
     private MessageRootType type;
+    private MessageSource source = MessageSource.PHONE;
     private String from;
     private String to;
     private Long time;
@@ -23,6 +24,14 @@ public class MessageRoot<T> {
 
     public void setType(MessageRootType type) {
         this.type = type;
+    }
+
+    public MessageSource getSource() {
+        return source;
+    }
+
+    public void setSource(MessageSource source) {
+        this.source = source;
     }
 
     public String getFrom() {

@@ -8,6 +8,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -31,9 +32,11 @@ import com.bairock.zhongchuan.qz.dialog.ActionItem;
 import com.bairock.zhongchuan.qz.dialog.TitlePopup;
 import com.bairock.zhongchuan.qz.netty.MessageBroadcaster;
 import com.bairock.zhongchuan.qz.netty.TcpServer;
+import com.bairock.zhongchuan.qz.utils.ConversationUtil;
 import com.bairock.zhongchuan.qz.utils.FileUtil;
 import com.bairock.zhongchuan.qz.utils.HeartThread;
 import com.bairock.zhongchuan.qz.utils.UserUtil;
+import com.bairock.zhongchuan.qz.view.ChatActivity;
 import com.bairock.zhongchuan.qz.view.fragment.FragmentVoiceUpload;
 import com.bairock.zhongchuan.qz.view.fragment.FragmentContact;
 import com.bairock.zhongchuan.qz.view.fragment.FragmentMsg;
@@ -119,6 +122,8 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
                 Toast.makeText(this, "shouldShowRequestPermissionRationale", Toast.LENGTH_SHORT).show();
             }
         }
+
+        initReceiver();
     }
 
     private void initTabView() {
@@ -197,48 +202,6 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
         currentTabIndex = index;
     }
 
-    private void initPopWindow() {
-        // 实例化标题栏弹窗
-        titlePopup = new TitlePopup(this, LayoutParams.WRAP_CONTENT,
-                LayoutParams.WRAP_CONTENT);
-        titlePopup.setItemOnClickListener(onitemClick);
-        // 给标题栏弹窗添加子类
-        titlePopup.addAction(new ActionItem(this, R.string.menu_groupchat,
-                R.drawable.icon_menu_group));
-        titlePopup.addAction(new ActionItem(this, R.string.menu_addfriend,
-                R.drawable.icon_menu_addfriend));
-        titlePopup.addAction(new ActionItem(this, R.string.menu_qrcode,
-                R.drawable.icon_menu_sao));
-        titlePopup.addAction(new ActionItem(this, R.string.menu_money,
-                R.drawable.abv));
-    }
-
-    private TitlePopup.OnItemOnClickListener onitemClick = new TitlePopup.OnItemOnClickListener() {
-
-        @Override
-        public void onItemClick(ActionItem item, int position) {
-            // mLoadingDialog.show();
-            switch (position) {
-                case 0:// 发起群聊
-//                    Utils.start_Activity(MainActivity.this,
-//                            AddGroupChatActivity.class);
-                    break;
-                case 1:// 添加朋友
-//                    Utils.start_Activity(MainActivity.this, PublicActivity.class,
-//                            new BasicNameValuePair(Constants.NAME, "添加朋友"));
-                    break;
-                case 2:// 扫一扫
-//                    Utils.start_Activity(MainActivity.this, CaptureActivity.class);
-                    break;
-                case 3:// 收钱
-//                    Utils.start_Activity(MainActivity.this, GetMoneyActivity.class);
-                    break;
-                default:
-                    break;
-            }
-        }
-    };
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -262,7 +225,6 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
 
     private void setOnListener() {
         img_right.setOnClickListener(this);
-
     }
 
     private int keyBackClickCount = 0;
@@ -308,27 +270,13 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
         }
     }
 
-    private void initVersion() {
-        // TODO 检查版本更新
-        String versionInfo = Utils.getValue(this, Constants.VersionInfo);
-        if (!TextUtils.isEmpty(versionInfo)) {
-//            Tipdialog = new WarnTipDialog(this,
-//                    "发现新版本：  1、更新啊阿三达到阿德阿   2、斯顿阿斯顿撒旦？");
-//            Tipdialog.setBtnOkLinstener(onclick);
-//            Tipdialog.show();
-        }
-    }
-
-    private DialogInterface.OnClickListener onclick = new DialogInterface.OnClickListener() {
-
-        @Override
-        public void onClick(DialogInterface dialog, int which) {
-            Utils.showLongToast(MainActivity.this, "正在下载...");// TODO
-//            Tipdialog.dismiss();
-        }
-    };
-
     private void initReceiver() {
+        // 注册接收消息广播
+        msgReceiver = new NewMessageBroadcastReceiver();
+        IntentFilter intentFilter = new IntentFilter(ConversationUtil.CHAT_ACTION);
+        // 设置广播的优先级别大于Mainacitivity,这样如果消息来的时候正好在chat页面，直接显示消息，而不是提示消息未读
+        intentFilter.setPriority(3);
+        registerReceiver(msgReceiver, intentFilter);
 //        Intent intent = new Intent(this, UpdateService.class);
 //        startService(intent);
 //        registerReceiver(new MyBroadcastReceiver(), new IntentFilter(
@@ -339,29 +287,6 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
 //                .getInstance().getNewMessageBroadcastAction());
 //        intentFilter.setPriority(3);
 //        registerReceiver(msgReceiver, intentFilter);
-//
-//        // 注册一个ack回执消息的BroadcastReceiver
-//        IntentFilter ackMessageIntentFilter = new IntentFilter(EMChatManager
-//                .getInstance().getAckMessageBroadcastAction());
-//        ackMessageIntentFilter.setPriority(3);
-//        registerReceiver(ackMessageReceiver, ackMessageIntentFilter);
-//
-//        // 注册一个透传消息的BroadcastReceiver
-//        IntentFilter cmdMessageIntentFilter = new IntentFilter(EMChatManager
-//                .getInstance().getCmdMessageBroadcastAction());
-//        cmdMessageIntentFilter.setPriority(3);
-//        registerReceiver(cmdMessageReceiver, cmdMessageIntentFilter);
-//        // setContactListener监听联系人的变化等
-//        // EMContactManager.getInstance().setContactListener(
-//        // new MyContactListener());
-//        // 注册一个监听连接状态的listener
-//        // EMChatManager.getInstance().addConnectionListener(
-//        // new MyConnectionListener());
-//        // // 注册群聊相关的listener
-//        EMGroupManager.getInstance().addGroupChangeListener(
-//                new MyGroupChangeListener());
-//        // 通知sdk，UI 已经初始化完毕，注册了相应的receiver和listener, 可以接受broadcast了
-//        EMChat.getInstance().setAppInited();
     }
 
     // 自己联系人 群组数据返回监听
@@ -392,7 +317,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
             abortBroadcast();
             // 刷新bottom bar消息未读数
             updateUnreadLabel();
-            if (currentTabIndex == 0) {
+            if (currentTabIndex == 1) {
                 // 当前页面如果为聊天历史页面，刷新此页面
                 if (fragmentMsg != null) {
                     fragmentMsg.refresh();
@@ -405,8 +330,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
      * 获取未读消息数
      */
     public void updateUnreadLabel() {
-        int count = 0;
-//        count = EMChatManager.getInstance().getUnreadMsgsCount();
+        int count = ConversationUtil.getUnreadCount();
         if (count > 0) {
             unreaMsgdLabel.setText(String.valueOf(count));
             unreaMsgdLabel.setVisibility(View.VISIBLE);
