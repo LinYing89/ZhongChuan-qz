@@ -12,7 +12,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.socket.DatagramPacket;
 import io.netty.handler.codec.MessageToMessageEncoder;
 
-public class MessageEncoder extends MessageToMessageEncoder<MessageRoot> {
+public class MessageEncoder extends MessageToMessageEncoder<byte[]> {
 
     private final InetSocketAddress remoteAddress;
 
@@ -21,7 +21,7 @@ public class MessageEncoder extends MessageToMessageEncoder<MessageRoot> {
     }
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, MessageRoot msg, List<Object> out) {
+    protected void encode(ChannelHandlerContext ctx, byte[] msg, List<Object> out) {
         Gson gson = new Gson();
         String json = gson.toJson(msg);
         byte[] bytes = json.getBytes();

@@ -40,21 +40,41 @@ public class MessageBroadcaster {
                     @Override
                     protected void initChannel(Channel channel) {
                         ChannelPipeline pipeline = channel.pipeline();
-                        pipeline.addLast(new MessageEncoder(new InetSocketAddress("255.255.255.255", 9999)));
-                        pipeline.addLast(new MessageDecoder());
+                        //pipeline.addLast(new MessageEncoder(new InetSocketAddress("255.255.255.255", 10000)));
+                        //pipeline.addLast(new MessageDecoder());
                         pipeline.addLast(new MessageHandler());
                     }
                 } )
-                .localAddress(new InetSocketAddress(9999));
+                .localAddress(new InetSocketAddress(10000));
     }
     public Channel bind() {
         channel =  bootstrap.bind().syncUninterruptibly().channel();
         return channel;
     }
 
-    public static void send(MessageRoot message){
+//    public static void send(MessageRoot message){
+//        if(null != channel) {
+//            String to = message.getTo();
+//            if(!to.equals("0")){
+//                InetSocketAddress inetSocketAddress = UserUtil.findInetSocketAddressByUsername(to);
+//                Log.e("MessageBroadcaster", "send to " + inetSocketAddress);
+//                if(null == inetSocketAddress){
+//                    return;
+//                }
+//                Gson gson = new Gson();
+//                String json = gson.toJson(message);
+//
+//                channel.writeAndFlush(new DatagramPacket(Unpooled.copiedBuffer(json, CharsetUtil.UTF_8),
+//                        inetSocketAddress));
+//            }else {
+//                channel.writeAndFlush(message);
+//            }
+//        }
+//    }
+
+    public static void send(MessageRoot message, String to){
         if(null != channel) {
-            String to = message.getTo();
+//            String to = message.getTo();
             if(!to.equals("0")){
                 InetSocketAddress inetSocketAddress = UserUtil.findInetSocketAddressByUsername(to);
                 Log.e("MessageBroadcaster", "send to " + inetSocketAddress);
