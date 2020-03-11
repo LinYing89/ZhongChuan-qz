@@ -11,7 +11,7 @@ public class ClientBase {
     private Location location;// 位置信息
     private String ip;
     private Marker marker;
-    private InetSocketAddress inetSocketAddress;
+//    private InetSocketAddress inetSocketAddress;
 
     public String getUsername() {
         return username;
@@ -48,11 +48,11 @@ public class ClientBase {
         this.marker = marker;
     }
 
-    public InetSocketAddress getInetSocketAddress() {
-        return inetSocketAddress;
-    }
-
-    public void setInetSocketAddress(InetSocketAddress inetSocketAddress) {
-        this.inetSocketAddress = inetSocketAddress;
-    }
+//    public InetSocketAddress getInetSocketAddress() {
+//        return inetSocketAddress;
+//    }
+//
+//    public void setInetSocketAddress(InetSocketAddress inetSocketAddress) {
+//        this.inetSocketAddress = inetSocketAddress;
+//    }
 }

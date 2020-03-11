@@ -7,6 +7,7 @@ import com.bairock.zhongchuan.qz.bean.MessageSource;
 import com.bairock.zhongchuan.qz.bean.ZCMessage;
 import com.bairock.zhongchuan.qz.bean.ZCMessageType;
 import com.bairock.zhongchuan.qz.netty.MessageBroadcaster;
+import com.bairock.zhongchuan.qz.netty.UdpMessageHelper;
 
 import java.util.Date;
 import java.util.UUID;
@@ -19,7 +20,7 @@ public class HeartThread extends Thread {
             chatTest();
             heartTest();
             try {
-                sleep(10000);
+                sleep(5000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -42,7 +43,8 @@ public class HeartThread extends Thread {
         }
         Location location = new Location(lng, 34.73371279664106);
         messageRoot.setData(location);
-        MessageBroadcaster.send(messageRoot);
+        MessageBroadcaster.sendBroadcast(UdpMessageHelper.createHeart("8080", Util.getLocalIp(), location));
+//        MessageBroadcaster.send(messageRoot);
 
         MessageRoot<Location> messageRoot1 = new MessageRoot<>();
         messageRoot1.setFrom("9081");
@@ -59,7 +61,8 @@ public class HeartThread extends Thread {
         }
         Location location1 = new Location(lng1, 34.73371279664106);
         messageRoot1.setData(location1);
-        MessageBroadcaster.send(messageRoot1);
+        MessageBroadcaster.sendBroadcast(UdpMessageHelper.createHeart("9081", Util.getLocalIp(), location1));
+//        MessageBroadcaster.send(messageRoot1);
 
         MessageRoot<Location> messageRoot2 = new MessageRoot<>();
         messageRoot2.setFrom("7081");
@@ -77,7 +80,8 @@ public class HeartThread extends Thread {
         }
         Location location2 = new Location(lng2, 34.73371279664106);
         messageRoot2.setData(location2);
-        MessageBroadcaster.send(messageRoot2);
+        MessageBroadcaster.sendBroadcast(UdpMessageHelper.createHeart("7081", Util.getLocalIp(), location2));
+//        MessageBroadcaster.send(messageRoot2);
     }
 
     private int i = 0;
@@ -120,6 +124,6 @@ public class HeartThread extends Thread {
         message.setMessageType(ZCMessageType.TXT);
         message.setContent("test receive");
         messageRoot.setData(message);
-        MessageBroadcaster.send(messageRoot);
+//        MessageBroadcaster.send(messageRoot);
     }
 }

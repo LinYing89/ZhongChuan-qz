@@ -76,17 +76,17 @@ public class TcpClient {
         if (linking || isLinked()) {
             return;
         }
-        if(user.getInetSocketAddress() == null){
+        if(user.getIp() == null){
             return;
         }
         linking = true;
         tcpClientHandler = new TcpClientHandler(this);
-        String serverName = user.getInetSocketAddress().getHostString();
+        String serverName = user.getIp();
         Log.e("TcpClient", "link to " + serverName);
 //        int port = user.getInetSocketAddress().getPort();
         try {
             // Start the client.
-            ChannelFuture channelFuture = b.connect(serverName, 8888); // (5)
+            ChannelFuture channelFuture = b.connect(serverName, TcpServer.PORT); // (5)
             // Wait until the connection is closed.
             channelFuture.channel().closeFuture();
             Log.e("TcpClient", "linked success " + serverName);
@@ -100,12 +100,12 @@ public class TcpClient {
         if (linking) {
             return;
         }
-        if(user.getInetSocketAddress() == null){
+        if(user.getIp() == null){
             return;
         }
         linking = true;
-        String serverName = user.getInetSocketAddress().getHostString();
-        int port = user.getInetSocketAddress().getPort();
+        String serverName = user.getIp();
+        int port = TcpServer.PORT;
         try {
             // Start the client.
             ChannelFuture channelFuture = b.connect(serverName, port); // (5)

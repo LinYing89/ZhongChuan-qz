@@ -8,6 +8,7 @@ import com.bairock.zhongchuan.qz.bean.Telescope;
 import com.bairock.zhongchuan.qz.bean.UnmannedAerialVehicle;
 import com.bairock.zhongchuan.qz.bean.User;
 
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
@@ -82,14 +83,14 @@ public class UserUtil {
         InetSocketAddress inetSocketAddress = null;
         for(User user : users){
             if(user.getUsername().equals(username)){
-                inetSocketAddress = user.getInetSocketAddress();
+                inetSocketAddress = new InetSocketAddress(user.getIp(), 10000);
                 break;
             }
         }
         if(null == inetSocketAddress){
             for(ClientBase user : telescopes){
                 if(user.getUsername().equals(username)){
-                    inetSocketAddress = user.getInetSocketAddress();
+                    inetSocketAddress = new InetSocketAddress(user.getIp(), 10000);
                     break;
                 }
             }
@@ -97,7 +98,7 @@ public class UserUtil {
         if(null == inetSocketAddress){
             for(ClientBase user : unmannedAerialVehicles){
                 if(user.getUsername().equals(username)){
-                    inetSocketAddress = user.getInetSocketAddress();
+                    inetSocketAddress = new InetSocketAddress(user.getIp(), 10000);
                     break;
                 }
             }
@@ -105,31 +106,64 @@ public class UserUtil {
         return inetSocketAddress;
     }
 
-    public static void setHeartInfo(InetSocketAddress inetSocketAddress, MessageRoot<Location> messageRoot){
-        if(messageRoot.getSource() == MessageSource.PHONE) {
-            for (User user : users) {
-                if (user.getUsername().equals(messageRoot.getFrom())) {
-                    user.setInetSocketAddress(inetSocketAddress);
-                    user.setLocation(messageRoot.getData());
-                    TcpClientUtil.tryLink(user);
-                }
+//    public static void setHeartInfo(InetSocketAddress inetSocketAddress, MessageRoot<Location> messageRoot){
+//        if(messageRoot.getSource() == MessageSource.PHONE) {
+//            for (User user : users) {
+//                if (user.getUsername().equals(messageRoot.getFrom())) {
+//                    user.setInetSocketAddress(inetSocketAddress);
+//                    user.setLocation(messageRoot.getData());
+//                    TcpClientUtil.tryLink(user);
+//                }
+//            }
+//        }else if(messageRoot.getSource() == MessageSource.UAV){
+//            for (ClientBase user : unmannedAerialVehicles) {
+//                if (user.getUsername().equals(messageRoot.getFrom())) {
+//                    user.setInetSocketAddress(inetSocketAddress);
+//                    user.setLocation(messageRoot.getData());
+//                    TcpClientUtil.tryLink(user);
+//                }
+//            }
+//        }else {
+//            for (ClientBase user : telescopes) {
+//                if (user.getUsername().equals(messageRoot.getFrom())) {
+//                    user.setInetSocketAddress(inetSocketAddress);
+//                    user.setLocation(messageRoot.getData());
+//                    TcpClientUtil.tryLink(user);
+//                }
+//            }
+//        }
+//    }
+
+    public static void setHeartInfo(String memberNumber, String ip, Location location){
+
+        ClientBase clientBase = null;
+        for (User user : users) {
+            if (user.getUsername().equals(memberNumber)) {
+                clientBase = user;
+                break;
             }
-        }else if(messageRoot.getSource() == MessageSource.UAV){
+        }
+        if(null == clientBase){
             for (ClientBase user : unmannedAerialVehicles) {
-                if (user.getUsername().equals(messageRoot.getFrom())) {
-                    user.setInetSocketAddress(inetSocketAddress);
-                    user.setLocation(messageRoot.getData());
-                    TcpClientUtil.tryLink(user);
+                if (user.getUsername().equals(memberNumber)) {
+                    clientBase = user;
+                    break;
                 }
             }
-        }else {
+        }
+        if(null == clientBase) {
             for (ClientBase user : telescopes) {
-                if (user.getUsername().equals(messageRoot.getFrom())) {
-                    user.setInetSocketAddress(inetSocketAddress);
-                    user.setLocation(messageRoot.getData());
-                    TcpClientUtil.tryLink(user);
+                if (user.getUsername().equals(memberNumber)) {
+                    clientBase = user;
+                    break;
                 }
             }
+        }
+
+        if(null != clientBase){
+            clientBase.setIp(ip);
+            clientBase.setLocation(location);
+            TcpClientUtil.tryLink(clientBase);
         }
     }
 

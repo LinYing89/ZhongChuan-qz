@@ -22,11 +22,11 @@ public class MessageEncoder extends MessageToMessageEncoder<byte[]> {
 
     @Override
     protected void encode(ChannelHandlerContext ctx, byte[] msg, List<Object> out) {
-        Gson gson = new Gson();
-        String json = gson.toJson(msg);
-        byte[] bytes = json.getBytes();
-        ByteBuf byteBuf = ctx.alloc().buffer(bytes.length);// 分配byteBuf的内存
-        byteBuf.writeBytes(bytes);
+//        Gson gson = new Gson();
+//        String json = gson.toJson(msg);
+//        byte[] bytes = json.getBytes();
+        ByteBuf byteBuf = ctx.alloc().buffer(msg.length);// 分配byteBuf的内存
+        byteBuf.writeBytes(msg);
         out.add(new DatagramPacket(byteBuf, remoteAddress));
     }
 }
