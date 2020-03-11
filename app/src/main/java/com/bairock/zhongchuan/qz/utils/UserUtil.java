@@ -79,6 +79,25 @@ public class UserUtil {
         return null;
     }
 
+    public static String findIpByUsername(String username){
+        for(User user : users){
+            if(user.getUsername().equals(username)){
+                return user.getIp();
+            }
+        }
+        for(ClientBase user : telescopes){
+            if(user.getUsername().equals(username)){
+                return user.getIp();
+            }
+        }
+        for(ClientBase user : unmannedAerialVehicles){
+            if(user.getUsername().equals(username)){
+                return user.getIp();
+            }
+        }
+        return null;
+    }
+
     public static InetSocketAddress findInetSocketAddressByUsername(String username){
         InetSocketAddress inetSocketAddress = null;
         for(User user : users){

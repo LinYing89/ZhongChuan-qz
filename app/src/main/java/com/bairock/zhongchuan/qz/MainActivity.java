@@ -30,6 +30,7 @@ import androidx.fragment.app.FragmentTransaction;
 import com.bairock.zhongchuan.qz.common.Utils;
 import com.bairock.zhongchuan.qz.dialog.ActionItem;
 import com.bairock.zhongchuan.qz.dialog.TitlePopup;
+import com.bairock.zhongchuan.qz.netty.H264bRoadcaster;
 import com.bairock.zhongchuan.qz.netty.MessageBroadcaster;
 import com.bairock.zhongchuan.qz.netty.TcpServer;
 import com.bairock.zhongchuan.qz.utils.ConversationUtil;
@@ -75,6 +76,9 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
         UserUtil.initUsers();
         MessageBroadcaster messageBroadcaster = new MessageBroadcaster();
         messageBroadcaster.bind();
+
+        H264bRoadcaster h264bRoadcaster = new H264bRoadcaster();
+        h264bRoadcaster.bind();
 
         new HeartThread().start();
         try {

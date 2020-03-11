@@ -47,8 +47,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".view.activity.ChatVideoActivity"
-            android:theme="@style/Theme.AppCompat"></activity>
+        <activity
+            android:name=".view.activity.VideoCallActivity"
+            android:theme="@style/Theme.AppCompat" />
+        <activity
+            android:name=".view.activity.ChatVideoActivity"
+            android:theme="@style/Theme.AppCompat" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -67,11 +71,11 @@
 
         <activity
             android:name=".view.activity.SettingsActivity"
-            android:screenOrientation="portrait"
+            android:screenOrientation="fullSensor"
             android:theme="@style/Theme.AppCompat" />
         <activity
             android:name=".view.activity.VoiceUploadActivity"
-            android:screenOrientation="portrait"
+            android:screenOrientation="fullSensor"
             android:theme="@style/Theme.AppCompat" />
         <activity
             android:name=".view.activity.VideoUploadActivity"

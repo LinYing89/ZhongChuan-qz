@@ -71,6 +71,7 @@ import com.bairock.zhongchuan.qz.utils.MyVoiceRecorder;
 import com.bairock.zhongchuan.qz.utils.TcpClientUtil;
 import com.bairock.zhongchuan.qz.utils.UserUtil;
 import com.bairock.zhongchuan.qz.view.activity.ChatVideoActivity;
+import com.bairock.zhongchuan.qz.view.activity.VideoCallActivity;
 import com.bairock.zhongchuan.qz.widght.PasteEditText;
 import com.easemob.EMError;
 
@@ -463,6 +464,9 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 			selectPicFromLocal(); // 点击图片图标
 			break;
 		case R.id.view_location:
+			Intent intent = new Intent(this, VideoCallActivity.class);
+			intent.putExtra(Constants.NAME, Name);
+			startActivity(intent);
 			break;
 		case R.id.view_audio:
 			// 语音通话

@@ -41,7 +41,7 @@ public class VideoUploadActivity extends AppCompatActivity {
         chronometer = findViewById(R.id.chronometer);
         chronometer.start();
         publish = new Publish.Buider(this, (PublishView) findViewById(R.id.publishView))
-                .setPushMode(new UdpSend("192.168.1.6", 8765))
+                .setPushMode(new UdpSend("192.168.1.6", 10001))
                 .setFrameRate(15)//帧率
                 .setVideoCode(VDEncoder.H264)//编码方式
                 .setIsPreview(true)//是否需要显示预览(如需后台推流最好设置false，如果设置false则构建Buider可以调用单参数方法Publish.Buider(context))
