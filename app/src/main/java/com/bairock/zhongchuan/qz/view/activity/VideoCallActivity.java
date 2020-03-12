@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 import com.bairock.zhongchuan.qz.Constants;
 import com.bairock.zhongchuan.qz.R;
-import com.bairock.zhongchuan.qz.netty.H264bRoadcaster;
+import com.bairock.zhongchuan.qz.netty.H264Broadcaster;
 import com.bairock.zhongchuan.qz.recorderlib.utils.Logger;
 import com.bairock.zhongchuan.qz.utils.FileUtil;
 import com.bairock.zhongchuan.qz.utils.UserUtil;
@@ -81,8 +81,8 @@ public class VideoCallActivity extends AppCompatActivity {
 //                        if(null != player){
 //                            player.write(bytes);
 //                        }
-//                        H264bRoadcaster.send(bytes, ip);
-                        H264bRoadcaster.send(bytes, "192.168.1.6");
+                        H264Broadcaster.send(bytes, ip);
+//                        H264bRoadcaster.send(bytes, "192.168.1.6");
                         return new byte[0];
                     }
                 })
@@ -94,14 +94,14 @@ public class VideoCallActivity extends AppCompatActivity {
 //                .setPullMode(new UdpRecive(10001))
                 .setPullMode(new UdpRecive())
                 .setVideoCode(VDDecoder.H264)//设置解码方式
-                .setMultiple(1)//音频调节，倍数限制为1-8倍。1为原声,放大后可能导致爆音。
-                .setUdpControl(new UdpControlInterface() {
-                    @Override
-                    public byte[] Control(byte[] bytes, int offset, int length) {//bytes为接收到的原始数据
-                        Logger.e(TAG, "BYTES LENGTH: " + bytes.length);
-                        return bytes;
-                    }
-                })
+                .setMultiple(3)//音频调节，倍数限制为1-8倍。1为原声,放大后可能导致爆音。
+//                .setUdpControl(new UdpControlInterface() {
+//                    @Override
+//                    public byte[] Control(byte[] bytes, int offset, int length) {//bytes为接收到的原始数据
+//                        Logger.e(TAG, "BYTES LENGTH: " + bytes.length);
+//                        return bytes;
+//                    }
+//                })
                 .build();
         player.start();
 

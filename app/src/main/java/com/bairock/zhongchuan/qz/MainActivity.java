@@ -6,17 +6,13 @@ import java.util.TimerTask;
 import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,17 +23,15 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.bairock.zhongchuan.qz.common.Utils;
-import com.bairock.zhongchuan.qz.dialog.ActionItem;
 import com.bairock.zhongchuan.qz.dialog.TitlePopup;
-import com.bairock.zhongchuan.qz.netty.H264bRoadcaster;
+import com.bairock.zhongchuan.qz.netty.H264Broadcaster;
 import com.bairock.zhongchuan.qz.netty.MessageBroadcaster;
 import com.bairock.zhongchuan.qz.netty.TcpServer;
+import com.bairock.zhongchuan.qz.netty.VoiceBroadcaster;
 import com.bairock.zhongchuan.qz.utils.ConversationUtil;
 import com.bairock.zhongchuan.qz.utils.FileUtil;
 import com.bairock.zhongchuan.qz.utils.HeartThread;
 import com.bairock.zhongchuan.qz.utils.UserUtil;
-import com.bairock.zhongchuan.qz.view.ChatActivity;
 import com.bairock.zhongchuan.qz.view.fragment.FragmentVoiceUpload;
 import com.bairock.zhongchuan.qz.view.fragment.FragmentContact;
 import com.bairock.zhongchuan.qz.view.fragment.FragmentMsg;
@@ -77,8 +71,11 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
         MessageBroadcaster messageBroadcaster = new MessageBroadcaster();
         messageBroadcaster.bind();
 
-        H264bRoadcaster h264bRoadcaster = new H264bRoadcaster();
+        H264Broadcaster h264bRoadcaster = new H264Broadcaster();
         h264bRoadcaster.bind();
+
+        VoiceBroadcaster voiceBroadcaster = new VoiceBroadcaster();
+        voiceBroadcaster.bind();
 
         new HeartThread().start();
         try {

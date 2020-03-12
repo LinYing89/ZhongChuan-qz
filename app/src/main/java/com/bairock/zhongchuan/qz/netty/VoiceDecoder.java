@@ -1,9 +1,7 @@
 package com.bairock.zhongchuan.qz.netty;
 
-import android.util.Log;
-
-import com.bairock.zhongchuan.qz.utils.Util;
 import com.bairock.zhongchuan.qz.view.activity.VideoCallActivity;
+import com.bairock.zhongchuan.qz.view.activity.VoiceCallActivity;
 
 import java.util.List;
 
@@ -12,7 +10,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.socket.DatagramPacket;
 import io.netty.handler.codec.MessageToMessageDecoder;
 
-public class H264Decoder extends MessageToMessageDecoder<DatagramPacket> {
+public class VoiceDecoder extends MessageToMessageDecoder<DatagramPacket> {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, DatagramPacket msg, List<Object> out) {
@@ -21,7 +19,7 @@ public class H264Decoder extends MessageToMessageDecoder<DatagramPacket> {
         ByteBuf byteBuf = msg.copy().content();
         byte[] req = new byte[byteBuf.readableBytes()];
         byteBuf.readBytes(req);
-        VideoCallActivity.player.write(req);
+        VoiceCallActivity.listen.write(req);
 //        Log.e("H264Decoder", Util.bytesToHexString(req));
     }
 }

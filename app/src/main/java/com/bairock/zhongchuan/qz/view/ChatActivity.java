@@ -72,6 +72,7 @@ import com.bairock.zhongchuan.qz.utils.TcpClientUtil;
 import com.bairock.zhongchuan.qz.utils.UserUtil;
 import com.bairock.zhongchuan.qz.view.activity.ChatVideoActivity;
 import com.bairock.zhongchuan.qz.view.activity.VideoCallActivity;
+import com.bairock.zhongchuan.qz.view.activity.VoiceCallActivity;
 import com.bairock.zhongchuan.qz.widght.PasteEditText;
 import com.easemob.EMError;
 
@@ -470,6 +471,9 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 			break;
 		case R.id.view_audio:
 			// 语音通话
+			Intent intent1 = new Intent(this, VoiceCallActivity.class);
+			intent1.putExtra(Constants.NAME, Name);
+			startActivity(intent1);
 			break;
 		case R.id.iv_emoticons_normal:
 			// 点击显示表情框
