@@ -6,6 +6,7 @@ import com.bairock.zhongchuan.qz.utils.Util;
 public class UdpMessageHelper {
 
     public static final byte HEART = 0x01;
+    public static final byte LOGIN = 0x02;
 
     public static byte[] createBytes(UdpMessage udpMessage){
         byte[] bytes = new byte[6 + udpMessage.getData().length];
@@ -43,6 +44,27 @@ public class UdpMessageHelper {
         byte[] byteLat = intToBytes(lat);
         System.arraycopy(byteLng, 0, data, 4, byteLng.length);
         System.arraycopy(byteLat, 0, data, 8, byteLng.length);
+        udpMessage.setData(data);
+        return udpMessage;
+    }
+
+    public static UdpMessage createLogin(String number, String password){
+        UdpMessage udpMessage = new UdpMessage();
+        udpMessage.setMemberNumber(Short.parseShort(number));
+        udpMessage.setFactionCode(LOGIN);
+        char[] cNumber = number.toCharArray();
+        char[] cPassword = password.toCharArray();
+        byte[] data = new byte[4 + cPassword.length];
+        data[0] = (byte) cNumber[0];
+        data[1] = (byte) cNumber[1];
+        data[2] = (byte) cNumber[2];
+        data[3] = (byte) cNumber[3];
+        byte[] bPassword = new byte[cPassword.length];
+        for(int i = 0; i < cPassword.length; i++){
+            bPassword[i] = (byte) cPassword[i];
+        }
+        System.arraycopy(bPassword, 0, data, 4, bPassword.length);
+        udpMessage.setDataLength((short) data.length);
         udpMessage.setData(data);
         return udpMessage;
     }

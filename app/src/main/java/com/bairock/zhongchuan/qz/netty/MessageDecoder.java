@@ -2,12 +2,19 @@ package com.bairock.zhongchuan.qz.netty;
 
 import android.util.Log;
 
+import com.bairock.zhongchuan.qz.bean.ClientBase;
 import com.bairock.zhongchuan.qz.bean.Location;
 import com.bairock.zhongchuan.qz.bean.MessageRoot;
 import com.bairock.zhongchuan.qz.bean.MessageRootType;
+import com.bairock.zhongchuan.qz.bean.SoundRecorder;
+import com.bairock.zhongchuan.qz.bean.Telescope;
+import com.bairock.zhongchuan.qz.bean.UnmannedAerialVehicle;
+import com.bairock.zhongchuan.qz.bean.User;
 import com.bairock.zhongchuan.qz.bean.ZCMessage;
+import com.bairock.zhongchuan.qz.common.Utils;
 import com.bairock.zhongchuan.qz.utils.UserUtil;
 import com.bairock.zhongchuan.qz.utils.Util;
+import com.bairock.zhongchuan.qz.view.activity.LoginActivity;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -54,43 +61,55 @@ public class MessageDecoder extends MessageToMessageDecoder<DatagramPacket> {
                 double dlat = lat / 10000000d;
                 UserUtil.setHeartInfo(String.valueOf(memberNumber), ip, new Location(dlng, dlat));
                 break;
+            case UdpMessageHelper.LOGIN:
+                if(null == LoginActivity.handler){
+                    return;
+                }
+                byte errCode = req[3];
+                if(errCode == 1){
+                    //登录失败
+                    LoginActivity.handler.obtainMessage(1);
+                }else{
+                    if(data.length % 3 != 0){
+                        //数据个数错误, data长度不是3的倍数
+                        return;
+                    }
+                    int index = 0;
+                    while (index < data.length) {
+                        byte[] byMember = new byte[3];
+                        System.arraycopy(data, index, byMember, 0, 3);
+                        String username = String.valueOf(Util.bytesToInt(new byte[]{byMember[1], byMember[2]}));
+                        ClientBase clientBase = null;
+                        switch (byMember[0]){
+                            case 0x01:
+                                //手持终端
+                                clientBase = new User();
+                                break;
+                            case 0x02:
+                                //摄像望远镜
+                                clientBase = new Telescope();
+                                break;
+                            case 0x03:
+                                //无人机
+                                clientBase = new UnmannedAerialVehicle();
+                                break;
+                            case 0x04:
+                                //便携式录音设备
+                                clientBase = new SoundRecorder();
+                                break;
+                        }
+                        if(null != clientBase) {
+                            clientBase.setUsername(username);
+                            UserUtil.addClientBase(clientBase);
+                        }
+
+                        index += 3;
+                    }
+                    LoginActivity.handler.obtainMessage(0);
+                }
+                break;
             default: break;
         }
         out.add(byteBuf);
-
-//        String strMsg = new String(bytes);
-//
-//        JsonObject jsonObject = JsonParser.parseString(strMsg).getAsJsonObject();
-//        String strType = jsonObject.get("type").getAsString();
-//        Gson gson = new Gson();
-//        switch (strType) {
-//            case "HEART": {
-//                Type type = new TypeToken<MessageRoot<Location>>() {
-//                }.getType();
-//                MessageRoot<Location> zcMessage = gson.fromJson(strMsg, type);
-////                UserUtil.setHeartInfo(msg.sender(), zcMessage);
-//                out.add(zcMessage);
-////                Log.e("MessageDecoder", msg.sender().toString());
-//                break;
-//            }
-//            case "CHAT": {
-//                Type type = new TypeToken<MessageRoot<ZCMessage>>() {
-//                }.getType();
-//                MessageRoot<ZCMessage> zcMessage = gson.fromJson(strMsg, type);
-//                out.add(zcMessage);
-//                break;
-//            }
-//            case "VIDEO": {
-////                Type type = new TypeToken<MessageRoot<byte[]>>() {
-////                }.getType();
-////                MessageRoot<byte[]> zcMessage = gson.fromJson(strMsg, type);
-////                out.add(zcMessage);
-////                break;
-//            }
-//            default:
-//                out.add(null);
-//                break;
-//        }
-
     }
 }

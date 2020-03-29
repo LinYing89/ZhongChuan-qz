@@ -4,6 +4,7 @@ import com.bairock.zhongchuan.qz.bean.ClientBase;
 import com.bairock.zhongchuan.qz.bean.Location;
 import com.bairock.zhongchuan.qz.bean.MessageRoot;
 import com.bairock.zhongchuan.qz.bean.MessageSource;
+import com.bairock.zhongchuan.qz.bean.SoundRecorder;
 import com.bairock.zhongchuan.qz.bean.Telescope;
 import com.bairock.zhongchuan.qz.bean.UnmannedAerialVehicle;
 import com.bairock.zhongchuan.qz.bean.User;
@@ -21,13 +22,28 @@ public class UserUtil {
 
     public static List<Telescope> telescopes = new ArrayList<>();
     public static List<UnmannedAerialVehicle> unmannedAerialVehicles = new ArrayList<>();
+    public static List<SoundRecorder> soundRecorders = new ArrayList<>();
 
     public static List<ClientBase> findClientBases(){
         List<ClientBase> clientBases = new ArrayList<>();
         clientBases.addAll(users);
         clientBases.addAll(telescopes);
         clientBases.addAll(unmannedAerialVehicles);
+        clientBases.addAll(soundRecorders);
         return clientBases;
+    }
+
+
+    public static void addClientBase(ClientBase clientBase){
+        if(clientBase instanceof User){
+            addUser((User) clientBase);
+        }else if(clientBase instanceof UnmannedAerialVehicle){
+            addUnmannedAerialVehicle((UnmannedAerialVehicle) clientBase);
+        }else if(clientBase instanceof Telescope) {
+            addTelescope((Telescope) clientBase);
+        }else if(clientBase instanceof SoundRecorder){
+            addSoundRecorder((SoundRecorder) clientBase);
+        }
     }
 
     public static void addUser(User user){
@@ -40,6 +56,27 @@ public class UserUtil {
             }
         }
         users.add(user);
+    }
+
+    public static void addTelescope(Telescope telescope){
+        if(null == telescope || telescope.getUsername() == null){
+            return;
+        }
+        telescopes.add(telescope);
+    }
+
+    public static void addUnmannedAerialVehicle(UnmannedAerialVehicle unmannedAerialVehicle){
+        if(null == unmannedAerialVehicle || unmannedAerialVehicle.getUsername() == null){
+            return;
+        }
+        unmannedAerialVehicles.add(unmannedAerialVehicle);
+    }
+
+    public static void addSoundRecorder(SoundRecorder soundRecorder){
+        if(null == soundRecorder || soundRecorder.getUsername() == null){
+            return;
+        }
+        soundRecorders.add(soundRecorder);
     }
 
     public static void initUsers(){
@@ -68,6 +105,13 @@ public class UserUtil {
             unmannedAerialVehicles.add(unmannedAerialVehicle);
             TcpClientUtil.add(unmannedAerialVehicle);
         }
+
+        for(int i = 1; i < 3; i++) {
+            SoundRecorder soundRecorder = new SoundRecorder();
+            soundRecorder.setUsername("608" + i);
+            soundRecorders.add(soundRecorder);
+            TcpClientUtil.add(soundRecorder);
+        }
     }
 
     public static User findUserByUsername(String username){
@@ -95,6 +139,11 @@ public class UserUtil {
                 return user.getIp();
             }
         }
+        for(ClientBase user : soundRecorders){
+            if(user.getUsername().equals(username)){
+                return user.getIp();
+            }
+        }
         return null;
     }
 
@@ -116,6 +165,14 @@ public class UserUtil {
         }
         if(null == inetSocketAddress){
             for(ClientBase user : unmannedAerialVehicles){
+                if(user.getUsername().equals(username)){
+                    inetSocketAddress = new InetSocketAddress(user.getIp(), 10000);
+                    break;
+                }
+            }
+        }
+        if(null == inetSocketAddress){
+            for(ClientBase user : soundRecorders){
                 if(user.getUsername().equals(username)){
                     inetSocketAddress = new InetSocketAddress(user.getIp(), 10000);
                     break;
@@ -178,11 +235,21 @@ public class UserUtil {
                 }
             }
         }
+        if(null == clientBase) {
+            for (ClientBase user : soundRecorders) {
+                if (user.getUsername().equals(memberNumber)) {
+                    clientBase = user;
+                    break;
+                }
+            }
+        }
 
         if(null != clientBase){
             clientBase.setIp(ip);
             clientBase.setLocation(location);
-            TcpClientUtil.tryLink(clientBase);
+            if(clientBase instanceof User) {
+                TcpClientUtil.tryLink(clientBase);
+            }
         }
     }
 

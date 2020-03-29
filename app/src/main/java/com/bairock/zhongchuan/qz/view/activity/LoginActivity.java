@@ -1,7 +1,10 @@
 package com.bairock.zhongchuan.qz.view.activity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -12,13 +15,19 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bairock.zhongchuan.qz.Constants;
 import com.bairock.zhongchuan.qz.MainActivity;
 import com.bairock.zhongchuan.qz.R;
 import com.bairock.zhongchuan.qz.common.DES;
 import com.bairock.zhongchuan.qz.common.Utils;
+import com.bairock.zhongchuan.qz.netty.MessageBroadcaster;
+import com.bairock.zhongchuan.qz.netty.UdpMessageHelper;
+import com.bairock.zhongchuan.qz.utils.Util;
 import com.bairock.zhongchuan.qz.view.BaseActivity;
+
+import java.lang.ref.WeakReference;
 
 //登陆
 public class LoginActivity extends BaseActivity implements OnClickListener {
@@ -26,11 +35,16 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 	private ImageView img_back;
 	private Button btn_login;
 	private EditText et_usertel, et_password;
+	private boolean loging = false;
+	private ProgressDialog loginDialog;
+
+	public static MyHandler handler;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		setContentView(R.layout.activity_login);
 		super.onCreate(savedInstanceState);
+		handler = new MyHandler(this);
 	}
 
 	@Override
@@ -70,11 +84,42 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 			Utils.finish(LoginActivity.this);
 			break;
 		case R.id.btn_login:
+			showDialog();
 			getLogin();
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						while (true) {
+							Thread.sleep(1000);
+							if (!loging) {
+								//登录已返回
+								return;
+							}
+						}
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					//登录超时
+					runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							Toast.makeText(LoginActivity.this, "", Toast.LENGTH_SHORT).show();
+						}
+					});
+				}
+			}).start();
 			break;
 		default:
 			break;
 		}
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		loginDialog = null;
+		handler = null;
 	}
 
 	private void getLogin() {
@@ -85,6 +130,9 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 
 	private void getLogin(final String userName, final String password) {
 		if (!TextUtils.isEmpty(userName) && !TextUtils.isEmpty(password)) {
+			loging = true;
+			MessageBroadcaster.sendBroadcast(UdpMessageHelper.createLogin(userName, password));
+
 			Intent intent = new Intent(LoginActivity.this,
 					MainActivity.class);
 			startActivity(intent);
@@ -94,6 +142,20 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 		} else {
 			Utils.showLongToast(LoginActivity.this, "请填写账号或密码！");
 		}
+	}
+
+	public void showDialog(){
+		loginDialog = new ProgressDialog(this);
+		loginDialog.setTitle("正在登录");
+		loginDialog.setIcon(R.mipmap.ic_launcher_round);
+		loginDialog.setMessage("请稍等...");
+		loginDialog.setCancelable(false);
+		loginDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+		loginDialog.show();
+	}
+
+	public void closeDialog(){
+		loginDialog.dismiss();
 	}
 
 	// EditText监听器
@@ -125,6 +187,35 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 				btn_login.setTextColor(0xFFD0EFC6);
 				btn_login.setEnabled(false);
 			}
+		}
+	}
+
+	public static class MyHandler extends Handler {
+		WeakReference<LoginActivity> mActivity;
+
+		MyHandler(LoginActivity activity) {
+			mActivity = new WeakReference<>(activity);
+		}
+
+		@Override
+		public void handleMessage(Message msg) {
+			final LoginActivity theActivity = mActivity.get();
+			if(!theActivity.loging){
+				return;
+			}
+			theActivity.closeDialog();
+			theActivity.loging = false;
+			switch (msg.what) {
+				case 1:
+					//登录失败
+					Toast.makeText(theActivity, "登录失败", Toast.LENGTH_SHORT).show();
+					break;
+				case 0:
+					//登录成功
+					theActivity.finish();
+					break;
+			}
+
 		}
 	}
 
