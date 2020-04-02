@@ -17,6 +17,10 @@ import java.util.UUID;
 public class ConversationUtil {
 
     public static String CHAT_ACTION = "com.bairock.zhongchuan.qz.chat";
+    public static String VOICE_ASK_ACTION = "com.bairock.zhongchuan.qz.voice_ask";
+    public static String VOICE_ANS_ACTION = "com.bairock.zhongchuan.qz.voice_ans";
+    public static String VIDEO_ASK_ACTION = "com.bairock.zhongchuan.qz.video_ask";
+    public static String VIDEO_ANS_ACTION = "com.bairock.zhongchuan.qz.video_ans";
     public static String CHAT_BROADCAST_PERMISSION = "qz.permission.MY_BROADCAST_PERMISSION";
 
     public static ZCConversation activeConversation = null;

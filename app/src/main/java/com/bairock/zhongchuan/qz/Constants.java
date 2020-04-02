@@ -11,6 +11,15 @@ public interface Constants {
 	String Title = "Title";
 	String ID = "id";
 	String NAME = "NAME";
+	String MEDIA_TYPE = "mediaType";
+	String MEDIA_TYPE_VOICE = "mediaTypeVoice";
+	String MEDIA_TYPE_VIDEO = "mediaTypeVideo";
+	String VOICE_TYPE = "voiceType";
+	String VOICE_ASK = "voiceAak";
+	String VOICE_ANS = "voiceAns";
+	String VIDEO_TYPE = "videoType";
+	String VIDEO_ASK = "videoAak";
+	String VIDEO_ANS = "videoAns";
 	String AccessToken = "AccessToken";
 	String PWD = "PWD";
 	String ContactMsg = "ContactMsg";

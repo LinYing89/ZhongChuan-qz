@@ -32,6 +32,8 @@ import com.bairock.zhongchuan.qz.utils.ConversationUtil;
 import com.bairock.zhongchuan.qz.utils.FileUtil;
 import com.bairock.zhongchuan.qz.utils.HeartThread;
 import com.bairock.zhongchuan.qz.utils.UserUtil;
+import com.bairock.zhongchuan.qz.view.activity.VideoCallActivity;
+import com.bairock.zhongchuan.qz.view.activity.VoiceCallActivity;
 import com.bairock.zhongchuan.qz.view.fragment.FragmentVoiceUpload;
 import com.bairock.zhongchuan.qz.view.fragment.FragmentContact;
 import com.bairock.zhongchuan.qz.view.fragment.FragmentMsg;
@@ -41,6 +43,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
     private TextView txt_title;
     private ImageView img_right;
     private NewMessageBroadcastReceiver msgReceiver;
+    private MediaBroadcastReceiver mediaBroadcastReceiver;
     protected static final String TAG = "MainActivity";
     private TitlePopup titlePopup;
     private TextView unreaMsgdLabel;// 未读消息textview
@@ -278,6 +281,11 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
         // 设置广播的优先级别大于Mainacitivity,这样如果消息来的时候正好在chat页面，直接显示消息，而不是提示消息未读
         intentFilter.setPriority(3);
         registerReceiver(msgReceiver, intentFilter);
+
+        mediaBroadcastReceiver = new MediaBroadcastReceiver();
+        IntentFilter intentFilter1 = new IntentFilter(ConversationUtil.VOICE_ANS_ACTION);
+        registerReceiver(mediaBroadcastReceiver, intentFilter1);
+
 //        Intent intent = new Intent(this, UpdateService.class);
 //        startService(intent);
 //        registerReceiver(new MyBroadcastReceiver(), new IntentFilter(
@@ -288,6 +296,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
 //                .getInstance().getNewMessageBroadcastAction());
 //        intentFilter.setPriority(3);
 //        registerReceiver(msgReceiver, intentFilter);
+
     }
 
     // 自己联系人 群组数据返回监听
@@ -323,6 +332,27 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
                 if (fragmentMsg != null) {
                     fragmentMsg.refresh();
                 }
+            }
+        }
+    }
+
+    private class MediaBroadcastReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String type = intent.getStringExtra(Constants.MEDIA_TYPE);
+            String name = intent.getStringExtra(Constants.NAME);
+            if(type.equals(Constants.MEDIA_TYPE_VOICE)){
+                //语音请求
+                Intent intent1 = new Intent(MainActivity.this, VoiceCallActivity.class);
+                intent1.putExtra(Constants.VOICE_TYPE, Constants.VOICE_ANS);
+                intent1.putExtra(Constants.NAME, name);
+                MainActivity.this.startActivity(intent);
+            }else if(type.equals(Constants.MEDIA_TYPE_VIDEO)){
+                // 视频请求
+                Intent intent1 = new Intent(MainActivity.this, VideoCallActivity.class);
+                intent1.putExtra(Constants.VIDEO_TYPE, Constants.VIDEO_ANS);
+                intent1.putExtra(Constants.NAME, name);
+                MainActivity.this.startActivity(intent);
             }
         }
     }

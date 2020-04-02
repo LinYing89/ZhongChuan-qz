@@ -1,7 +1,10 @@
 package com.bairock.zhongchuan.qz.netty;
 
+import android.content.Intent;
 import android.util.Log;
 
+import com.bairock.zhongchuan.qz.App;
+import com.bairock.zhongchuan.qz.Constants;
 import com.bairock.zhongchuan.qz.bean.ClientBase;
 import com.bairock.zhongchuan.qz.bean.Location;
 import com.bairock.zhongchuan.qz.bean.MessageRoot;
@@ -12,6 +15,7 @@ import com.bairock.zhongchuan.qz.bean.UnmannedAerialVehicle;
 import com.bairock.zhongchuan.qz.bean.User;
 import com.bairock.zhongchuan.qz.bean.ZCMessage;
 import com.bairock.zhongchuan.qz.common.Utils;
+import com.bairock.zhongchuan.qz.utils.ConversationUtil;
 import com.bairock.zhongchuan.qz.utils.UserUtil;
 import com.bairock.zhongchuan.qz.utils.Util;
 import com.bairock.zhongchuan.qz.view.activity.LoginActivity;
@@ -43,6 +47,7 @@ public class MessageDecoder extends MessageToMessageDecoder<DatagramPacket> {
 
         int memberNumber = Util.bytesToInt(new byte[]{req[0], req[1]});
         byte factionCode = req[2];
+        byte errCode = req[3];
         int length = Util.bytesToInt(new byte[]{req[4], req[5]});
         byte[] data = new byte[length];
         if(length > 0){
@@ -65,7 +70,7 @@ public class MessageDecoder extends MessageToMessageDecoder<DatagramPacket> {
                 if(null == LoginActivity.handler){
                     return;
                 }
-                byte errCode = req[3];
+
                 if(errCode == 1){
                     //登录失败
                     LoginActivity.handler.obtainMessage(1);
@@ -107,6 +112,36 @@ public class MessageDecoder extends MessageToMessageDecoder<DatagramPacket> {
                     }
                     LoginActivity.handler.obtainMessage(0);
                 }
+                break;
+            case UdpMessageHelper.VOICE_CALL_ANS:
+                //语音通话请求
+                Intent i1 = new Intent(ConversationUtil.VOICE_ANS_ACTION);
+                i1.putExtra(Constants.MEDIA_TYPE, Constants.MEDIA_TYPE_VOICE);
+                i1.putExtra(Constants.NAME, memberNumber);
+                App.getInstance().sendOrderedBroadcast(i1, ConversationUtil.CHAT_BROADCAST_PERMISSION);
+                break;
+            case UdpMessageHelper.VOICE_CALL_ASK :
+                // 语音通话应答
+                String result = String.valueOf(errCode);
+                //发送应答广播
+                Intent i2 = new Intent(ConversationUtil.VOICE_ASK_ACTION);
+                i2.putExtra("result", result);
+                App.getInstance().sendOrderedBroadcast(i2, ConversationUtil.CHAT_BROADCAST_PERMISSION);
+                break;
+            case UdpMessageHelper.VIDEO_CALL_ANS:
+                //语音通话请求
+                Intent i3 = new Intent(ConversationUtil.VIDEO_ANS_ACTION);
+                i3.putExtra(Constants.MEDIA_TYPE, Constants.MEDIA_TYPE_VIDEO);
+                i3.putExtra(Constants.NAME, memberNumber);
+                App.getInstance().sendOrderedBroadcast(i3, ConversationUtil.CHAT_BROADCAST_PERMISSION);
+                break;
+            case UdpMessageHelper.VIDEO_CALL_ASK :
+                // 语音通话应答
+                String result1 = String.valueOf(errCode);
+                //发送应答广播
+                Intent i = new Intent(ConversationUtil.VIDEO_ASK_ACTION);
+                i.putExtra("result", result1);
+                App.getInstance().sendOrderedBroadcast(i, ConversationUtil.CHAT_BROADCAST_PERMISSION);
                 break;
             default: break;
         }

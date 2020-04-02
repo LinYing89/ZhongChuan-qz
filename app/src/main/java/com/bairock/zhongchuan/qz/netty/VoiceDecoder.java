@@ -1,11 +1,14 @@
 package com.bairock.zhongchuan.qz.netty;
 
+import com.bairock.zhongchuan.qz.bean.User;
+import com.bairock.zhongchuan.qz.utils.UserUtil;
 import com.bairock.zhongchuan.qz.view.activity.VideoCallActivity;
 import com.bairock.zhongchuan.qz.view.activity.VoiceCallActivity;
 
 import java.util.List;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.socket.DatagramPacket;
 import io.netty.handler.codec.MessageToMessageDecoder;
@@ -19,7 +22,14 @@ public class VoiceDecoder extends MessageToMessageDecoder<DatagramPacket> {
         ByteBuf byteBuf = msg.copy().content();
         byte[] req = new byte[byteBuf.readableBytes()];
         byteBuf.readBytes(req);
-        VoiceCallActivity.listen.write(req);
+        if(null != VoiceCallActivity.listen) {
+            VoiceCallActivity.listen.write(req);
+        }else {
+            UdpMessage udpMessage = UdpMessageHelper.createVoiceCallAsk(UserUtil.user.getUsername(), 1);
+            byte[] bytes = UdpMessageHelper.createBytes(udpMessage);
+            ctx.writeAndFlush(new DatagramPacket(Unpooled.copiedBuffer(bytes),
+                    msg.sender()));
+        }
 //        Log.e("H264Decoder", Util.bytesToHexString(req));
     }
 }

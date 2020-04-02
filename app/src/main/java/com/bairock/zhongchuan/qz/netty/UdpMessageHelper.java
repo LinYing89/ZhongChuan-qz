@@ -7,6 +7,10 @@ public class UdpMessageHelper {
 
     public static final byte HEART = 0x01;
     public static final byte LOGIN = 0x02;
+    public static final byte VOICE_CALL_ANS = 0x51;
+    public static final byte VOICE_CALL_ASK = 0x52;
+    public static final byte VIDEO_CALL_ANS = 0x53;
+    public static final byte VIDEO_CALL_ASK = 0x54;
 
     public static byte[] createBytes(UdpMessage udpMessage){
         byte[] bytes = new byte[6 + udpMessage.getData().length];
@@ -66,6 +70,44 @@ public class UdpMessageHelper {
         System.arraycopy(bPassword, 0, data, 4, bPassword.length);
         udpMessage.setDataLength((short) data.length);
         udpMessage.setData(data);
+        return udpMessage;
+    }
+
+    //创建语音呼叫请求命令
+    public static UdpMessage createVoiceCallAns(String number){
+        UdpMessage udpMessage = new UdpMessage();
+        udpMessage.setMemberNumber(Short.parseShort(number));
+        udpMessage.setFactionCode(VOICE_CALL_ANS);
+        udpMessage.setDataLength((short) 0);
+        return udpMessage;
+    }
+
+    //创建语音呼叫回应命令
+    public static UdpMessage createVoiceCallAsk(String number, int errorCode){
+        UdpMessage udpMessage = new UdpMessage();
+        udpMessage.setMemberNumber(Short.parseShort(number));
+        udpMessage.setFactionCode(VOICE_CALL_ASK);
+        udpMessage.setErrorCode((byte) errorCode);
+        udpMessage.setDataLength((short) 0);
+        return udpMessage;
+    }
+
+    //创建视频呼叫请求命令
+    public static UdpMessage createVideoCallAns(String number){
+        UdpMessage udpMessage = new UdpMessage();
+        udpMessage.setMemberNumber(Short.parseShort(number));
+        udpMessage.setFactionCode(VIDEO_CALL_ANS);
+        udpMessage.setDataLength((short) 0);
+        return udpMessage;
+    }
+
+    //创建视频呼叫回应命令
+    public static UdpMessage createVideoCallAsk(String number, int errorCode){
+        UdpMessage udpMessage = new UdpMessage();
+        udpMessage.setMemberNumber(Short.parseShort(number));
+        udpMessage.setFactionCode(VIDEO_CALL_ASK);
+        udpMessage.setErrorCode((byte) errorCode);
+        udpMessage.setDataLength((short) 0);
         return udpMessage;
     }
 
