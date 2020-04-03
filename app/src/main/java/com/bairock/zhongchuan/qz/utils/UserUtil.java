@@ -16,7 +16,7 @@ import java.util.List;
 
 public class UserUtil {
 
-    public static User user;
+    public static User user = new User();
 
     public static List<User> users = new ArrayList<>();
 

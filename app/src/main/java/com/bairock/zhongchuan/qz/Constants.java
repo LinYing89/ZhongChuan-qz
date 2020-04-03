@@ -15,10 +15,10 @@ public interface Constants {
 	String MEDIA_TYPE_VOICE = "mediaTypeVoice";
 	String MEDIA_TYPE_VIDEO = "mediaTypeVideo";
 	String VOICE_TYPE = "voiceType";
-	String VOICE_ASK = "voiceAak";
+	String VOICE_ASK = "voiceAsk";
 	String VOICE_ANS = "voiceAns";
 	String VIDEO_TYPE = "videoType";
-	String VIDEO_ASK = "videoAak";
+	String VIDEO_ASK = "videoAsk";
 	String VIDEO_ANS = "videoAns";
 	String AccessToken = "AccessToken";
 	String PWD = "PWD";

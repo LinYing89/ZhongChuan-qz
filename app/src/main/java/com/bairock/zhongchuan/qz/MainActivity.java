@@ -71,8 +71,8 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
 //        initReceiver();
 
         UserUtil.initUsers();
-        MessageBroadcaster messageBroadcaster = new MessageBroadcaster();
-        messageBroadcaster.bind();
+//        MessageBroadcaster messageBroadcaster = new MessageBroadcaster();
+//        messageBroadcaster.bind();
 
         H264Broadcaster h264bRoadcaster = new H264Broadcaster();
         h264bRoadcaster.bind();
@@ -343,16 +343,20 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
             String name = intent.getStringExtra(Constants.NAME);
             if(type.equals(Constants.MEDIA_TYPE_VOICE)){
                 //语音请求
-                Intent intent1 = new Intent(MainActivity.this, VoiceCallActivity.class);
-                intent1.putExtra(Constants.VOICE_TYPE, Constants.VOICE_ANS);
-                intent1.putExtra(Constants.NAME, name);
-                MainActivity.this.startActivity(intent);
+                if(VoiceCallActivity.listen == null) {
+                    Intent intent1 = new Intent(MainActivity.this, VoiceCallActivity.class);
+                    intent1.putExtra(Constants.VOICE_TYPE, Constants.VOICE_ANS);
+                    intent1.putExtra(Constants.NAME, name);
+                    MainActivity.this.startActivity(intent1);
+                }
             }else if(type.equals(Constants.MEDIA_TYPE_VIDEO)){
                 // 视频请求
-                Intent intent1 = new Intent(MainActivity.this, VideoCallActivity.class);
-                intent1.putExtra(Constants.VIDEO_TYPE, Constants.VIDEO_ANS);
-                intent1.putExtra(Constants.NAME, name);
-                MainActivity.this.startActivity(intent);
+                if(VideoCallActivity.player == null) {
+                    Intent intent1 = new Intent(MainActivity.this, VideoCallActivity.class);
+                    intent1.putExtra(Constants.VIDEO_TYPE, Constants.VIDEO_ANS);
+                    intent1.putExtra(Constants.NAME, name);
+                    MainActivity.this.startActivity(intent1);
+                }
             }
         }
     }

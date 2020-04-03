@@ -24,6 +24,7 @@ import com.bairock.zhongchuan.qz.common.DES;
 import com.bairock.zhongchuan.qz.common.Utils;
 import com.bairock.zhongchuan.qz.netty.MessageBroadcaster;
 import com.bairock.zhongchuan.qz.netty.UdpMessageHelper;
+import com.bairock.zhongchuan.qz.utils.UserUtil;
 import com.bairock.zhongchuan.qz.utils.Util;
 import com.bairock.zhongchuan.qz.view.BaseActivity;
 
@@ -45,6 +46,8 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 		setContentView(R.layout.activity_login);
 		super.onCreate(savedInstanceState);
 		handler = new MyHandler(this);
+		MessageBroadcaster messageBroadcaster = new MessageBroadcaster();
+		messageBroadcaster.bind();
 	}
 
 	@Override
@@ -56,8 +59,8 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 		btn_login = findViewById(R.id.btn_login);
 		et_usertel = findViewById(R.id.et_usertel);
 		et_password = findViewById(R.id.et_password);
-		et_usertel.setText("12345");
-		et_password.setText("1234578");
+		et_usertel.setText("8080");
+		et_password.setText("8080");
 	}
 
 	@Override
@@ -90,12 +93,14 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 				@Override
 				public void run() {
 					try {
-						while (true) {
+						int i = 0;
+						while (i < 10) {
 							Thread.sleep(1000);
 							if (!loging) {
 								//登录已返回
 								return;
 							}
+							i++;
 						}
 					} catch (InterruptedException e) {
 						e.printStackTrace();
@@ -104,7 +109,8 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 					runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
-							Toast.makeText(LoginActivity.this, "", Toast.LENGTH_SHORT).show();
+							Toast.makeText(LoginActivity.this, "登录超时", Toast.LENGTH_SHORT).show();
+							closeDialog();
 						}
 					});
 				}
@@ -118,7 +124,13 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		loginDialog = null;
+		loging = false;
+		if(null != loginDialog){
+			if(loginDialog.isShowing()){
+				loginDialog.dismiss();
+			}
+			loginDialog = null;
+		}
 		handler = null;
 	}
 
@@ -136,8 +148,8 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 			Intent intent = new Intent(LoginActivity.this,
 					MainActivity.class);
 			startActivity(intent);
-			overridePendingTransition(R.anim.push_up_in,
-					R.anim.push_up_out);
+//			overridePendingTransition(R.anim.push_up_in,
+//					R.anim.push_up_out);
 			finish();
 		} else {
 			Utils.showLongToast(LoginActivity.this, "请填写账号或密码！");
@@ -147,7 +159,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 	public void showDialog(){
 		loginDialog = new ProgressDialog(this);
 		loginDialog.setTitle("正在登录");
-		loginDialog.setIcon(R.mipmap.ic_launcher_round);
+//		loginDialog.setIcon(R.mipmap.ic_launcher_round);
 		loginDialog.setMessage("请稍等...");
 		loginDialog.setCancelable(false);
 		loginDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
@@ -212,6 +224,9 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 					break;
 				case 0:
 					//登录成功
+					UserUtil.user.setUsername(theActivity.et_usertel.getText().toString());
+					Intent intent = new Intent(theActivity, MainActivity.class);
+					theActivity.startActivity(intent);
 					theActivity.finish();
 					break;
 			}

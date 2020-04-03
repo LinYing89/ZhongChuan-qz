@@ -34,4 +34,7 @@
     <string name="menu_addfriend">添加朋友</string>
     <string name="menu_qrcode">扫一扫</string>
     <string name="menu_money">微信支付</string>
+
+    <string name="all_offline">所有城市</string>
+    <string name="download_offline">下载管理</string>
 </resources>

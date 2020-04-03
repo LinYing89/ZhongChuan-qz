@@ -47,9 +47,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".view.activity.VoiceCallActivity"
+        <activity android:name=".view.activity.OfflineMapActivity"></activity>
+        <activity
+            android:name=".view.activity.VoiceCallActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat"/>
+            android:theme="@style/Theme.AppCompat" />
         <activity
             android:name=".view.activity.VideoCallActivity"
             android:theme="@style/Theme.AppCompat" />

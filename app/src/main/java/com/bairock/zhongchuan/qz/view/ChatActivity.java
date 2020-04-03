@@ -466,12 +466,14 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 			break;
 		case R.id.view_location:
 			Intent intent = new Intent(this, VideoCallActivity.class);
+			intent.putExtra(Constants.VIDEO_TYPE, Constants.VIDEO_ASK);
 			intent.putExtra(Constants.NAME, Name);
 			startActivity(intent);
 			break;
 		case R.id.view_audio:
 			// 语音通话
 			Intent intent1 = new Intent(this, VoiceCallActivity.class);
+			intent1.putExtra(Constants.VOICE_TYPE, Constants.VOICE_ASK);
 			intent1.putExtra(Constants.NAME, Name);
 			startActivity(intent1);
 			break;

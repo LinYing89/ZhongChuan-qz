@@ -32,6 +32,7 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@color/light_notes_color" />
+
     <TextView
         android:id="@+id/tvChangePsd"
         android:layout_width="match_parent"
@@ -40,11 +41,14 @@
         android:minHeight="?android:attr/listPreferredItemHeightSmall"
         android:text="密码修改"
         android:textAppearance="@android:style/TextAppearance.Widget.TextView"
-        android:textColor="@color/blacky"/>
+        android:textColor="@color/blacky"
+        android:visibility="gone" />
+
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/light_notes_color" />
+        android:background="@color/light_notes_color"
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/tvMyInfo"

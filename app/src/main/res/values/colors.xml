@@ -110,4 +110,9 @@
     <color name="commonReminder">#ffbdbab5</color>
     <color name="gray">#ff808080</color>
     <color name="gray2">#ffeef2fb</color>
+
+    <color name="taobao_black">#333333</color>
+    <color name="offline_down_size">#777777</color>
+    <color name="gary">#898989</color>
+    <color name="gray_lite">#c5c5c5</color>
 </resources>

@@ -41,7 +41,7 @@ public class VideoCallActivity extends AppCompatActivity {
     private Chronometer chronometer;
     public static Player player;
     private Publish publishMe;
-    private TextView txtTo;
+//    private TextView txtTo;
     private ImageView imgMute;
     private ImageView imgHangUp;
     private ImageView imgSpeaker;
@@ -64,7 +64,7 @@ public class VideoCallActivity extends AppCompatActivity {
         String videoType = getIntent().getStringExtra(Constants.VIDEO_TYPE);
         findViews();
 
-        if(videoType.equals(Constants.VOICE_ASK)){
+        if(videoType.equals(Constants.VIDEO_ASK)){
             // 主动发起请求, 等待对方应答界面
             layoutAsk.setVisibility(View.VISIBLE);
             layoutAns.setVisibility(View.GONE);
@@ -75,7 +75,7 @@ public class VideoCallActivity extends AppCompatActivity {
             layoutAns.setVisibility(View.VISIBLE);
         }
 
-        txtTo.setText(name);
+//        txtTo.setText(name);
         ip = UserUtil.findIpByUsername(name);
         if(null == ip){
             Logger.e(TAG, "ip is null");
@@ -121,7 +121,7 @@ public class VideoCallActivity extends AppCompatActivity {
     }
 
     private void findViews(){
-        txtTo = findViewById(R.id.txtTo);
+//        txtTo = findViewById(R.id.txtTo);
         chronometer = findViewById(R.id.chronometer);
         imgMute = findViewById(R.id.imgMute);
         imgHangUp = findViewById(R.id.imgHangUp);

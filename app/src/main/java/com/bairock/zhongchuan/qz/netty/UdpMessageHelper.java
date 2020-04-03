@@ -13,7 +13,11 @@ public class UdpMessageHelper {
     public static final byte VIDEO_CALL_ASK = 0x54;
 
     public static byte[] createBytes(UdpMessage udpMessage){
-        byte[] bytes = new byte[6 + udpMessage.getData().length];
+        int length = 6;
+        if(udpMessage.getData() != null && udpMessage.getData().length > 0){
+            length = 6 + udpMessage.getData().length;
+        }
+        byte[] bytes = new byte[length];
         //成员编号
         bytes[0] = (byte) (udpMessage.getMemberNumber() >> 8 & 0xff);
         bytes[1] = (byte) (udpMessage.getMemberNumber() & 0xff);
@@ -23,7 +27,9 @@ public class UdpMessageHelper {
         bytes[4] = (byte) (udpMessage.getDataLength() >> 8 & 0xff);
         bytes[5] = (byte) (udpMessage.getDataLength() & 0xff);
         //
-        System.arraycopy(udpMessage.getData(), 0, bytes, 6, udpMessage.getData().length);
+        if(udpMessage.getData() != null && udpMessage.getData().length > 0) {
+            System.arraycopy(udpMessage.getData(), 0, bytes, 6, udpMessage.getData().length);
+        }
         return bytes;
     }
 

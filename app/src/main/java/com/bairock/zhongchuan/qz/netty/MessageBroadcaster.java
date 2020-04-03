@@ -29,6 +29,7 @@ public class MessageBroadcaster {
     private final EventLoopGroup group;
     private final Bootstrap bootstrap;
     public static Channel channel;
+    public static final int PORT = 10000;
 
     public MessageBroadcaster() {
         group = new NioEventLoopGroup();
@@ -43,15 +44,15 @@ public class MessageBroadcaster {
                     @Override
                     protected void initChannel(Channel channel) {
                         ChannelPipeline pipeline = channel.pipeline();
-                        pipeline.addLast(new MessageEncoder(new InetSocketAddress("255.255.255.255", 10000)));
+                        pipeline.addLast(new MessageEncoder(new InetSocketAddress("255.255.255.255", PORT)));
                         pipeline.addLast(new MessageDecoder());
 //                        pipeline.addLast(new MessageHandler());
                     }
                 } )
-                .localAddress(new InetSocketAddress(10000));
+                .localAddress(new InetSocketAddress(PORT));
     }
     public Channel bind() {
-        channel =  bootstrap.bind(10000).syncUninterruptibly().channel();
+        channel =  bootstrap.bind(PORT).syncUninterruptibly().channel();
         return channel;
     }
 

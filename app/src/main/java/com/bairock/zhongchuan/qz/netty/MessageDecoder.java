@@ -110,7 +110,9 @@ public class MessageDecoder extends MessageToMessageDecoder<DatagramPacket> {
 
                         index += 3;
                     }
-                    LoginActivity.handler.obtainMessage(0);
+                    if(null != LoginActivity.handler) {
+                        LoginActivity.handler.obtainMessage(0);
+                    }
                 }
                 break;
             case UdpMessageHelper.VOICE_CALL_ANS:

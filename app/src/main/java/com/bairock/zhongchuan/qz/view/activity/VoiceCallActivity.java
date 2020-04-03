@@ -192,9 +192,6 @@ public class VoiceCallActivity extends AppCompatActivity {
     private class AskBroadcastReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            // 记得把广播给终结掉
-            abortBroadcast();
-
             String result = intent.getStringExtra("result");
             if(result.equals("0")){
                 //接受
