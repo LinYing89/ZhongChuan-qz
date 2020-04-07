@@ -283,7 +283,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
         registerReceiver(msgReceiver, intentFilter);
 
         mediaBroadcastReceiver = new MediaBroadcastReceiver();
-        IntentFilter intentFilter1 = new IntentFilter(ConversationUtil.VOICE_ANS_ACTION);
+        IntentFilter intentFilter1 = new IntentFilter(ConversationUtil.VOICE_ASK_ACTION);
         registerReceiver(mediaBroadcastReceiver, intentFilter1);
 
 //        Intent intent = new Intent(this, UpdateService.class);
@@ -342,17 +342,19 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
             String type = intent.getStringExtra(Constants.MEDIA_TYPE);
             String name = intent.getStringExtra(Constants.NAME);
             if(type.equals(Constants.MEDIA_TYPE_VOICE)){
-                //语音请求
+                // 收到语音请求
                 if(VoiceCallActivity.listen == null) {
                     Intent intent1 = new Intent(MainActivity.this, VoiceCallActivity.class);
+                    // 进入应答界面
                     intent1.putExtra(Constants.VOICE_TYPE, Constants.VOICE_ANS);
                     intent1.putExtra(Constants.NAME, name);
                     MainActivity.this.startActivity(intent1);
                 }
             }else if(type.equals(Constants.MEDIA_TYPE_VIDEO)){
-                // 视频请求
+                // 收到视频请求
                 if(VideoCallActivity.player == null) {
                     Intent intent1 = new Intent(MainActivity.this, VideoCallActivity.class);
+                    // 进入应答界面
                     intent1.putExtra(Constants.VIDEO_TYPE, Constants.VIDEO_ANS);
                     intent1.putExtra(Constants.NAME, name);
                     MainActivity.this.startActivity(intent1);

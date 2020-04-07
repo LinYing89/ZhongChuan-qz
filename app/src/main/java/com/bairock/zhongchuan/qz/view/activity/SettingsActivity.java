@@ -3,6 +3,7 @@ package com.bairock.zhongchuan.qz.view.activity;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
@@ -67,7 +68,7 @@ public class SettingsActivity extends AppCompatActivity {
         public void onClick(View v) {
             switch (v.getId()){
                 case R.id.txtMap:
-
+                    startActivity(new Intent(SettingsActivity.this, OfflineMapActivity.class));
                     break;
                 case R.id.btnLogout:
                     progressDialog = new ProgressDialog(SettingsActivity.this);

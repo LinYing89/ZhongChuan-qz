@@ -87,9 +87,7 @@ public class VoiceCallActivity extends AppCompatActivity {
 
         // 注册接收消息广播
         receiver = new AskBroadcastReceiver();
-        IntentFilter intentFilter = new IntentFilter(ConversationUtil.VOICE_ASK_ACTION);
-        // 设置广播的优先级别
-//        intentFilter.setPriority(5);
+        IntentFilter intentFilter = new IntentFilter(ConversationUtil.VOICE_ANS_ACTION);
         registerReceiver(receiver, intentFilter);
     }
 

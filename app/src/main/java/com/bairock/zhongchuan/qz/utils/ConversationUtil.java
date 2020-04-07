@@ -21,6 +21,8 @@ public class ConversationUtil {
     public static String VOICE_ANS_ACTION = "com.bairock.zhongchuan.qz.voice_ans";
     public static String VIDEO_ASK_ACTION = "com.bairock.zhongchuan.qz.video_ask";
     public static String VIDEO_ANS_ACTION = "com.bairock.zhongchuan.qz.video_ans";
+    public static String VOICE_UPLOAD_ANS_ACTION = "com.bairock.zhongchuan.qz.voice_upload_ans";
+    public static String VIDEO_UPLOAD_ANS_ACTION = "com.bairock.zhongchuan.qz.video_upload_ans";
     public static String CHAT_BROADCAST_PERMISSION = "qz.permission.MY_BROADCAST_PERMISSION";
 
     public static ZCConversation activeConversation = null;

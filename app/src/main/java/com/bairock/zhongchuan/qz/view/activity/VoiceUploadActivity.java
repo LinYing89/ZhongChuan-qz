@@ -2,17 +2,24 @@ package com.bairock.zhongchuan.qz.view.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.AudioFormat;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Chronometer;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bairock.zhongchuan.qz.App;
 import com.bairock.zhongchuan.qz.R;
+import com.bairock.zhongchuan.qz.netty.MessageBroadcaster;
+import com.bairock.zhongchuan.qz.netty.UdpMessageHelper;
 import com.bairock.zhongchuan.qz.recorderlib.RecordManager;
 import com.bairock.zhongchuan.qz.recorderlib.recorder.RecordConfig;
 import com.bairock.zhongchuan.qz.recorderlib.recorder.RecordHelper;
@@ -22,7 +29,9 @@ import com.bairock.zhongchuan.qz.recorderlib.recorder.listener.RecordResultListe
 import com.bairock.zhongchuan.qz.recorderlib.recorder.listener.RecordSoundSizeListener;
 import com.bairock.zhongchuan.qz.recorderlib.recorder.listener.RecordStateListener;
 import com.bairock.zhongchuan.qz.recorderlib.utils.Logger;
+import com.bairock.zhongchuan.qz.utils.ConversationUtil;
 import com.bairock.zhongchuan.qz.utils.FileUtil;
+import com.bairock.zhongchuan.qz.utils.UserUtil;
 import com.bairock.zhongchuan.qz.widght.AudioView;
 
 import java.io.File;
@@ -32,12 +41,13 @@ public class VoiceUploadActivity extends AppCompatActivity {
 
     private static String TAG = "VoiceUploadActivity";
     private Context context;
-    private Button btnStart;
+    private ImageView imgHangUp;
+    private TextView txtMessage;
     private AudioView audioView;
     private Chronometer chronometer;
+    private AskBroadcastReceiver receiver;
 
-    private boolean isStart = false;
-    final RecordManager recordManager = RecordManager.getInstance();
+    private RecordManager recordManager = RecordManager.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,18 +57,33 @@ public class VoiceUploadActivity extends AppCompatActivity {
         findViews();
         setOnListener();
         initRecord();
-        chronometer.start();
+//        MessageBroadcaster.send(UdpMessageHelper.createVoiceCallAns(UserUtil.user.getUsername()), name);
+        // 注册接收消息广播
+        receiver = new AskBroadcastReceiver();
+        IntentFilter intentFilter = new IntentFilter(ConversationUtil.VOICE_UPLOAD_ANS_ACTION);
+        registerReceiver(receiver, intentFilter);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        try {
+            unregisterReceiver(receiver);
+            receiver = null;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void findViews() {
-        btnStart = findViewById(R.id.btnStart);
+        imgHangUp = findViewById(R.id.imgHangUp);
         audioView = findViewById(R.id.audioView);
         audioView.setStyle(AudioView.ShowStyle.getStyle("STYLE_ALL"), audioView.getDownStyle());
         audioView.setStyle(audioView.getUpStyle(), AudioView.ShowStyle.getStyle("STYLE_ALL"));
     }
 
     private void setOnListener() {
-        btnStart.setOnClickListener(onClickListener);
+        imgHangUp.setOnClickListener(onClickListener);
     }
 
     private void initRecord() {
@@ -128,40 +153,20 @@ public class VoiceUploadActivity extends AppCompatActivity {
         @Override
         public void onClick(View v) {
             switch (v.getId()){
-                case R.id.btnStart :
-                    doPlay();
+                case R.id.imgHangUp :
+                    recordManager.stop();
+                    recordManager.setRecordDataListener(null);
+                    finish();
                     break;
             }
         }
     };
 
-    private void doStop() {
-        recordManager.stop();
-        recordManager.setRecordDataListener(null);
-        btnStart.setText("开始上报");
-        isStart = false;
-    }
-
-    private void doPlay() {
-        if (isStart) {
-            doStop();
-        } else {
-            btnStart.setText("结束上报");
-            recordManager.start();
-            recordManager.setRecordDataListener(recordDataListener);
-            isStart = true;
-        }
-//		if (isStart) {
-//			recordManager.pause();
-//			btnStart.setText("结束上报");
-//			isPause = true;
-//			isStart = false;
-//		} else {
-//			recordManager.start();
-//			recordManager.setRecordDataListener(recordDataListener);
-//			isPause = false;
-//			isStart = true;
-//		}
+    private void startVoice(){
+        txtMessage.setText("正在上传语音");
+        chronometer.start();
+        recordManager.start();
+        recordManager.setRecordDataListener(recordDataListener);
     }
 
     private RecordDataListener recordDataListener = new RecordDataListener(){
@@ -171,5 +176,20 @@ public class VoiceUploadActivity extends AppCompatActivity {
             Log.e("Main", data.length + "?");
         }
     };
+
+    private class AskBroadcastReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String result = intent.getStringExtra("result");
+            if(result.equals("0")){
+                //接受
+                startVoice();
+            }else if(result.equals("1")){
+                //拒绝1/挂断2
+                Toast.makeText(VoiceUploadActivity.this, "对方忙", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        }
+    }
 
 }

@@ -2,8 +2,8 @@ package com.bairock.zhongchuan.qz.bean;
 
 import com.amap.api.maps.model.LatLng;
 import com.amap.api.maps.model.Marker;
-
-import java.net.InetSocketAddress;
+import com.bairock.zhongchuan.qz.enums.ClientBaseType;
+import com.bairock.zhongchuan.qz.enums.UserStatus;
 
 public class ClientBase {
 
@@ -11,6 +11,13 @@ public class ClientBase {
     private Location location;// 位置信息
     private String ip;
     private Marker marker;
+
+    private String id;//
+    private String password;
+    private String realName;// 用户名
+    private String headUrl;// 头像保存路径
+    private ClientBaseType clientBaseType = null;
+    private UserStatus userStatus = UserStatus.ONLINE;
 //    private InetSocketAddress inetSocketAddress;
 
     public String getUsername() {
@@ -48,11 +55,51 @@ public class ClientBase {
         this.marker = marker;
     }
 
-//    public InetSocketAddress getInetSocketAddress() {
-//        return inetSocketAddress;
-//    }
-//
-//    public void setInetSocketAddress(InetSocketAddress inetSocketAddress) {
-//        this.inetSocketAddress = inetSocketAddress;
-//    }
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getRealName() {
+        return realName;
+    }
+
+    public void setRealName(String realName) {
+        this.realName = realName;
+    }
+
+    public String getHeadUrl() {
+        return headUrl;
+    }
+
+    public void setHeadUrl(String headUrl) {
+        this.headUrl = headUrl;
+    }
+
+    public ClientBaseType getClientBaseType() {
+        return clientBaseType;
+    }
+
+    public void setClientBaseType(ClientBaseType clientBaseType) {
+        this.clientBaseType = clientBaseType;
+    }
+
+    public UserStatus getUserStatus() {
+        return userStatus;
+    }
+
+    public void setUserStatus(UserStatus userStatus) {
+        this.userStatus = userStatus;
+    }
 }

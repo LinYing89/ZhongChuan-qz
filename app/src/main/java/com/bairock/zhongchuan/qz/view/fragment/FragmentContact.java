@@ -31,6 +31,7 @@ import com.bairock.zhongchuan.qz.bean.User;
 import com.bairock.zhongchuan.qz.bean.ZCConversation;
 import com.bairock.zhongchuan.qz.dialog.ActionItem;
 import com.bairock.zhongchuan.qz.dialog.TitlePopup;
+import com.bairock.zhongchuan.qz.enums.ClientBaseType;
 import com.bairock.zhongchuan.qz.utils.ConversationUtil;
 import com.bairock.zhongchuan.qz.utils.UserUtil;
 import com.bairock.zhongchuan.qz.view.ChatActivity;
@@ -141,7 +142,7 @@ public class FragmentContact extends Fragment {
 				ViewGroup.LayoutParams.WRAP_CONTENT);
 		groupPopup.setItemOnClickListener(onitemClick);
 		// 给标题栏弹窗添加子类
-		for(User user : UserUtil.users){
+		for(ClientBase user : UserUtil.findPhoneUser()){
 //			if(!user.getUsername().equals(UserUtil.user.getUsername())) {
 				groupPopup.addAction(new ActionItem(activity, user.getUsername()));
 //			}
@@ -181,13 +182,13 @@ public class FragmentContact extends Fragment {
 							MarkerOptions markerOption = new MarkerOptions();
 							markerOption.position(latLng);
 							markerOption.title(user.getUsername()).snippet(user.getUsername());
-							if(user instanceof User) {
+							if(user.getClientBaseType() == ClientBaseType.PHONE) {
 								markerOption.icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory
 										.decodeResource(getResources(), R.drawable.jingyuan_green)));
-							}else if(user instanceof UnmannedAerialVehicle){
+							}else if(user.getClientBaseType() == ClientBaseType.UAV){
 								markerOption.icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory
 										.decodeResource(getResources(), R.drawable.wurenjicaitu)));
-							}else {
+							}else if(user.getClientBaseType() == ClientBaseType.TELESCOPE){
 								markerOption.icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory
 										.decodeResource(getResources(), R.drawable.wangyuanjing)));
 							}

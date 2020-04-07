@@ -338,7 +338,6 @@ public class OfflineMapActivity extends AppCompatActivity implements
                 try {
                     amapManager.downloadByCityName(mapCity.getCity());
                 } catch (AMapException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
             }
@@ -448,7 +447,6 @@ public class OfflineMapActivity extends AppCompatActivity implements
 
     @Override
     public void onCheckUpdate(boolean hasNew, String name) {
-        // TODO Auto-generated method stub
         Log.i("amap-demo", "onCheckUpdate " + name + " : " + hasNew);
         Message message = new Message();
         message.what = SHOW_MSG;
@@ -458,7 +456,6 @@ public class OfflineMapActivity extends AppCompatActivity implements
 
     @Override
     public void onRemove(boolean success, String name, String describe) {
-        // TODO Auto-generated method stub
         Log.i("amap-demo", "onRemove " + name + " : " + success + " , "
                 + describe);
         handler.sendEmptyMessage(UPDATE_LIST);

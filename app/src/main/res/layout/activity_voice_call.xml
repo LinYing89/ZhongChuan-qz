@@ -103,7 +103,7 @@
                     android:id="@+id/imgHangUp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:srcCompat="@drawable/icon_speaker_on" />
+                    app:srcCompat="@drawable/hangup" />
 
                 <TextView
                     android:id="@+id/textView5"
@@ -157,7 +157,7 @@
                     android:id="@+id/imgHangUp2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:srcCompat="@drawable/icon_mute_normal" />
+                    app:srcCompat="@drawable/hangup" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -178,7 +178,7 @@
                     android:id="@+id/imgOk"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:srcCompat="@drawable/icon_speaker_normal" />
+                    app:srcCompat="@drawable/answer" />
 
                 <TextView
                     android:layout_width="match_parent"
