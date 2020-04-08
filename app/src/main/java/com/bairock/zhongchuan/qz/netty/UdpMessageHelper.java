@@ -7,10 +7,10 @@ public class UdpMessageHelper {
 
     public static final byte HEART = 0x01;
     public static final byte LOGIN = 0x02;
-    public static final byte VOICE_CALL_ANS = 0x51;
-    public static final byte VOICE_CALL_ASK = 0x52;
-    public static final byte VIDEO_CALL_ANS = 0x53;
-    public static final byte VIDEO_CALL_ASK = 0x54;
+    public static final byte VOICE_CALL_ASK = 0x51;
+    public static final byte VOICE_CALL_ANS = 0x52;
+    public static final byte VIDEO_CALL_ASK = 0x53;
+    public static final byte VIDEO_CALL_ANS = 0x54;
 
     public static byte[] createBytes(UdpMessage udpMessage){
         int length = 6;
@@ -23,6 +23,7 @@ public class UdpMessageHelper {
         bytes[1] = (byte) (udpMessage.getMemberNumber() & 0xff);
         //功能码
         bytes[2] = udpMessage.getFactionCode();
+        bytes[3] = udpMessage.getErrorCode();
         //数据长度
         bytes[4] = (byte) (udpMessage.getDataLength() >> 8 & 0xff);
         bytes[5] = (byte) (udpMessage.getDataLength() & 0xff);
@@ -79,40 +80,40 @@ public class UdpMessageHelper {
         return udpMessage;
     }
 
-    //创建语音呼叫请求命令
-    public static UdpMessage createVoiceCallAns(String number){
+    //创建语音呼叫回应命令
+    public static UdpMessage createVoiceCallAns(String number, int errorCode){
         UdpMessage udpMessage = new UdpMessage();
         udpMessage.setMemberNumber(Short.parseShort(number));
         udpMessage.setFactionCode(VOICE_CALL_ANS);
+        udpMessage.setErrorCode((byte) errorCode);
         udpMessage.setDataLength((short) 0);
         return udpMessage;
     }
 
-    //创建语音呼叫回应命令
-    public static UdpMessage createVoiceCallAsk(String number, int errorCode){
+    //创建语音呼叫请求命令
+    public static UdpMessage createVoiceCallAsk(String number){
         UdpMessage udpMessage = new UdpMessage();
         udpMessage.setMemberNumber(Short.parseShort(number));
         udpMessage.setFactionCode(VOICE_CALL_ASK);
+        udpMessage.setDataLength((short) 0);
+        return udpMessage;
+    }
+
+    //创建视频呼叫回应命令
+    public static UdpMessage createVideoCallAns(String number, int errorCode){
+        UdpMessage udpMessage = new UdpMessage();
+        udpMessage.setMemberNumber(Short.parseShort(number));
+        udpMessage.setFactionCode(VIDEO_CALL_ANS);
         udpMessage.setErrorCode((byte) errorCode);
         udpMessage.setDataLength((short) 0);
         return udpMessage;
     }
 
     //创建视频呼叫请求命令
-    public static UdpMessage createVideoCallAns(String number){
-        UdpMessage udpMessage = new UdpMessage();
-        udpMessage.setMemberNumber(Short.parseShort(number));
-        udpMessage.setFactionCode(VIDEO_CALL_ANS);
-        udpMessage.setDataLength((short) 0);
-        return udpMessage;
-    }
-
-    //创建视频呼叫回应命令
-    public static UdpMessage createVideoCallAsk(String number, int errorCode){
+    public static UdpMessage createVideoCallAsk(String number){
         UdpMessage udpMessage = new UdpMessage();
         udpMessage.setMemberNumber(Short.parseShort(number));
         udpMessage.setFactionCode(VIDEO_CALL_ASK);
-        udpMessage.setErrorCode((byte) errorCode);
         udpMessage.setDataLength((short) 0);
         return udpMessage;
     }

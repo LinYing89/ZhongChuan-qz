@@ -25,7 +25,7 @@ public class VoiceDecoder extends MessageToMessageDecoder<DatagramPacket> {
         if(null != VoiceCallActivity.listen) {
             VoiceCallActivity.listen.write(req);
         }else {
-            UdpMessage udpMessage = UdpMessageHelper.createVoiceCallAsk(UserUtil.user.getUsername(), 1);
+            UdpMessage udpMessage = UdpMessageHelper.createVoiceCallAns(UserUtil.user.getUsername(), 1);
             byte[] bytes = UdpMessageHelper.createBytes(udpMessage);
             ctx.writeAndFlush(new DatagramPacket(Unpooled.copiedBuffer(bytes),
                     msg.sender()));

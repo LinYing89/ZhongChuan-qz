@@ -66,7 +66,7 @@ public class VoiceCallActivity extends AppCompatActivity {
             // 主动发起请求, 等待对方应答界面
             layoutAsk.setVisibility(View.VISIBLE);
             layoutAns.setVisibility(View.GONE);
-            MessageBroadcaster.send(UdpMessageHelper.createVoiceCallAns(UserUtil.user.getUsername()), name);
+            MessageBroadcaster.send(UdpMessageHelper.createVoiceCallAsk(UserUtil.user.getUsername()), name);
         }else {
             // 被动接听界面
             txtMessage.setText("");
@@ -147,13 +147,13 @@ public class VoiceCallActivity extends AppCompatActivity {
                     break;
                 case R.id.imgHangUp:
                 case R.id.imgHangUp2:
-                    MessageBroadcaster.send(UdpMessageHelper.createVoiceCallAsk(UserUtil.user.getUsername(), 1), name);
+                    MessageBroadcaster.send(UdpMessageHelper.createVoiceCallAns(UserUtil.user.getUsername(), 1), name);
                     finish();
                     break;
                 case R.id.imgSpeaker:
                     break;
                 case R.id.imgOk:
-                    MessageBroadcaster.send(UdpMessageHelper.createVoiceCallAsk(UserUtil.user.getUsername(), 0), name);
+                    MessageBroadcaster.send(UdpMessageHelper.createVoiceCallAns(UserUtil.user.getUsername(), 0), name);
                     layoutAns.setVisibility(View.GONE);
                     layoutAsk.setVisibility(View.VISIBLE);
                     startVoice();

@@ -71,8 +71,8 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
 //        initReceiver();
 
         UserUtil.initUsers();
-//        MessageBroadcaster messageBroadcaster = new MessageBroadcaster();
-//        messageBroadcaster.bind();
+        MessageBroadcaster messageBroadcaster = new MessageBroadcaster();
+        messageBroadcaster.bind();
 
         H264Broadcaster h264bRoadcaster = new H264Broadcaster();
         h264bRoadcaster.bind();

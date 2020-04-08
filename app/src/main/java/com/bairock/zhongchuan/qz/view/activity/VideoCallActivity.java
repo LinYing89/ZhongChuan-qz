@@ -68,7 +68,7 @@ public class VideoCallActivity extends AppCompatActivity {
             // 主动发起请求, 等待对方应答界面
             layoutAsk.setVisibility(View.VISIBLE);
             layoutAns.setVisibility(View.GONE);
-            MessageBroadcaster.send(UdpMessageHelper.createVideoCallAns(UserUtil.user.getUsername()), name);
+            MessageBroadcaster.send(UdpMessageHelper.createVideoCallAsk(UserUtil.user.getUsername()), name);
         }else {
             // 被动接听界面
             layoutAsk.setVisibility(View.GONE);
@@ -148,13 +148,13 @@ public class VideoCallActivity extends AppCompatActivity {
                     break;
                 case R.id.imgHangUp:
                 case R.id.imgHangUp2:
-                    MessageBroadcaster.send(UdpMessageHelper.createVideoCallAsk(UserUtil.user.getUsername(), 1), name);
+                    MessageBroadcaster.send(UdpMessageHelper.createVideoCallAns(UserUtil.user.getUsername(), 1), name);
                     finish();
                     break;
                 case R.id.imgSpeaker:
                     break;
                 case R.id.imgOk:
-                    MessageBroadcaster.send(UdpMessageHelper.createVideoCallAsk(UserUtil.user.getUsername(), 0), name);
+                    MessageBroadcaster.send(UdpMessageHelper.createVideoCallAns(UserUtil.user.getUsername(), 0), name);
                     layoutAns.setVisibility(View.GONE);
                     layoutAsk.setVisibility(View.VISIBLE);
                     startVideo();
