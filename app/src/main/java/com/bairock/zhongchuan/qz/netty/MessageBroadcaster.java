@@ -29,6 +29,9 @@ public class MessageBroadcaster {
     private final EventLoopGroup group;
     private final Bootstrap bootstrap;
     public static Channel channel;
+    /**
+     * 手持终端端口
+     */
     public static final int PORT = 10000;
 
     public MessageBroadcaster() {

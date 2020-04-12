@@ -45,6 +45,7 @@ public class TcpClientHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
+        //自己发的消息自己无法接收, 因为已在广播中过滤了自己的心跳, 无法和自己建立tcp连接
         String str = (String) msg;
         Log.e("TcpClientHandler", str);
         Gson gson = new Gson();

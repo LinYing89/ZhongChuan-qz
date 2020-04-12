@@ -142,15 +142,16 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 
 	private void getLogin(final String userName, final String password) {
 		if (!TextUtils.isEmpty(userName) && !TextUtils.isEmpty(password)) {
+			UserUtil.user.setUsername(userName);
 			loging = true;
 			MessageBroadcaster.sendBroadcast(UdpMessageHelper.createLogin(userName, password));
 
-			Intent intent = new Intent(LoginActivity.this,
-					MainActivity.class);
-			startActivity(intent);
+//			Intent intent = new Intent(LoginActivity.this,
+//					MainActivity.class);
+//			startActivity(intent);
 //			overridePendingTransition(R.anim.push_up_in,
 //					R.anim.push_up_out);
-			finish();
+//			finish();
 		} else {
 			Utils.showLongToast(LoginActivity.this, "请填写账号或密码！");
 		}
@@ -224,6 +225,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 					break;
 				case 0:
 					//登录成功
+					Toast.makeText(theActivity, "登录成功", Toast.LENGTH_SHORT).show();
 					UserUtil.user.setUsername(theActivity.et_usertel.getText().toString());
 					Intent intent = new Intent(theActivity, MainActivity.class);
 					theActivity.startActivity(intent);

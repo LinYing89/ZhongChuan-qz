@@ -44,7 +44,7 @@ public class TcpServer {
                             // 解码和编码，应和客户端一致
                             ph.addLast("decoder", new StringDecoder(StandardCharsets.UTF_8));
                             ph.addLast("encoder", new StringEncoder(StandardCharsets.UTF_8));
-                            ph.addLast(new IdleStateHandler(90, -1, -1));
+//                            ph.addLast(new IdleStateHandler(90, -1, -1));
                             ph.addLast(new TcpServerHandler());
                         }
                     }).option(ChannelOption.SO_BACKLOG, 128) // (5)

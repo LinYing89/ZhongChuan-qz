@@ -33,6 +33,9 @@ public class UserUtil {
 
     public static void addClientBase(ClientBase clientBase){
         clientBases.add(clientBase);
+        if(clientBase.getClientBaseType() == ClientBaseType.PHONE){
+            TcpClientUtil.add(clientBase);
+        }
 //        if(clientBase instanceof User){
 //            addUser((User) clientBase);
 //        }else if(clientBase instanceof UnmannedAerialVehicle){
@@ -152,7 +155,7 @@ public class UserUtil {
     public static InetSocketAddress findInetSocketAddressByUsername(String username){
         for(ClientBase user : clientBases){
             if(user.getUsername().equals(username)){
-                return new InetSocketAddress(user.getIp(), 10000);
+                return new InetSocketAddress(user.getIp(), 10001);
             }
         }
         return null;

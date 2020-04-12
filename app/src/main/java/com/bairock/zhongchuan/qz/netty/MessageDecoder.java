@@ -1,6 +1,7 @@
 package com.bairock.zhongchuan.qz.netty;
 
 import android.content.Intent;
+import android.util.Log;
 
 import com.bairock.zhongchuan.qz.App;
 import com.bairock.zhongchuan.qz.Constants;
@@ -20,6 +21,8 @@ import io.netty.handler.codec.MessageToMessageDecoder;
 
 public class MessageDecoder extends MessageToMessageDecoder<DatagramPacket> {
 
+    private static final String TAG = "MessageDecoder";
+
     @Override
     protected void decode(ChannelHandlerContext ctx, DatagramPacket msg, List<Object> out) {
 //        ByteBuf data = msg.content(); // 获取对DatagramPacket 中的数据（ByteBuf）的引用
@@ -30,10 +33,17 @@ public class MessageDecoder extends MessageToMessageDecoder<DatagramPacket> {
         }
         byte[] req = new byte[byteBuf.readableBytes()];
         byteBuf.readBytes(req);
+        Log.e(TAG, "bytes" + Util.bytesToHexString(req));
 
         int memberNumber = Util.bytesToInt(new byte[]{req[0], req[1]});
+        Log.e(TAG, "memberNumber: " + memberNumber);
+        //过滤掉自己发的信息
+        if(memberNumber == Integer.parseInt(UserUtil.user.getUsername())){
+            return;
+        }
         byte factionCode = req[2];
         byte errCode = req[3];
+        Log.e(TAG, "factionCode: " + factionCode);
         int length = Util.bytesToInt(new byte[]{req[4], req[5]});
         byte[] data = new byte[length];
         if(length > 0){
@@ -41,6 +51,7 @@ public class MessageDecoder extends MessageToMessageDecoder<DatagramPacket> {
         }
         switch (factionCode){
             case UdpMessageHelper.HEART:
+                //自己的心跳已在上面过滤掉了
                 int ip1 = data[0] & 0xff;
                 int ip2 = data[1] & 0xff;
                 int ip3 = data[2] & 0xff;
@@ -139,7 +150,7 @@ public class MessageDecoder extends MessageToMessageDecoder<DatagramPacket> {
                 index += 3;
             }
             if(null != LoginActivity.handler) {
-                LoginActivity.handler.obtainMessage(0);
+                LoginActivity.handler.obtainMessage(0).sendToTarget();
             }
         }
     }

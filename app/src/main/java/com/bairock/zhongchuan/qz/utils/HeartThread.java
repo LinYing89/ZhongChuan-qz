@@ -1,5 +1,6 @@
 package com.bairock.zhongchuan.qz.utils;
 
+import com.bairock.zhongchuan.qz.bean.ClientBase;
 import com.bairock.zhongchuan.qz.bean.Location;
 import com.bairock.zhongchuan.qz.bean.MessageRoot;
 import com.bairock.zhongchuan.qz.bean.MessageRootType;
@@ -18,9 +19,36 @@ public class HeartThread extends Thread {
     public void run() {
         while (!interrupted()) {
             chatTest();
-            heartTest();
+            sendHeart();
+//            heartTest();
             try {
                 sleep(5000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void sendHeart(){
+        for(ClientBase clientBase : UserUtil.clientBases){
+            MessageRoot<Location> messageRoot = new MessageRoot<>();
+            messageRoot.setFrom(clientBase.getUsername());
+            messageRoot.setTo("0");
+            messageRoot.setType(MessageRootType.HEART);
+            messageRoot.setMsgId(UUID.randomUUID().toString());
+            messageRoot.setTime(new Date().getTime());
+
+            double lng = 0;
+            if(i == 0){
+                lng = 119.25745697692036;
+            }else {
+                lng = 119.25945697692036;
+            }
+            Location location = new Location(lng, 34.73371279664106);
+            messageRoot.setData(location);
+            MessageBroadcaster.sendBroadcast(UdpMessageHelper.createHeart(clientBase.getUsername(), Util.getLocalIp(), location));
+            try {
+                sleep(500);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

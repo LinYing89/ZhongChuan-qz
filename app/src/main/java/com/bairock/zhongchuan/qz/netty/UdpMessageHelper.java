@@ -6,7 +6,7 @@ import com.bairock.zhongchuan.qz.utils.Util;
 public class UdpMessageHelper {
 
     public static final byte HEART = 0x01;
-    public static final byte LOGIN = 0x02;
+    public static final byte LOGIN = 0x03;
     public static final byte VOICE_CALL_ASK = 0x51;
     public static final byte VOICE_CALL_ANS = 0x52;
     public static final byte VIDEO_CALL_ASK = 0x53;
@@ -63,13 +63,13 @@ public class UdpMessageHelper {
         UdpMessage udpMessage = new UdpMessage();
         udpMessage.setMemberNumber(Short.parseShort(number));
         udpMessage.setFactionCode(LOGIN);
-        char[] cNumber = number.toCharArray();
         char[] cPassword = password.toCharArray();
+        byte [] byteNum = intToBytes(Integer.parseInt(number));
         byte[] data = new byte[4 + cPassword.length];
-        data[0] = (byte) cNumber[0];
-        data[1] = (byte) cNumber[1];
-        data[2] = (byte) cNumber[2];
-        data[3] = (byte) cNumber[3];
+        data[0] = byteNum[0];
+        data[1] = byteNum[1];
+        data[2] = byteNum[2];
+        data[3] = byteNum[3];
         byte[] bPassword = new byte[cPassword.length];
         for(int i = 0; i < cPassword.length; i++){
             bPassword[i] = (byte) cPassword[i];
