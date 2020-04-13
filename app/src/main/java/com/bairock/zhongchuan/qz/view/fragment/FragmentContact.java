@@ -10,6 +10,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -46,6 +47,8 @@ public class FragmentContact extends Fragment {
 	private LinearLayout layoutGroupMember;
 	private View layout;
 	private ImageView imgHead;
+	private TextView txtName;
+	private TextView txtMember;
 	private TitlePopup groupPopup;
 
 	@Override
@@ -56,6 +59,8 @@ public class FragmentContact extends Fragment {
 					null);
 			findViews();
 			setListener();
+			txtName.setText(UserUtil.user.getUsername());
+			txtMember.setText(UserUtil.user.getUsername());
 			initPopWindow();
 			mapView.onCreate(savedInstanceState);
 
@@ -87,6 +92,8 @@ public class FragmentContact extends Fragment {
 		mapView = layout.findViewById(R.id.map);
 		layoutGroupMember = layout.findViewById(R.id.layoutGroupMember);
 		imgHead = layout.findViewById(R.id.imgHead);
+		txtName = layout.findViewById(R.id.txtName);
+		txtMember = layout.findViewById(R.id.txtMember);
 	}
 
 	@Override

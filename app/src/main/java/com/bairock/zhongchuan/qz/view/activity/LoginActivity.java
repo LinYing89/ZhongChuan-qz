@@ -189,7 +189,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 		public void onTextChanged(CharSequence cs, int start, int before,
 				int count) {
 			boolean Sign2 = et_usertel.getText().length() > 0;
-			boolean Sign3 = et_password.getText().length() > 4;
+			boolean Sign3 = et_password.getText().length() > 1;
 			if (Sign2 & Sign3) {
 				btn_login.setBackgroundDrawable(getResources().getDrawable(
 						R.drawable.btn_bg_green));

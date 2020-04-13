@@ -339,8 +339,10 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
     private class MediaBroadcastReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            String type = intent.getStringExtra(Constants.MEDIA_TYPE);
-            String name = intent.getStringExtra(Constants.NAME);
+//            String type = intent.getStringExtra(Constants.MEDIA_TYPE);
+            Bundle bundle = intent.getBundleExtra("myBundle");
+            String type = bundle.getString(Constants.MEDIA_TYPE);
+            String name = bundle.getString(Constants.NAME);
             if(type.equals(Constants.MEDIA_TYPE_VOICE)){
                 // 收到语音请求
                 if(VoiceCallActivity.listen == null) {

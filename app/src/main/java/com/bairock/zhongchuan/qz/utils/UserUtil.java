@@ -3,6 +3,7 @@ package com.bairock.zhongchuan.qz.utils;
 import com.bairock.zhongchuan.qz.bean.ClientBase;
 import com.bairock.zhongchuan.qz.bean.Location;
 import com.bairock.zhongchuan.qz.enums.ClientBaseType;
+import com.bairock.zhongchuan.qz.netty.MessageBroadcaster;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
@@ -155,7 +156,7 @@ public class UserUtil {
     public static InetSocketAddress findInetSocketAddressByUsername(String username){
         for(ClientBase user : clientBases){
             if(user.getUsername().equals(username)){
-                return new InetSocketAddress(user.getIp(), 10001);
+                return new InetSocketAddress(user.getIp(), MessageBroadcaster.PORT);
             }
         }
         return null;

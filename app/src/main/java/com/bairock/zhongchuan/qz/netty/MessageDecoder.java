@@ -1,6 +1,7 @@
 package com.bairock.zhongchuan.qz.netty;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.util.Log;
 
 import com.bairock.zhongchuan.qz.App;
@@ -33,17 +34,17 @@ public class MessageDecoder extends MessageToMessageDecoder<DatagramPacket> {
         }
         byte[] req = new byte[byteBuf.readableBytes()];
         byteBuf.readBytes(req);
-        Log.e(TAG, "bytes" + Util.bytesToHexString(req));
+//        Log.e(TAG, "bytes " + Util.bytesToHexString(req));
 
         int memberNumber = Util.bytesToInt(new byte[]{req[0], req[1]});
-        Log.e(TAG, "memberNumber: " + memberNumber);
+//        Log.e(TAG, "memberNumber: " + memberNumber);
         //过滤掉自己发的信息
         if(memberNumber == Integer.parseInt(UserUtil.user.getUsername())){
             return;
         }
         byte factionCode = req[2];
         byte errCode = req[3];
-        Log.e(TAG, "factionCode: " + factionCode);
+//        Log.e(TAG, "factionCode: " + factionCode);
         int length = Util.bytesToInt(new byte[]{req[4], req[5]});
         byte[] data = new byte[length];
         if(length > 0){
@@ -77,8 +78,10 @@ public class MessageDecoder extends MessageToMessageDecoder<DatagramPacket> {
             case UdpMessageHelper.VOICE_CALL_ASK :
                 //语音通话请求
                 Intent i1 = new Intent(ConversationUtil.VOICE_ASK_ACTION);
-                i1.putExtra(Constants.MEDIA_TYPE, Constants.MEDIA_TYPE_VOICE);
-                i1.putExtra(Constants.NAME, memberNumber);
+                Bundle bundle = new Bundle();
+                bundle.putString(Constants.MEDIA_TYPE, Constants.MEDIA_TYPE_VOICE);
+                bundle.putString(Constants.NAME, String.valueOf(memberNumber));
+                i1.putExtra("myBundle", bundle);
                 App.getInstance().sendOrderedBroadcast(i1, ConversationUtil.CHAT_BROADCAST_PERMISSION);
                 break;
             case UdpMessageHelper.VIDEO_CALL_ANS:
@@ -92,8 +95,10 @@ public class MessageDecoder extends MessageToMessageDecoder<DatagramPacket> {
             case UdpMessageHelper.VIDEO_CALL_ASK :
                 //语音通话请求
                 Intent i3 = new Intent(ConversationUtil.VIDEO_ASK_ACTION);
-                i3.putExtra(Constants.MEDIA_TYPE, Constants.MEDIA_TYPE_VIDEO);
-                i3.putExtra(Constants.NAME, memberNumber);
+                Bundle bundle1 = new Bundle();
+                bundle1.putString(Constants.MEDIA_TYPE, Constants.MEDIA_TYPE_VOICE);
+                bundle1.putString(Constants.NAME, String.valueOf(memberNumber));
+                i3.putExtra("myBundle", bundle1);
                 App.getInstance().sendOrderedBroadcast(i3, ConversationUtil.CHAT_BROADCAST_PERMISSION);
                 break;
             default: break;

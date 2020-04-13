@@ -75,20 +75,22 @@ public class FragmentMsg extends Fragment implements OnClickListener,
      * 刷新页面
      */
     public void refresh() {
-        adpter.notifyDataSetChanged();
-//        conversationList.clear();
-//        initViews();
+//        if(null != adpter) {
+//            adpter.notifyDataSetChanged();
+//        }
+        conversationList.clear();
+        initViews();
     }
 
     private void initViews() {
         conversationList.addAll(loadConversationsWithRecentChat());
         if (conversationList != null && conversationList.size() > 0) {
             layout.findViewById(R.id.txt_nochat).setVisibility(View.GONE);
-            adpter = new NewMsgAdpter(getActivity(), conversationList);
-            lvContact.setAdapter(adpter);
         } else {
             layout.findViewById(R.id.txt_nochat).setVisibility(View.VISIBLE);
         }
+        adpter = new NewMsgAdpter(getActivity(), conversationList);
+        lvContact.setAdapter(adpter);
     }
 
     /**
@@ -102,33 +104,33 @@ public class FragmentMsg extends Fragment implements OnClickListener,
             return ConversationUtil.conversations;
         }
 
-        MessageRoot<ZCMessage> messageRoot = new MessageRoot<>();
-        messageRoot.setType(MessageRootType.CHAT);
-        messageRoot.setFrom("8081");
-        messageRoot.setTo("8080");
-        messageRoot.setTime(new Date().getTime());
-        messageRoot.setMsgId(UUID.randomUUID().toString());
-
-        ZCMessage message = new ZCMessage();
-        message.setContent("test");
-        message.setDirect(ZCMessageDirect.RECEIVE);
-        message.setMessageType(ZCMessageType.TXT);
-        messageRoot.setData(message);
-        ConversationUtil.addReceivedMessage(messageRoot);
-
-        MessageRoot<ZCMessage> messageRoot1 = new MessageRoot<>();
-        messageRoot1.setType(MessageRootType.CHAT);
-        messageRoot1.setFrom("8082");
-        messageRoot1.setTo("8080");
-        messageRoot1.setTime(new Date().getTime());
-        messageRoot1.setMsgId(UUID.randomUUID().toString());
-
-        ZCMessage message1 = new ZCMessage();
-        message1.setContent("hello");
-        message1.setDirect(ZCMessageDirect.SEND);
-        message1.setMessageType(ZCMessageType.TXT);
-        messageRoot1.setData(message1);
-        ConversationUtil.addReceivedMessage(messageRoot1);
+//        MessageRoot<ZCMessage> messageRoot = new MessageRoot<>();
+//        messageRoot.setType(MessageRootType.CHAT);
+//        messageRoot.setFrom("8081");
+//        messageRoot.setTo("8080");
+//        messageRoot.setTime(new Date().getTime());
+//        messageRoot.setMsgId(UUID.randomUUID().toString());
+//
+//        ZCMessage message = new ZCMessage();
+//        message.setContent("test");
+//        message.setDirect(ZCMessageDirect.RECEIVE);
+//        message.setMessageType(ZCMessageType.TXT);
+//        messageRoot.setData(message);
+//        ConversationUtil.addReceivedMessage(messageRoot);
+//
+//        MessageRoot<ZCMessage> messageRoot1 = new MessageRoot<>();
+//        messageRoot1.setType(MessageRootType.CHAT);
+//        messageRoot1.setFrom("8082");
+//        messageRoot1.setTo("8080");
+//        messageRoot1.setTime(new Date().getTime());
+//        messageRoot1.setMsgId(UUID.randomUUID().toString());
+//
+//        ZCMessage message1 = new ZCMessage();
+//        message1.setContent("hello");
+//        message1.setDirect(ZCMessageDirect.SEND);
+//        message1.setMessageType(ZCMessageType.TXT);
+//        messageRoot1.setData(message1);
+//        ConversationUtil.addReceivedMessage(messageRoot1);
         // 排序
         sortConversationByLastChatTime(ConversationUtil.conversations);
         return ConversationUtil.conversations;
