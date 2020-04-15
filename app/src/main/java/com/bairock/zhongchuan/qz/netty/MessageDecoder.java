@@ -96,7 +96,7 @@ public class MessageDecoder extends MessageToMessageDecoder<DatagramPacket> {
                 //语音通话请求
                 Intent i3 = new Intent(ConversationUtil.VIDEO_ASK_ACTION);
                 Bundle bundle1 = new Bundle();
-                bundle1.putString(Constants.MEDIA_TYPE, Constants.MEDIA_TYPE_VOICE);
+                bundle1.putString(Constants.MEDIA_TYPE, Constants.MEDIA_TYPE_VIDEO);
                 bundle1.putString(Constants.NAME, String.valueOf(memberNumber));
                 i3.putExtra("myBundle", bundle1);
                 App.getInstance().sendOrderedBroadcast(i3, ConversationUtil.CHAT_BROADCAST_PERMISSION);
