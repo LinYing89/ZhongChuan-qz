@@ -7,18 +7,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.view.View;
-import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bairock.zhongchuan.qz.Constants;
-import com.bairock.zhongchuan.qz.MainActivity;
 import com.bairock.zhongchuan.qz.R;
 import com.bairock.zhongchuan.qz.netty.H264Broadcaster;
 import com.bairock.zhongchuan.qz.netty.MessageBroadcaster;
@@ -38,15 +33,10 @@ import com.library.live.vd.VDEncoder;
 import com.library.live.view.PlayerView;
 import com.library.live.view.PublishView;
 
-import java.lang.ref.WeakReference;
-import java.util.LinkedList;
-import java.util.Queue;
-
 public class VideoCallActivity extends AppCompatActivity {
 
     private static String TAG = "VideoCallActivity";
 
-    public static MyHandler handler;
     private Chronometer chronometer;
     public static Player player;
     private Publish publishMe;
@@ -64,8 +54,6 @@ public class VideoCallActivity extends AppCompatActivity {
     private String ip;
 
     private AskBroadcastReceiver receiver;
-
-    private static Queue<byte[]> queue = new LinkedList<byte[]>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,16 +84,13 @@ public class VideoCallActivity extends AppCompatActivity {
 
         setListener();
 
-        handler = new MyHandler(this);
         init();
         // 注册接收消息广播
         receiver = new AskBroadcastReceiver();
         IntentFilter intentFilter = new IntentFilter(ConversationUtil.VIDEO_ANS_ACTION);
-        // 设置广播的优先级别
-//        intentFilter.setPriority(5);
         registerReceiver(receiver, intentFilter);
 
-        startVideo();
+//        startVideo();
     }
 
     @Override
@@ -129,7 +114,6 @@ public class VideoCallActivity extends AppCompatActivity {
             player.destroy();
             player = null;
         }
-        handler = null;
 
         if(null != chronometer) {
             chronometer.stop();
@@ -157,18 +141,13 @@ public class VideoCallActivity extends AppCompatActivity {
     }
     private void init(){
         publishMe = new Publish.Buider(this, (PublishView) findViewById(R.id.publishViewMe))
-                .setPushMode(new UdpSend(ip, 10002))
-//                .setPushMode(new UdpSend(Util.getLocalIp(), 10002))
-//                .setFrameRate(15)//帧率
-                .setFrameRate(10)//帧率
+//                .setPushMode(new UdpSend(ip, H264Broadcaster.PORT))
+                .setPushMode(new UdpSend(Util.getLocalIp(), 10009))
+                .setFrameRate(15)//帧率
                 .setVideoCode(VDEncoder.H264)//编码方式
                 .setIsPreview(true)//是否需要显示预览(如需后台推流最好设置false，如果设置false则构建Buider可以调用单参数方法Publish.Buider(context))
-//                .setPublishBitrate(600 * 1024)//推流采样率
-//                .setCollectionBitrate(600 * 1024)//采集采样率
-//                .setCollectionBitrateVC(64 * 1024)//音频采集采样率
-//                .setPublishBitrateVC(24 * 1024)//音频推流采样率
-                .setPublishBitrate(320 * 480)//推流采样率
-                .setCollectionBitrate(320 * 480)//采集采样率
+                .setPublishBitrate(600 * 1024)//推流采样率
+                .setCollectionBitrate(600 * 1024)//采集采样率
                 .setCollectionBitrateVC(64 * 1024)//音频采集采样率
                 .setPublishBitrateVC(24 * 1024)//音频推流采样率
                 .setPublishSize(480, 320)//推流分辨率，不要高于预览分辨率
@@ -179,44 +158,31 @@ public class VideoCallActivity extends AppCompatActivity {
 //                .setVideoDirPath(Environment.getExternalStorageDirectory().getPath() + File.separator + "VideoLive")//录制路径,当前为默认路径
 //                .setPictureDirPath(Environment.getExternalStorageDirectory().getPath() + File.separator + "VideoPicture")//拍照路径,当前为默认路径
                 .setVideoDirPath(FileUtil.getPoliceVideoPath())//录制路径,当前为默认路径
-//                .setUdpControl(new UdpControlInterface() {
-//                    @Override
-//                    public byte[] Control(byte[] bytes, int offset, int length) {//bytes为udp包数据,offset为起始位,length为长度
-//                        //返回自定义后udp包数据,不要做耗时操作。如果调用了此方法不要将原数组返回
-////                        queue.offer(bytes);
-////                        handler.obtainMessage().sendToTarget();
-////                        if(null != player){
-////                        if(null != handler){
-////                            Bundle bundle=new Bundle();
-////                            bundle.putByteArray("bs",bytes);
-////                            Message message=handler.obtainMessage();
-////                            message.setData(bundle);
-////                            handler.sendMessage(message);
-////                            handler.obtainMessage(0, bytes).sendToTarget();
-////                        }
-////                            player.write(bytes);
-////                        }
-////                        H264Broadcaster.send(bytes, ip);
-////                        H264bRoadcaster.send(bytes, "192.168.1.6");
-//                        return new byte[0];
-//                    }
-//                })
-                .build();
-        publishMe.start();
-        player = new Player.Buider((PlayerView) findViewById(R.id.player))
-                .setPullMode(new UdpRecive(10002))
-//                .setPullMode(new UdpRecive())
-                .setVideoCode(VDDecoder.H264)//设置解码方式
-                .setMultiple(0)//音频调节，倍数限制为1-8倍。1为原声,放大后可能导致爆音。
-//                .setUdpPacketCacheMin(1)//udp包缓存数量,以音频为基准
-//                .setVideoFrameCacheMin(2)//视频帧达到播放条件的缓存帧数
                 .setUdpControl(new UdpControlInterface() {
                     @Override
-                    public byte[] Control(byte[] bytes, int offset, int length) {//bytes为接收到的原始数据
-                        Logger.e(TAG, "BYTES LENGTH: " + bytes.length);
-                        return bytes;
+                    public byte[] Control(byte[] bytes, int offset, int length) {//bytes为udp包数据,offset为起始位,length为长度
+                        //返回自定义后udp包数据,不要做耗时操作。如果调用了此方法不要将原数组返回
+//                            player.write(bytes);
+                        H264Broadcaster.send(bytes, ip);
+//                        H264bRoadcaster.send(bytes, "192.168.1.6");
+                        return new byte[0];
                     }
                 })
+                .build();
+//        publishMe.start();
+        player = new Player.Buider((PlayerView) findViewById(R.id.player))
+//                .setPullMode(new UdpRecive(10002))
+                .setPullMode(new UdpRecive())
+                .setVideoCode(VDDecoder.H264)//设置解码方式
+                .setMultiple(0)//音频调节，倍数限制为1-8倍。1为原声,放大后可能导致爆音。
+                .setSize(480, 320)
+//                .setUdpControl(new UdpControlInterface() {
+//                    @Override
+//                    public byte[] Control(byte[] bytes, int offset, int length) {//bytes为接收到的原始数据
+//                        Logger.e(TAG, "BYTES LENGTH: " + bytes.length);
+//                        return bytes;
+//                    }
+//                })
                 .build();
         player.start();
 
@@ -266,26 +232,6 @@ public class VideoCallActivity extends AppCompatActivity {
                 Toast.makeText(VideoCallActivity.this, "对方忙", Toast.LENGTH_SHORT).show();
                 finish();
             }
-        }
-    }
-
-    public static class MyHandler extends Handler {
-        WeakReference<VideoCallActivity> mActivity;
-
-        MyHandler(VideoCallActivity activity) {
-            mActivity = new WeakReference<>(activity);
-        }
-
-        @Override
-        public void handleMessage(Message msg) {
-//            final VideoCallActivity theActivity = mActivity.get();
-//            Bundle bundle = msg.getData();
-//            byte[] bs = bundle.getByteArray("bs");
-            byte[] bs = queue.poll();
-            if(null != bs) {
-                player.write(bs);
-            }
-
         }
     }
 }

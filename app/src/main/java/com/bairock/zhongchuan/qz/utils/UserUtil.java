@@ -156,6 +156,9 @@ public class UserUtil {
     public static InetSocketAddress findInetSocketAddressByUsername(String username){
         for(ClientBase user : clientBases){
             if(user.getUsername().equals(username)){
+                if(null == user.getIp()){
+                    return null;
+                }
                 return new InetSocketAddress(user.getIp(), MessageBroadcaster.PORT);
             }
         }

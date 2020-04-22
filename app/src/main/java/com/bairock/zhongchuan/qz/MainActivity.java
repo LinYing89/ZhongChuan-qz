@@ -74,11 +74,11 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
 //        MessageBroadcaster messageBroadcaster = new MessageBroadcaster();
 //        messageBroadcaster.bind();
 
-//        H264Broadcaster h264bRoadcaster = new H264Broadcaster();
-//        h264bRoadcaster.bind();
+        H264Broadcaster h264bRoadcaster = new H264Broadcaster();
+        h264bRoadcaster.bind();
 
-//        VoiceBroadcaster voiceBroadcaster = new VoiceBroadcaster();
-//        voiceBroadcaster.bind();
+        VoiceBroadcaster voiceBroadcaster = new VoiceBroadcaster();
+        voiceBroadcaster.bind();
 
         new HeartThread().start();
         try {
@@ -355,7 +355,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
                 }
             }else if(type.equals(Constants.MEDIA_TYPE_VIDEO)){
                 // 收到视频请求
-                if(VideoCallActivity.handler == null) {
+                if(VideoCallActivity.player == null) {
                     Intent intent1 = new Intent(MainActivity.this, VideoCallActivity.class);
                     // 进入应答界面
                     intent1.putExtra(Constants.VIDEO_TYPE, Constants.VIDEO_ANS);
