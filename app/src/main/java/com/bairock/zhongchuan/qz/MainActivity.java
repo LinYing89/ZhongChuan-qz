@@ -2,6 +2,8 @@ package com.bairock.zhongchuan.qz;
 
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import android.Manifest;
 import android.content.BroadcastReceiver;
@@ -10,6 +12,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -23,6 +26,10 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.amap.api.location.AMapLocation;
+import com.amap.api.location.AMapLocationClient;
+import com.amap.api.location.AMapLocationClientOption;
+import com.amap.api.location.AMapLocationListener;
 import com.bairock.zhongchuan.qz.dialog.TitlePopup;
 import com.bairock.zhongchuan.qz.netty.H264Broadcaster;
 import com.bairock.zhongchuan.qz.netty.MessageBroadcaster;
@@ -31,6 +38,7 @@ import com.bairock.zhongchuan.qz.netty.VoiceBroadcaster;
 import com.bairock.zhongchuan.qz.utils.ConversationUtil;
 import com.bairock.zhongchuan.qz.utils.FileUtil;
 import com.bairock.zhongchuan.qz.utils.HeartThread;
+import com.bairock.zhongchuan.qz.utils.TcpClientUtil;
 import com.bairock.zhongchuan.qz.utils.UserUtil;
 import com.bairock.zhongchuan.qz.view.activity.VideoCallActivity;
 import com.bairock.zhongchuan.qz.view.activity.VoiceCallActivity;
@@ -44,6 +52,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
     private ImageView img_right;
     private NewMessageBroadcastReceiver msgReceiver;
     private MediaBroadcastReceiver mediaBroadcastReceiver;
+    private LogoutBroadcastReceiver logoutBroadcastReceiver;
     protected static final String TAG = "MainActivity";
     private TitlePopup titlePopup;
     private TextView unreaMsgdLabel;// 未读消息textview
@@ -57,6 +66,8 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
     private String connectMsg = "";;
     private int index;
     private int currentTabIndex;// 当前fragment的index
+    private AMapLocationClient mLocationClient = null;
+    public final ExecutorService executorService = Executors.newCachedThreadPool();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -71,35 +82,18 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
 //        initReceiver();
 
 //        UserUtil.initUsers();
-//        MessageBroadcaster messageBroadcaster = new MessageBroadcaster();
-//        messageBroadcaster.bind();
 
-        H264Broadcaster h264bRoadcaster = new H264Broadcaster();
-        h264bRoadcaster.bind();
-
-        VoiceBroadcaster voiceBroadcaster = new VoiceBroadcaster();
-        voiceBroadcaster.bind();
+        H264Broadcaster.getIns().bind();
+        VoiceBroadcaster.getIns().bind();
 
         new HeartThread().start();
         try {
-            new TcpServer().run();
+            TcpServer.getIns().run();
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         FileUtil.createPolicePath();
-
-//        if (Build.VERSION.SDK_INT >= 23) {
-//            int REQUEST_CODE_CONTACT = 101;
-//            String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE};
-//            //验证是否许可权限
-//            for (String str : permissions) {
-//                if (this.checkSelfPermission(str) != PackageManager.PERMISSION_GRANTED) {
-//                    //申请权限
-//                    this.requestPermissions(permissions, REQUEST_CODE_CONTACT);
-//                }
-//            }
-//        }
 
         if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
             ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},200);
@@ -108,10 +102,6 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
         if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
             ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},200);
         }
-
-//        if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED){
-//            ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.RECORD_AUDIO},200);
-//        }
 
         if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
             ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.CAMERA},200);
@@ -128,6 +118,9 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
         }
 
         initReceiver();
+        if(null == mLocationClient){
+            initLocation();
+        }
     }
 
     private void initTabView() {
@@ -213,6 +206,18 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
 
     @Override
     protected void onDestroy() {
+        if(null != msgReceiver) {
+            unregisterReceiver(msgReceiver);
+            msgReceiver = null;
+        }
+        if(null != mediaBroadcastReceiver) {
+            unregisterReceiver(mediaBroadcastReceiver);
+            mediaBroadcastReceiver = null;
+        }
+        if(null != logoutBroadcastReceiver) {
+            unregisterReceiver(logoutBroadcastReceiver);
+            logoutBroadcastReceiver = null;
+        }
         super.onDestroy();
     }
 
@@ -287,33 +292,67 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
         intentFilter1.addAction(ConversationUtil.VIDEO_ASK_ACTION);
         registerReceiver(mediaBroadcastReceiver, intentFilter1);
 
-//        Intent intent = new Intent(this, UpdateService.class);
-//        startService(intent);
-//        registerReceiver(new MyBroadcastReceiver(), new IntentFilter(
-//                "com.juns.wechat.Brodcast"));
-//        // 注册一个接收消息的BroadcastReceiver
-//        msgReceiver = new NewMessageBroadcastReceiver();
-//        IntentFilter intentFilter = new IntentFilter(EMChatManager
-//                .getInstance().getNewMessageBroadcastAction());
-//        intentFilter.setPriority(3);
-//        registerReceiver(msgReceiver, intentFilter);
-
+        logoutBroadcastReceiver = new LogoutBroadcastReceiver();
+        IntentFilter intentFilter2 = new IntentFilter(ConversationUtil.LOGOUT_ACTION);
+        registerReceiver(logoutBroadcastReceiver, intentFilter2);
     }
 
-    // 自己联系人 群组数据返回监听
-    public class MyBroadcastReceiver extends BroadcastReceiver {
+    private void initLocation(){
+        //初始化定位
+        mLocationClient = new AMapLocationClient(getApplicationContext());
+        //设置定位回调监听
+        mLocationClient.setLocationListener(mAMapLocationListener);
+        AMapLocationClientOption mLocationOption = new AMapLocationClientOption();
+        //设置定位模式为AMapLocationMode.Hight_Accuracy，高精度模式。
+//        mLocationOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy);
+        mLocationOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Device_Sensors);
+        mLocationOption.setSensorEnable(true);
+        //设置定位间隔,单位毫秒,默认为2000ms，最低1000ms。
+        mLocationOption.setInterval(5000);
+        //设置是否返回地址信息（默认返回地址信息）
+        mLocationOption.setNeedAddress(false);
+        //关闭缓存机制
+        mLocationOption.setLocationCacheEnable(false);
+        //给定位客户端对象设置定位参数
+        mLocationClient.setLocationOption(mLocationOption);
+        //启动定位
+        mLocationClient.startLocation();
+    }
 
+    private AMapLocationListener mAMapLocationListener = new AMapLocationListener(){
         @Override
-        public void onReceive(Context context, Intent intent) {
-            // Bundle bundle = intent.getExtras();
-            fragmentMsg.refresh();
+        public void onLocationChanged(final AMapLocation amapLocation) {
+            executorService.execute(new Runnable() {
+                @Override
+                public void run() {
+                    locationRefresh(amapLocation);
+                }});
         }
+    };
+
+    private void locationRefresh( final AMapLocation amapLocation){
+        Double lat = null;
+        Double lng = null;
+        if (amapLocation != null) {
+            if (amapLocation.getErrorCode() == 0) {
+                //可在其中解析amapLocation获取相应内容。
+                lat = amapLocation.getLatitude();//获取纬度
+                lng = amapLocation.getLongitude();//获取经度
+                UserUtil.MY_LOCATION.setLat(lat);
+                UserUtil.MY_LOCATION.setLng(lng);
+                Log.e("MainActivity", "lng:" + lng + ",lat:" + lat);
+            }else {
+                //定位失败时，可通过ErrCode（错误码）信息来确定失败的原因，errInfo是错误信息，详见错误码表。
+                Log.e("AmapError","location Error, ErrCode:"
+                        + amapLocation.getErrorCode() + ", errInfo:"
+                        + amapLocation.getErrorInfo());
+            }
+        }
+//        UserUtil.sendMyHeart(lat, lng);
     }
 
     /**
      * 新消息广播接收者
-     *
-     *
      */
     private class NewMessageBroadcastReceiver extends BroadcastReceiver {
         @Override
@@ -363,6 +402,23 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
                     MainActivity.this.startActivity(intent1);
                 }
             }
+        }
+    }
+
+    private class LogoutBroadcastReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            MessageBroadcaster.getIns().stop();
+            H264Broadcaster.getIns().stop();
+            VoiceBroadcaster.getIns().stop();
+            TcpServer.getIns().close();
+            TcpClientUtil.close();
+            if(null != mLocationClient) {
+                mLocationClient.stopLocation();//停止定位后，本地定位服务并不会被销毁
+                mLocationClient.onDestroy();//销毁定位客户端，同时销毁本地定位服务。
+                mLocationClient = null;
+            }
+            finish();
         }
     }
 

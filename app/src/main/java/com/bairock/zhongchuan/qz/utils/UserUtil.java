@@ -4,12 +4,15 @@ import com.bairock.zhongchuan.qz.bean.ClientBase;
 import com.bairock.zhongchuan.qz.bean.Location;
 import com.bairock.zhongchuan.qz.enums.ClientBaseType;
 import com.bairock.zhongchuan.qz.netty.MessageBroadcaster;
+import com.bairock.zhongchuan.qz.netty.UdpMessageHelper;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 
 public class UserUtil {
+
+    public static Location MY_LOCATION = new Location();
 
     public static ClientBase user = new ClientBase();
 
@@ -20,6 +23,18 @@ public class UserUtil {
 //    public static List<Telescope> telescopes = new ArrayList<>();
 //    public static List<UnmannedAerialVehicle> unmannedAerialVehicles = new ArrayList<>();
 //    public static List<SoundRecorder> soundRecorders = new ArrayList<>();
+
+    public static void sendMyHeart(){
+        MessageBroadcaster.sendBroadcast(UdpMessageHelper.createHeart(UserUtil.user.getUsername(), Util.getLocalIp(), MY_LOCATION));
+    }
+
+    public static void sendMyHeart(Double lat, Double lng){
+        if(null != lat && lat != 0 && null != lng && lng != 0){
+            MY_LOCATION.setLat(lat);
+            MY_LOCATION.setLng(lng);
+        }
+        MessageBroadcaster.sendBroadcast(UdpMessageHelper.createHeart(UserUtil.user.getUsername(), Util.getLocalIp(), MY_LOCATION));
+    }
 
     public static List<ClientBase> findClientBases(){
         return clientBases;
@@ -133,6 +148,15 @@ public class UserUtil {
             }
         }
         return phoneUsers;
+    }
+
+    public static String findMainServerIp(){
+        for(ClientBase user : clientBases){
+            if(user.getClientBaseType() == ClientBaseType.MAIN_SERVER){
+                return user.getIp();
+            }
+        }
+        return null;
     }
 
     public static ClientBase findUserByUsername(String username){

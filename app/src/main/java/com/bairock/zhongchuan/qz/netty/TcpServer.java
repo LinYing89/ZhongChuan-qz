@@ -21,12 +21,21 @@ import io.netty.handler.codec.string.StringEncoder;
 import io.netty.handler.timeout.IdleStateHandler;
 
 public class TcpServer {
+
+    private static TcpServer ins = new TcpServer();
+
     public static int PORT = 8888;
 
     private ServerBootstrap b;
     private ChannelFuture f;
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
+
+    public static TcpServer getIns(){
+        return ins;
+    }
+
+    private TcpServer(){}
 
     public void run() throws Exception {
         bossGroup = new NioEventLoopGroup(); // (1)

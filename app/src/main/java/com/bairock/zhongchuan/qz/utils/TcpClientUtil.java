@@ -59,4 +59,10 @@ public class TcpClientUtil {
             CommonUtils.executeThread(thread);
         }
     }
+
+    public static void close(){
+        for(TcpClient tcpClient : tcpClients){
+            tcpClient.close();
+        }
+    }
 }

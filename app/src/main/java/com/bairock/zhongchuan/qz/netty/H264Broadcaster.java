@@ -16,12 +16,18 @@ import io.netty.channel.socket.nio.NioDatagramChannel;
 
 public class H264Broadcaster {
 
+    private static H264Broadcaster ins = new H264Broadcaster();
+
     public static final int PORT = 10001;
     private final EventLoopGroup group;
     private final Bootstrap bootstrap;
     public static Channel channel;
 
-    public H264Broadcaster() {
+    public static H264Broadcaster getIns(){
+        return ins;
+    }
+
+    private H264Broadcaster() {
         group = new NioEventLoopGroup();
         bootstrap = new Bootstrap();
         bootstrap.group(group)

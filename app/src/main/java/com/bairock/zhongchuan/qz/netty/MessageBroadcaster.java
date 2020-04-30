@@ -26,6 +26,8 @@ import io.netty.util.internal.StringUtil;
 
 public class MessageBroadcaster {
 
+    private static MessageBroadcaster ins = new MessageBroadcaster();
+
     private final EventLoopGroup group;
     private final Bootstrap bootstrap;
     public static Channel channel;
@@ -34,7 +36,11 @@ public class MessageBroadcaster {
      */
     public static final int PORT = 10000;
 
-    public MessageBroadcaster() {
+    public static MessageBroadcaster getIns(){
+        return ins;
+    }
+
+    private MessageBroadcaster() {
         group = new NioEventLoopGroup();
         bootstrap = new Bootstrap();
         bootstrap.group(group)

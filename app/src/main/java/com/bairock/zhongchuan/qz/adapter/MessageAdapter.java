@@ -529,8 +529,9 @@ public class MessageAdapter extends BaseAdapter {
                 }
             });
         }else{
-            new LoadVideoImageTask().execute(message.getContent(), holder.iv);
+            new LoadVideoImageTask().execute(message.getContent(), holder.iv, activity);
         }
+
     }
 
     /**

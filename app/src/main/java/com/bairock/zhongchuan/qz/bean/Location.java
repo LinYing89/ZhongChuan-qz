@@ -3,9 +3,9 @@ package com.bairock.zhongchuan.qz.bean;
 public class Location {
 
     //经度
-    private Double lng;
+    private Double lng = 0d;
     //纬度
-    private Double lat;
+    private Double lat = 0d;
 
     public Location() {
     }

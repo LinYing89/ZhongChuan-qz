@@ -20,6 +20,7 @@ import com.bairock.zhongchuan.qz.App;
 import com.bairock.zhongchuan.qz.R;
 import com.bairock.zhongchuan.qz.netty.MessageBroadcaster;
 import com.bairock.zhongchuan.qz.netty.UdpMessageHelper;
+import com.bairock.zhongchuan.qz.netty.VoiceBroadcaster;
 import com.bairock.zhongchuan.qz.recorderlib.RecordManager;
 import com.bairock.zhongchuan.qz.recorderlib.recorder.RecordConfig;
 import com.bairock.zhongchuan.qz.recorderlib.recorder.RecordHelper;
@@ -46,7 +47,7 @@ public class VoiceUploadActivity extends AppCompatActivity {
     private AudioView audioView;
     private Chronometer chronometer;
     private AskBroadcastReceiver receiver;
-
+    private String ip;
     private RecordManager recordManager = RecordManager.getInstance();
 
     @Override
@@ -54,6 +55,12 @@ public class VoiceUploadActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_voice_upload);
         context = this.getBaseContext();
+
+        ip = UserUtil.findMainServerIp();
+        if(ip == null){
+            Toast.makeText(this, "对方不在线", Toast.LENGTH_SHORT).show();
+        }
+
         findViews();
         setOnListener();
         initRecord();
@@ -174,6 +181,7 @@ public class VoiceUploadActivity extends AppCompatActivity {
         @Override
         public void onData(byte[] data) {
             Log.e("Main", data.length + "?");
+            VoiceBroadcaster.send(data, ip);
         }
     };
 

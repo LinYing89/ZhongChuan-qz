@@ -12,8 +12,10 @@ import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.bairock.zhongchuan.qz.App;
 import com.bairock.zhongchuan.qz.R;
 import com.bairock.zhongchuan.qz.utils.Config;
+import com.bairock.zhongchuan.qz.utils.ConversationUtil;
 import com.bairock.zhongchuan.qz.utils.SharedHelper;
 
 import java.lang.ref.WeakReference;
@@ -96,6 +98,8 @@ public class SettingsActivity extends AppCompatActivity {
                 Config.password = "";
                 SharedHelper sharedHelper = new SharedHelper();
                 sharedHelper.putUser();
+                Intent i3 = new Intent(ConversationUtil.LOGOUT_ACTION);
+                App.getInstance().sendOrderedBroadcast(i3, ConversationUtil.CHAT_BROADCAST_PERMISSION);
                 return true;
             }catch (Exception e){
                 e.printStackTrace();

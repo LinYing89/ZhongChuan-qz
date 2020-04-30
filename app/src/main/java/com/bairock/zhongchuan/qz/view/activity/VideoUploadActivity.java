@@ -8,9 +8,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bairock.zhongchuan.qz.R;
+import com.bairock.zhongchuan.qz.netty.H264Broadcaster;
 import com.bairock.zhongchuan.qz.utils.FileUtil;
+import com.bairock.zhongchuan.qz.utils.UserUtil;
 import com.library.common.WriteFileCallback;
 import com.library.live.Publish;
 import com.library.live.stream.UdpSend;
@@ -27,10 +30,16 @@ public class VideoUploadActivity extends AppCompatActivity {
     private Button btnOff;
     private TextView txtTo;
 
+    private String ip;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video_upload);
+        ip = UserUtil.findMainServerIp();
+        if(ip == null){
+            Toast.makeText(this, "对方不在线", Toast.LENGTH_SHORT).show();
+        }
         findViews();
     }
 
@@ -41,7 +50,7 @@ public class VideoUploadActivity extends AppCompatActivity {
         chronometer = findViewById(R.id.chronometer);
         chronometer.start();
         publish = new Publish.Buider(this, (PublishView) findViewById(R.id.publishView))
-                .setPushMode(new UdpSend("192.168.1.6", 10001))
+                .setPushMode(new UdpSend(ip, H264Broadcaster.PORT))
                 .setFrameRate(15)//帧率
                 .setVideoCode(VDEncoder.H264)//编码方式
                 .setIsPreview(true)//是否需要显示预览(如需后台推流最好设置false，如果设置false则构建Buider可以调用单参数方法Publish.Buider(context))

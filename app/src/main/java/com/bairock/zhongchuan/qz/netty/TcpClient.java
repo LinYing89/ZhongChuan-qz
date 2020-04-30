@@ -26,6 +26,7 @@ import io.netty.handler.timeout.IdleStateHandler;
 public class TcpClient {
 
     private Bootstrap b;
+    private EventLoopGroup workerGroup;
 
     private boolean linking;
     private TcpClientHandler tcpClientHandler;
@@ -46,7 +47,7 @@ public class TcpClient {
     }
 
     private void init() {
-        EventLoopGroup workerGroup = new NioEventLoopGroup();
+        workerGroup = new NioEventLoopGroup();
         b = new Bootstrap(); // (1)
         b.group(workerGroup); // (2)
         b.channel(NioSocketChannel.class); // (3)
@@ -125,6 +126,12 @@ public class TcpClient {
         Log.e("TcpClient", user.getUsername() + " linked = " + isLinked());
         if (isLinked()) {
             tcpClientHandler.send(msg);
+        }
+    }
+
+    public void close() {
+        if (null != workerGroup) {
+            workerGroup.shutdownGracefully().syncUninterruptibly();
         }
     }
 }

@@ -39,6 +39,9 @@ public class MessageDecoder extends MessageToMessageDecoder<DatagramPacket> {
         int memberNumber = Util.bytesToInt(new byte[]{req[0], req[1]});
 //        Log.e(TAG, "memberNumber: " + memberNumber);
         //过滤掉自己发的信息
+        if(UserUtil.user.getUsername() == null){
+            return;
+        }
         if(memberNumber == Integer.parseInt(UserUtil.user.getUsername())){
             return;
         }
@@ -124,6 +127,10 @@ public class MessageDecoder extends MessageToMessageDecoder<DatagramPacket> {
                 byte[] byMember = new byte[3];
                 System.arraycopy(data, index, byMember, 0, 3);
                 String username = String.valueOf(Util.bytesToInt(new byte[]{byMember[1], byMember[2]}));
+                if(username.equals(UserUtil.user.getUsername())) {
+                    index += 3;
+                    continue;
+                }
                 ClientBase clientBase = new ClientBase();
                 switch (byMember[0]){
                     case 0x01:

@@ -19,13 +19,19 @@ import io.netty.channel.socket.nio.NioDatagramChannel;
  */
 public class VoiceBroadcaster {
 
+    private static VoiceBroadcaster ins = new VoiceBroadcaster();
+
     public static final int PORT = 10002;
 
     private final EventLoopGroup group;
     private final Bootstrap bootstrap;
     public static Channel channel;
 
-    public VoiceBroadcaster() {
+    public static VoiceBroadcaster getIns(){
+        return ins;
+    }
+
+    private VoiceBroadcaster() {
         group = new NioEventLoopGroup();
         bootstrap = new Bootstrap();
         bootstrap.group(group)

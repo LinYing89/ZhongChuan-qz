@@ -78,6 +78,7 @@ public class VideoCallActivity extends AppCompatActivity {
         ip = UserUtil.findIpByUsername(name);
         if(null == ip){
             Logger.e(TAG, "ip is null");
+            Toast.makeText(this, "对方不在线", Toast.LENGTH_SHORT).show();
             finish();
         }
         Logger.e(TAG, "ip:" + ip);

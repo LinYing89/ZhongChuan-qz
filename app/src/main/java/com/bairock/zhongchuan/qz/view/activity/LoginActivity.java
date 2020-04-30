@@ -46,8 +46,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 		setContentView(R.layout.activity_login);
 		super.onCreate(savedInstanceState);
 		handler = new MyHandler(this);
-		MessageBroadcaster messageBroadcaster = new MessageBroadcaster();
-		messageBroadcaster.bind();
+		MessageBroadcaster.getIns().bind();
 	}
 
 	@Override
