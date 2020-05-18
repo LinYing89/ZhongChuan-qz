@@ -30,7 +30,7 @@ public class UdpMessageHelper {
     public static final byte VIDEO_CALL_ASK = 0x53;
     public static final byte VIDEO_CALL_ANS = 0x54;
     public static final byte TEXT_MESSAGE = 0x61;
-    public static final byte IMAGE_MESSAGE = 0x62;
+    public static final byte IMAGE_MESSAGE = 0x63;
 
     public static byte[] createBytes(UdpMessage udpMessage){
         int length = 6;
