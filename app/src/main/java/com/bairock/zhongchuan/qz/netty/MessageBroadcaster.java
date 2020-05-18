@@ -122,6 +122,20 @@ public class MessageBroadcaster {
         }
     }
 
+    public static void sendIp(UdpMessage udpMessage, String ip){
+        if(null != channel) {
+            byte[] bytes = UdpMessageHelper.createBytes(udpMessage);
+            if(null == ip || ip.isEmpty()) {
+                channel.writeAndFlush(bytes);
+            }else{
+                InetSocketAddress inetSocketAddress = new InetSocketAddress(ip, PORT);
+                Log.e("MessageBroadcaster", "send to " + inetSocketAddress);
+                channel.writeAndFlush(new DatagramPacket(Unpooled.copiedBuffer(bytes),
+                        inetSocketAddress));
+            }
+        }
+    }
+
     public static void sendIp(UdpMessage udpMessage, String ip, int port){
         if(null != channel) {
             byte[] bytes = UdpMessageHelper.createBytes(udpMessage);

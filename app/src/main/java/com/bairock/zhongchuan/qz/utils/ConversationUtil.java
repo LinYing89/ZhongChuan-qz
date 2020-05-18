@@ -81,6 +81,19 @@ public class ConversationUtil {
         return null;
     }
 
+    public static void setConversationFilePath(String from, String msgId, String filePath){
+        for (ZCConversation con: conversations) {
+            if(con.getUsername().equals(from)){
+                for(MessageRoot<ZCMessage> messageRoot : con.getMessages()){
+                    if(messageRoot.getMsgId().equals(msgId)){
+                        messageRoot.getData().setContent(filePath);
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
     public static void removeConversation(ZCConversation conversation){
         conversations.remove(conversation);
     }

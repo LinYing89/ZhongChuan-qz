@@ -10,7 +10,6 @@ import android.media.AudioFormat;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -36,7 +35,6 @@ import com.bairock.zhongchuan.qz.utils.UserUtil;
 import com.bairock.zhongchuan.qz.widght.AudioView;
 
 import java.io.File;
-import java.util.Locale;
 
 public class VoiceUploadActivity extends AppCompatActivity {
 
@@ -59,16 +57,17 @@ public class VoiceUploadActivity extends AppCompatActivity {
         ip = UserUtil.findMainServerIp();
         if(ip == null){
             Toast.makeText(this, "对方不在线", Toast.LENGTH_SHORT).show();
+            finish();
         }
 
         findViews();
         setOnListener();
         initRecord();
-//        MessageBroadcaster.send(UdpMessageHelper.createVoiceCallAns(UserUtil.user.getUsername()), name);
         // 注册接收消息广播
         receiver = new AskBroadcastReceiver();
         IntentFilter intentFilter = new IntentFilter(ConversationUtil.VOICE_UPLOAD_ANS_ACTION);
         registerReceiver(receiver, intentFilter);
+        MessageBroadcaster.sendIp(UdpMessageHelper.createVoiceCallMainServerAsk(UserUtil.user.getUsername()), ip);
     }
 
     @Override
@@ -80,9 +79,15 @@ public class VoiceUploadActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        if(null != recordManager){
+            recordManager.stop();
+            recordManager.setRecordDataListener(null);
+        }
     }
 
     private void findViews() {
+        txtMessage = findViewById(R.id.txtMessage);
+        chronometer = findViewById(R.id.chronometer);
         imgHangUp = findViewById(R.id.imgHangUp);
         audioView = findViewById(R.id.audioView);
         audioView.setStyle(AudioView.ShowStyle.getStyle("STYLE_ALL"), audioView.getDownStyle());
@@ -103,6 +108,7 @@ public class VoiceUploadActivity extends AppCompatActivity {
         String recordDir = FileUtil.getPolicePath() + "voice" + File.separator;
         recordManager.changeRecordDir(recordDir);
         initRecordEvent();
+        Logger.e(TAG, recordManager.getRecordConfig().toString());
     }
 
     private void initRecordEvent() {
@@ -161,8 +167,8 @@ public class VoiceUploadActivity extends AppCompatActivity {
         public void onClick(View v) {
             switch (v.getId()){
                 case R.id.imgHangUp :
-                    recordManager.stop();
-                    recordManager.setRecordDataListener(null);
+                    MessageBroadcaster.sendIp(UdpMessageHelper.createCallMainServerStopAsk(UserUtil.user.getUsername()), ip);
+
                     finish();
                     break;
             }
@@ -180,7 +186,7 @@ public class VoiceUploadActivity extends AppCompatActivity {
 
         @Override
         public void onData(byte[] data) {
-            Log.e("Main", data.length + "?");
+//            Log.e("Main", data.length + "?");
             VoiceBroadcaster.send(data, ip);
         }
     };

@@ -36,6 +36,7 @@ import com.bairock.zhongchuan.qz.enums.ClientBaseType;
 import com.bairock.zhongchuan.qz.utils.ConversationUtil;
 import com.bairock.zhongchuan.qz.utils.UserUtil;
 import com.bairock.zhongchuan.qz.view.ChatActivity;
+import com.bairock.zhongchuan.qz.view.activity.MainServerChatActivity;
 import com.bairock.zhongchuan.qz.view.activity.SettingsActivity;
 
 //通讯录
@@ -151,29 +152,42 @@ public class FragmentContact extends Fragment {
 		// 给标题栏弹窗添加子类
 		for(ClientBase user : UserUtil.findPhoneUser()){
 //			if(!user.getUsername().equals(UserUtil.user.getUsername())) {
-				groupPopup.addAction(new ActionItem(activity, user.getUsername()));
+			String name = user.getUsername();
+			if(user.getClientBaseType() == ClientBaseType.MAIN_SERVER){
+				name = name + "(信息处理终端)";
+			}
+			groupPopup.addAction(new ActionItem(activity, name));
 //			}
 		}
-//		groupPopup.addAction(new ActionItem(activity, "成员1"));
-//		groupPopup.addAction(new ActionItem(activity, "成员2"));
-//		groupPopup.addAction(new ActionItem(activity, "成员3"));
-//		groupPopup.addAction(new ActionItem(activity, "成员4"));
 	}
 
 	private TitlePopup.OnItemOnClickListener onitemClick = new TitlePopup.OnItemOnClickListener() {
 
 		@Override
 		public void onItemClick(ActionItem item, int position) {
-			ZCConversation conversation = ConversationUtil.activeConversation(item.mTitle.toString());
-			if(null == conversation){
-				conversation = new ZCConversation(item.mTitle.toString());
+			String title = item.mTitle.toString();
+			String number = title;
+			if(title.contains("信息处理终端")){
+				number = title.substring(0, title.indexOf("("));
+			}
+			ZCConversation conversation = ConversationUtil.activeConversation(number);
+			if (null == conversation) {
+				conversation = new ZCConversation(number);
 				ConversationUtil.addConversation(conversation);
 			}
-			Intent intent = new Intent(getActivity(), ChatActivity.class);
-			intent.putExtra(Constants.NAME, conversation.getUsername());// 设置昵称
-			intent.putExtra(Constants.TYPE, ChatActivity.CHATTYPE_SINGLE);
-			intent.putExtra(Constants.User_ID, conversation.getUsername());
-			getActivity().startActivity(intent);
+			if(title.contains("信息处理终端")){
+				Intent intent = new Intent(getActivity(), MainServerChatActivity.class);
+				intent.putExtra(Constants.NAME, title);// 设置昵称
+				intent.putExtra(Constants.TYPE, ChatActivity.CHATTYPE_SINGLE);
+				intent.putExtra(Constants.User_ID, conversation.getUsername());
+				getActivity().startActivity(intent);
+			}else {
+				Intent intent = new Intent(getActivity(), ChatActivity.class);
+				intent.putExtra(Constants.NAME, conversation.getUsername());// 设置昵称
+				intent.putExtra(Constants.TYPE, ChatActivity.CHATTYPE_SINGLE);
+				intent.putExtra(Constants.User_ID, conversation.getUsername());
+				getActivity().startActivity(intent);
+			}
 		}
 	};
 

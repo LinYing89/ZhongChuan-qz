@@ -143,7 +143,7 @@ public class UserUtil {
     public static List<ClientBase> findPhoneUser(){
         List<ClientBase> phoneUsers = new ArrayList<>();
         for(ClientBase user : clientBases){
-            if(user.getClientBaseType() == ClientBaseType.PHONE){
+            if(user.getClientBaseType() == ClientBaseType.PHONE || user.getClientBaseType() == ClientBaseType.MAIN_SERVER){
                 phoneUsers.add(user);
             }
         }

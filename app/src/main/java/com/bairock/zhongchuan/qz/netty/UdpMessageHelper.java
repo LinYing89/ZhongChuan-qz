@@ -3,14 +3,34 @@ package com.bairock.zhongchuan.qz.netty;
 import com.bairock.zhongchuan.qz.bean.Location;
 import com.bairock.zhongchuan.qz.utils.Util;
 
+import java.nio.charset.StandardCharsets;
+
 public class UdpMessageHelper {
 
     public static final byte HEART = 0x01;
     public static final byte LOGIN = 0x03;
+
+    // 手持终端请求推送视频流给信息处理终端
+    public static final byte VIDEO_CALL_MAIN_SERVER_ASK = 0x31;
+    // 信息处理终端回应推送视频流
+    public static final byte VIDEO_CALL_MAIN_SERVER_ANS = 0x32;
+
+    // 手持终端请求推送音频流给信息处理终端
+    public static final byte VOICE_CALL_MAIN_SERVER_ASK = 0x41;
+    // 信息处理终端回应推送音频流
+    public static final byte VOICE_CALL_MAIN_SERVER_ANS = 0x42;
+
+    // 手持终端请求停止推送音视频数据流到信息处理终端, 包括音视频
+    public static final byte CALL_MAIN_SERVER_STOP_ASK = 0x43;
+    // 信息处理终端回应收到停止推送请求
+    public static final byte CALL_MAIN_SERVER_STOP_ANS = 0x44;
+
     public static final byte VOICE_CALL_ASK = 0x51;
     public static final byte VOICE_CALL_ANS = 0x52;
     public static final byte VIDEO_CALL_ASK = 0x53;
     public static final byte VIDEO_CALL_ANS = 0x54;
+    public static final byte TEXT_MESSAGE = 0x61;
+    public static final byte IMAGE_MESSAGE = 0x62;
 
     public static byte[] createBytes(UdpMessage udpMessage){
         int length = 6;
@@ -115,6 +135,69 @@ public class UdpMessageHelper {
         udpMessage.setMemberNumber(Short.parseShort(number));
         udpMessage.setFactionCode(VIDEO_CALL_ASK);
         udpMessage.setDataLength((short) 0);
+        return udpMessage;
+    }
+
+    // 创建推送视频流到信息处理终端命令
+    public static UdpMessage createVideoCallMainServerAsk(String number){
+        UdpMessage udpMessage = new UdpMessage();
+        udpMessage.setMemberNumber(Short.parseShort(number));
+        udpMessage.setFactionCode(VIDEO_CALL_MAIN_SERVER_ASK);
+        udpMessage.setDataLength((short) 0);
+        return udpMessage;
+    }
+
+    // 创建推送音频流到信息处理终端命令
+    public static UdpMessage createVoiceCallMainServerAsk(String number){
+        UdpMessage udpMessage = new UdpMessage();
+        udpMessage.setMemberNumber(Short.parseShort(number));
+        udpMessage.setFactionCode(VOICE_CALL_MAIN_SERVER_ASK);
+        udpMessage.setDataLength((short) 0);
+        return udpMessage;
+    }
+
+    // 创建停止推送数据流到信息处理终端命令
+    public static UdpMessage createCallMainServerStopAsk(String number){
+        UdpMessage udpMessage = new UdpMessage();
+        udpMessage.setMemberNumber(Short.parseShort(number));
+        udpMessage.setFactionCode(CALL_MAIN_SERVER_STOP_ASK);
+        udpMessage.setDataLength((short) 0);
+        return udpMessage;
+    }
+
+    public static UdpMessage createTextMessage(String number, String message){
+        byte[] by = message.getBytes(StandardCharsets.UTF_8);
+        UdpMessage udpMessage = new UdpMessage();
+        udpMessage.setMemberNumber(Short.parseShort(number));
+        udpMessage.setFactionCode(TEXT_MESSAGE);
+        udpMessage.setDataLength((short) by.length);
+        udpMessage.setData(by);
+        return udpMessage;
+    }
+
+    public static UdpMessage createImageMessage(String number, byte[] imageBytes){
+        UdpMessage udpMessage = new UdpMessage();
+        udpMessage.setMemberNumber(Short.parseShort(number));
+        udpMessage.setFactionCode(IMAGE_MESSAGE);
+        udpMessage.setDataLength((short) imageBytes.length);
+        udpMessage.setData(imageBytes);
+        return udpMessage;
+    }
+
+    /**
+     * 创建图片消息
+     * @param number 发放编号
+     * @param imageBytes 图片部分字节
+     * @param errorCode 错误码, 如果为1表示后面还有数据, 如果为0表示数据已发完
+     * @return 消息
+     */
+    public static UdpMessage createSubImageMessage1(String number, byte[] imageBytes, int errorCode){
+        UdpMessage udpMessage = new UdpMessage();
+        udpMessage.setMemberNumber(Short.parseShort(number));
+        udpMessage.setFactionCode(IMAGE_MESSAGE);
+        udpMessage.setErrorCode((byte)errorCode);
+        udpMessage.setDataLength((short) imageBytes.length);
+        udpMessage.setData(imageBytes);
         return udpMessage;
     }
 

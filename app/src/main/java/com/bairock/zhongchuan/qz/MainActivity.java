@@ -35,6 +35,7 @@ import com.bairock.zhongchuan.qz.netty.H264Broadcaster;
 import com.bairock.zhongchuan.qz.netty.MessageBroadcaster;
 import com.bairock.zhongchuan.qz.netty.TcpServer;
 import com.bairock.zhongchuan.qz.netty.VoiceBroadcaster;
+import com.bairock.zhongchuan.qz.netty.file.FileUploadServer;
 import com.bairock.zhongchuan.qz.utils.ConversationUtil;
 import com.bairock.zhongchuan.qz.utils.FileUtil;
 import com.bairock.zhongchuan.qz.utils.HeartThread;
@@ -92,6 +93,8 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        FileUploadServer.getIns().bind();
 
         FileUtil.createPolicePath();
 
@@ -411,6 +414,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
             MessageBroadcaster.getIns().stop();
             H264Broadcaster.getIns().stop();
             VoiceBroadcaster.getIns().stop();
+            FileUploadServer.getIns().close();
             TcpServer.getIns().close();
             TcpClientUtil.close();
             if(null != mLocationClient) {

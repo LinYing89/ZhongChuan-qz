@@ -73,23 +73,23 @@ public class TcpServerHandler extends ChannelInboundHandlerAdapter {
                         messageRoot.getData().setDirect(ZCMessageDirect.RECEIVE);
                         ZCMessage message = messageRoot.getData();
                         if(message.getMessageType() == ZCMessageType.IMAGE){
-                            String flePath = message.getContent();
-                            String newPath = FileUtil.getPolicePath() + System.currentTimeMillis() + flePath.substring(flePath.lastIndexOf("."));
-                            FileUtil.readBin2Image(message.getStream(), newPath);
-                            message.setContent(newPath);
-                            message.setStream(null);
+//                            String flePath = message.getContent();
+//                            String newPath = FileUtil.getPolicePath() + System.currentTimeMillis() + flePath.substring(flePath.lastIndexOf("."));
+//                            FileUtil.readBin2Image(message.getStream(), newPath);
+//                            message.setContent(newPath);
+//                            message.setStream(null);
                         }else if(message.getMessageType() == ZCMessageType.VIDEO){
-                            String flePath = message.getContent();
-                            String newPath = FileUtil.getPolicePath() + System.currentTimeMillis() + flePath.substring(flePath.lastIndexOf("."));
-                            FileUtil.readBin2Image(message.getStream(), newPath);
-                            message.setContent(newPath);
-                            message.setStream(null);
+//                            String flePath = message.getContent();
+//                            String newPath = FileUtil.getPolicePath() + System.currentTimeMillis() + flePath.substring(flePath.lastIndexOf("."));
+//                            FileUtil.readBin2Image(message.getStream(), newPath);
+//                            message.setContent(newPath);
+//                            message.setStream(null);
                         }else if(message.getMessageType() == ZCMessageType.VOICE){
-                            String flePath = message.getContent();
-                            String newPath = FileUtil.getPolicePath() + System.currentTimeMillis() + flePath.substring(flePath.lastIndexOf("."));
-                            FileUtil.readBin2Image(message.getStream(), newPath);
-                            message.setContent(newPath);
-                            message.setStream(null);
+//                            String flePath = message.getContent();
+//                            String newPath = FileUtil.getPolicePath() + System.currentTimeMillis() + flePath.substring(flePath.lastIndexOf("."));
+//                            FileUtil.readBin2Image(message.getStream(), newPath);
+//                            message.setContent(newPath);
+//                            message.setStream(null);
                         }
                         ConversationUtil.addReceivedMessage(messageRoot);
 

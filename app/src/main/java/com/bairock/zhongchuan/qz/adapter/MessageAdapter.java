@@ -76,9 +76,7 @@ public class MessageAdapter extends BaseAdapter {
 
     private Context context;
 
-    private Map<String, Timer> timers = new Hashtable<String, Timer>();
-
-    public MessageAdapter(Context context, String username, int chatType) {
+    public MessageAdapter(Context context, String username) {
         this.username = username;
         this.context = context;
         inflater = LayoutInflater.from(context);
@@ -445,6 +443,9 @@ public class MessageAdapter extends BaseAdapter {
     private void handleImageMessage(MessageRoot<ZCMessage> messageRoot, ViewHolder holder,
                                    final int position) {
         final ZCMessage message = messageRoot.getData();
+        if(message.getContent() == null || message.getContent().isEmpty()){
+            return;
+        }
         Bitmap bitmap = ImageCache.getInstance().get(message.getContent());
         if (bitmap != null) {
             holder.iv.setImageBitmap(bitmap);
@@ -464,7 +465,7 @@ public class MessageAdapter extends BaseAdapter {
                 }
             });
         }else{
-            new LoadImageTask().execute(message.getContent(), holder.iv);
+            new LoadImageTask().execute(message.getContent(), holder.iv, activity);
         }
     }
 
@@ -507,6 +508,9 @@ public class MessageAdapter extends BaseAdapter {
 
     private void handleVideoMessage(MessageRoot<ZCMessage> messageRoot, ViewHolder holder){
         final ZCMessage message = messageRoot.getData();
+        if(message.getContent() == null || message.getContent().isEmpty()){
+            return;
+        }
         Bitmap bitmap = ImageCache.getInstance().get(message.getContent());
         if (bitmap != null) {
             holder.iv.setImageBitmap(bitmap);

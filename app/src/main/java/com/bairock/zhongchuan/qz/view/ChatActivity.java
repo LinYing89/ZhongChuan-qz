@@ -3,8 +3,10 @@ package com.bairock.zhongchuan.qz.view;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -23,6 +25,8 @@ import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.os.PowerManager;
 import android.provider.MediaStore;
 import android.text.ClipboardManager;
@@ -55,6 +59,7 @@ import androidx.core.content.FileProvider;
 import androidx.viewpager.widget.ViewPager;
 
 import com.bairock.zhongchuan.qz.Constants;
+import com.bairock.zhongchuan.qz.MainActivity;
 import com.bairock.zhongchuan.qz.R;
 import com.bairock.zhongchuan.qz.adapter.ExpressionPagerAdapter;
 import com.bairock.zhongchuan.qz.adapter.MessageAdapter;
@@ -63,6 +68,10 @@ import com.bairock.zhongchuan.qz.bean.ZCConversation;
 import com.bairock.zhongchuan.qz.bean.ZCMessage;
 import com.bairock.zhongchuan.qz.bean.ZCMessageType;
 import com.bairock.zhongchuan.qz.netty.MessageBroadcaster;
+import com.bairock.zhongchuan.qz.netty.file.FileUploadClient;
+import com.bairock.zhongchuan.qz.netty.file.FileUploadFile;
+import com.bairock.zhongchuan.qz.netty.file.FileUploadServer;
+import com.bairock.zhongchuan.qz.recorderlib.utils.Logger;
 import com.bairock.zhongchuan.qz.utils.CommonUtils;
 import com.bairock.zhongchuan.qz.utils.ConversationUtil;
 import com.bairock.zhongchuan.qz.common.Utils;
@@ -71,6 +80,7 @@ import com.bairock.zhongchuan.qz.utils.MyVoiceRecorder;
 import com.bairock.zhongchuan.qz.utils.TcpClientUtil;
 import com.bairock.zhongchuan.qz.utils.UserUtil;
 import com.bairock.zhongchuan.qz.view.activity.ChatVideoActivity;
+import com.bairock.zhongchuan.qz.view.activity.LoginActivity;
 import com.bairock.zhongchuan.qz.view.activity.VideoCallActivity;
 import com.bairock.zhongchuan.qz.view.activity.VoiceCallActivity;
 import com.bairock.zhongchuan.qz.widght.PasteEditText;
@@ -115,6 +125,8 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 	public static final int CHATTYPE_GROUP = 2;
 
 	public static final String COPY_IMAGE = "EASEMOBIMG";
+
+	public static MyHandler handler;
 	private View recordingContainer;
 	private ImageView micImage;
 	private TextView recordingHint;
@@ -125,13 +137,13 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 	private View buttonSend;
 	private View buttonPressToSpeak;
 	// private ViewPager expressionViewpager;
-	private LinearLayout emojiIconContainer;
+//	private LinearLayout emojiIconContainer;
 	private LinearLayout btnContainer;
 	// private ImageView locationImgview;
 	private View more;
 	private int position;
 	private ClipboardManager clipboard;
-	private ViewPager expressionViewpager;
+//	private ViewPager expressionViewpager;
 	private InputMethodManager manager;
 	private List<String> reslist;
 	private Drawable[] micImages;
@@ -147,7 +159,8 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 	static int resendPos;
 
 	private TextView txt_title;
-	private ImageView iv_emoticons_normal, img_right;
+//	private ImageView iv_emoticons_normal;
+	private ImageView img_right;
 	private ImageView iv_emoticons_checked;
 	private RelativeLayout edittext_layout;
 	private ProgressBar loadmorePB;
@@ -160,6 +173,7 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 
 	private MyVoiceRecorder voiceRecorder;
 	// private EMGroup group;
+	private String ip;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -169,6 +183,14 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 		initView();
 		setUpView();
 		setListener();
+
+		ip = UserUtil.findIpByUsername(toChatUsername);
+		if(null == ip){
+			Toast.makeText(this, "对方不在线", Toast.LENGTH_SHORT).show();
+			finish();
+		}
+
+		handler = new MyHandler(this);
 	}
 
 	@Override
@@ -198,16 +220,16 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 		buttonSetModeVoice = findViewById(R.id.btn_set_mode_voice);
 		buttonSend = findViewById(R.id.btn_send);
 		buttonPressToSpeak = findViewById(R.id.btn_press_to_speak);
-		expressionViewpager = findViewById(R.id.vPager);
-		emojiIconContainer = findViewById(R.id.ll_face_container);
+//		expressionViewpager = findViewById(R.id.vPager);
+//		emojiIconContainer = findViewById(R.id.ll_face_container);
 		btnContainer = findViewById(R.id.ll_btn_container);
 		// locationImgview = (ImageView) findViewById(R.id.btn_location);
-		iv_emoticons_normal = findViewById(R.id.iv_emoticons_normal);
-		iv_emoticons_checked = findViewById(R.id.iv_emoticons_checked);
+//		iv_emoticons_normal = findViewById(R.id.iv_emoticons_normal);
+//		iv_emoticons_checked = findViewById(R.id.iv_emoticons_checked);
 		loadmorePB = findViewById(R.id.pb_load_more);
 		btnMore = findViewById(R.id.btn_more);
-		iv_emoticons_normal.setVisibility(View.VISIBLE);
-		iv_emoticons_checked.setVisibility(View.INVISIBLE);
+//		iv_emoticons_normal.setVisibility(View.VISIBLE);
+//		iv_emoticons_checked.setVisibility(View.INVISIBLE);
 		more = findViewById(R.id.more);
 		edittext_layout.setBackgroundResource(R.drawable.input_bar_bg_normal);
 
@@ -215,7 +237,7 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 		reslist = getExpressionRes(62);
 		// 初始化表情viewpager
 		List<View> views = new ArrayList<>();
-		expressionViewpager.setAdapter(new ExpressionPagerAdapter(views));
+//		expressionViewpager.setAdapter(new ExpressionPagerAdapter(views));
 		edittext_layout.requestFocus();
 		voiceRecorder = new MyVoiceRecorder();
 		buttonPressToSpeak.setOnTouchListener(new PressToSpeakListen());
@@ -240,9 +262,9 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 				edittext_layout
 						.setBackgroundResource(R.drawable.input_bar_bg_active);
 				more.setVisibility(View.GONE);
-				iv_emoticons_normal.setVisibility(View.VISIBLE);
-				iv_emoticons_checked.setVisibility(View.INVISIBLE);
-				emojiIconContainer.setVisibility(View.GONE);
+//				iv_emoticons_normal.setVisibility(View.VISIBLE);
+//				iv_emoticons_checked.setVisibility(View.INVISIBLE);
+//				emojiIconContainer.setVisibility(View.GONE);
 				btnContainer.setVisibility(View.GONE);
 			}
 		});
@@ -277,8 +299,8 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 	@SuppressLint("InvalidWakeLockTag")
 	private void setUpView() {
 		activityInstance = this;
-		iv_emoticons_normal.setOnClickListener(this);
-		iv_emoticons_checked.setOnClickListener(this);
+//		iv_emoticons_normal.setOnClickListener(this);
+//		iv_emoticons_checked.setOnClickListener(this);
 		// position = getIntent().getIntExtra("position", -1);
 		clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
 		manager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -296,7 +318,7 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 		conversation = ConversationUtil.activeConversation(toChatUsername);
 		// 把此会话的未读数置为0
 //		conversation.setUnreadCount(0);
-		adapter = new MessageAdapter(this, toChatUsername, chatType);
+		adapter = new MessageAdapter(this, toChatUsername);
 		// 显示消息
 		listView.setAdapter(adapter);
 		listView.setOnScrollListener(new ListScrollListener());
@@ -311,9 +333,9 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 			public boolean onTouch(View v, MotionEvent event) {
 				hideKeyboard();
 				more.setVisibility(View.GONE);
-				iv_emoticons_normal.setVisibility(View.VISIBLE);
-				iv_emoticons_checked.setVisibility(View.INVISIBLE);
-				emojiIconContainer.setVisibility(View.GONE);
+//				iv_emoticons_normal.setVisibility(View.VISIBLE);
+//				iv_emoticons_checked.setVisibility(View.INVISIBLE);
+//				emojiIconContainer.setVisibility(View.GONE);
 				btnContainer.setVisibility(View.GONE);
 				return false;
 			}
@@ -453,22 +475,27 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 			break;
 		case R.id.view_camera:
 			selectPicFromCamera();// 点击照相图标
+			more.setVisibility(View.GONE);
 			break;
 		case R.id.view_file:
 			// 发送文件
 			selectFileFromLocal();
+			more.setVisibility(View.GONE);
 			break;
 		case R.id.view_video:
 			startActivityForResult(new Intent(this, ChatVideoActivity.class), REQUEST_CODE_VIDEO);
+			more.setVisibility(View.GONE);
 			break;
 		case R.id.view_photo:
 			selectPicFromLocal(); // 点击图片图标
+			more.setVisibility(View.GONE);
 			break;
 		case R.id.view_location:
 			Intent intent = new Intent(this, VideoCallActivity.class);
 			intent.putExtra(Constants.VIDEO_TYPE, Constants.VIDEO_ASK);
 			intent.putExtra(Constants.NAME, Name);
 			startActivity(intent);
+			more.setVisibility(View.GONE);
 			break;
 		case R.id.view_audio:
 			// 语音通话
@@ -476,23 +503,24 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 			intent1.putExtra(Constants.VOICE_TYPE, Constants.VOICE_ASK);
 			intent1.putExtra(Constants.NAME, Name);
 			startActivity(intent1);
-			break;
-		case R.id.iv_emoticons_normal:
-			// 点击显示表情框
-			more.setVisibility(View.VISIBLE);
-			iv_emoticons_normal.setVisibility(View.INVISIBLE);
-			iv_emoticons_checked.setVisibility(View.VISIBLE);
-			btnContainer.setVisibility(View.GONE);
-			emojiIconContainer.setVisibility(View.VISIBLE);
-			hideKeyboard();
-			break;
-		case R.id.iv_emoticons_checked:// 点击隐藏表情框
-			iv_emoticons_normal.setVisibility(View.VISIBLE);
-			iv_emoticons_checked.setVisibility(View.INVISIBLE);
-			btnContainer.setVisibility(View.VISIBLE);
-			emojiIconContainer.setVisibility(View.GONE);
 			more.setVisibility(View.GONE);
 			break;
+//		case R.id.iv_emoticons_normal:
+			// 点击显示表情框
+//			more.setVisibility(View.VISIBLE);
+//			iv_emoticons_normal.setVisibility(View.INVISIBLE);
+//			iv_emoticons_checked.setVisibility(View.VISIBLE);
+//			btnContainer.setVisibility(View.GONE);
+//			emojiIconContainer.setVisibility(View.VISIBLE);
+//			hideKeyboard();
+//			break;
+//		case R.id.iv_emoticons_checked:// 点击隐藏表情框
+//			iv_emoticons_normal.setVisibility(View.VISIBLE);
+//			iv_emoticons_checked.setVisibility(View.INVISIBLE);
+//			btnContainer.setVisibility(View.VISIBLE);
+//			emojiIconContainer.setVisibility(View.GONE);
+//			more.setVisibility(View.GONE);
+//			break;
 		case R.id.btn_send:
 			// 点击发送按钮(发文字和表情)
 			String s = mEditTextContent.getText().toString();
@@ -599,12 +627,13 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 		if (!(new File(filePath).exists())) {
 			return;
 		}
-
+		String msgId = UUID.randomUUID().toString();
 		final MessageRoot<ZCMessage> messageRoot = ConversationUtil.createSendMessage(ZCMessageType.VOICE, UserUtil.user.getUsername(), toChatUsername);
 		ZCMessage message = messageRoot.getData();
+		messageRoot.setMsgId(msgId);
 		message.setContent(filePath);
-		byte[] bytes = FileUtil.getImageStream(filePath);
-		message.setStream(bytes);
+//		byte[] bytes = FileUtil.getImageStream(filePath);
+//		message.setStream(bytes);
 		TcpClientUtil.send(messageRoot);
 		ConversationUtil.addSendMessage(messageRoot);
 
@@ -612,6 +641,17 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 		adapter.refresh();
 		listView.setSelection(listView.getCount() - 1);
 		setResult(RESULT_OK);
+
+		FileUploadFile uploadFile = new FileUploadFile();
+		File file = new File(filePath);
+		String fileMd5 = file.getName();// 文件名
+		uploadFile.setFrom(UserUtil.user.getUsername());
+		uploadFile.setMsgId(msgId);
+		uploadFile.setFile(file);
+		uploadFile.setFile_md5(fileMd5);
+		uploadFile.setStarPos(0);// 文件开始位置
+		new FileUploadClient().connect(FileUploadServer.PORT, ip, uploadFile);
+
 	}
 
 	/**
@@ -619,12 +659,32 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 	 * 
 	 * @param filePath
 	 */
+//	private void sendPicture(final String filePath) {
+//		final MessageRoot<ZCMessage> messageRoot = ConversationUtil.createSendMessage(ZCMessageType.IMAGE, UserUtil.user.getUsername(), toChatUsername);
+//		ZCMessage message = messageRoot.getData();
+//		message.setContent(filePath);
+//		byte[] bytes = FileUtil.getImageStream(filePath);
+//		message.setStream(bytes);
+////		conversation.addMessage(messageRoot);
+//		TcpClientUtil.send(messageRoot);
+//		ConversationUtil.addSendMessage(messageRoot);
+////		MessageBroadcaster.send(messageRoot);
+//
+//		listView.setAdapter(adapter);
+//		adapter.refresh();
+//		listView.setSelection(listView.getCount() - 1);
+//		setResult(RESULT_OK);
+//		// more(more);
+//	}
+
 	private void sendPicture(final String filePath) {
+		String msgId = UUID.randomUUID().toString();
 		final MessageRoot<ZCMessage> messageRoot = ConversationUtil.createSendMessage(ZCMessageType.IMAGE, UserUtil.user.getUsername(), toChatUsername);
 		ZCMessage message = messageRoot.getData();
+		messageRoot.setMsgId(msgId);
 		message.setContent(filePath);
-		byte[] bytes = FileUtil.getImageStream(filePath);
-		message.setStream(bytes);
+//		byte[] bytes = FileUtil.getImageStream(filePath);
+//		message.setStream(bytes);
 //		conversation.addMessage(messageRoot);
 		TcpClientUtil.send(messageRoot);
 		ConversationUtil.addSendMessage(messageRoot);
@@ -634,7 +694,16 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 		adapter.refresh();
 		listView.setSelection(listView.getCount() - 1);
 		setResult(RESULT_OK);
-		// more(more);
+		 more(more);
+		FileUploadFile uploadFile = new FileUploadFile();
+		File file = new File(filePath);
+		String fileMd5 = file.getName();// 文件名
+		uploadFile.setFrom(UserUtil.user.getUsername());
+		uploadFile.setMsgId(msgId);
+		uploadFile.setFile(file);
+		uploadFile.setFile_md5(fileMd5);
+		uploadFile.setStarPos(0);// 文件开始位置
+		new FileUploadClient().connect(FileUploadServer.PORT, ip, uploadFile);
 	}
 
 	/**
@@ -761,17 +830,30 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 	}
 
 	private void sendFile(String filePath){
+		String msgId = UUID.randomUUID().toString();
 		final MessageRoot<ZCMessage> messageRoot = ConversationUtil.createSendMessage(ZCMessageType.VIDEO, UserUtil.user.getUsername(), toChatUsername);
 		ZCMessage message = messageRoot.getData();
 		message.setContent(filePath);
-		byte[] bytes = FileUtil.getImageStream(filePath);
-		message.setStream(bytes);
+		messageRoot.setMsgId(msgId);
+//		byte[] bytes = FileUtil.getImageStream(filePath);
+//		message.setStream(bytes);
 		TcpClientUtil.send(messageRoot);
 		conversation.addMessage(messageRoot);
 		listView.setAdapter(adapter);
 		adapter.refresh();
 		listView.setSelection(listView.getCount() - 1);
 		setResult(RESULT_OK);
+		more(more);
+
+		FileUploadFile uploadFile = new FileUploadFile();
+		File file = new File(filePath);
+		String fileMd5 = file.getName();// 文件名
+		uploadFile.setFrom(UserUtil.user.getUsername());
+		uploadFile.setMsgId(msgId);
+		uploadFile.setFile(file);
+		uploadFile.setFile_md5(fileMd5);
+		uploadFile.setStarPos(0);// 文件开始位置
+		new FileUploadClient().connect(FileUploadServer.PORT, ip, uploadFile);
 	}
 
 	/**
@@ -788,10 +870,10 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 		buttonSend.setVisibility(View.GONE);
 		btnMore.setVisibility(View.VISIBLE);
 		buttonPressToSpeak.setVisibility(View.VISIBLE);
-		iv_emoticons_normal.setVisibility(View.VISIBLE);
-		iv_emoticons_checked.setVisibility(View.INVISIBLE);
+//		iv_emoticons_normal.setVisibility(View.VISIBLE);
+//		iv_emoticons_checked.setVisibility(View.INVISIBLE);
 		btnContainer.setVisibility(View.VISIBLE);
-		emojiIconContainer.setVisibility(View.GONE);
+//		emojiIconContainer.setVisibility(View.GONE);
 
 	}
 
@@ -844,16 +926,16 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 			hideKeyboard();
 			more.setVisibility(View.VISIBLE);
 			btnContainer.setVisibility(View.VISIBLE);
-			emojiIconContainer.setVisibility(View.GONE);
+//			emojiIconContainer.setVisibility(View.GONE);
 		} else {
-			if (emojiIconContainer.getVisibility() == View.VISIBLE) {
-				emojiIconContainer.setVisibility(View.GONE);
-				btnContainer.setVisibility(View.VISIBLE);
-				iv_emoticons_normal.setVisibility(View.VISIBLE);
-				iv_emoticons_checked.setVisibility(View.INVISIBLE);
-			} else {
+//			if (emojiIconContainer.getVisibility() == View.VISIBLE) {
+//				emojiIconContainer.setVisibility(View.GONE);
+//				btnContainer.setVisibility(View.VISIBLE);
+//				iv_emoticons_normal.setVisibility(View.VISIBLE);
+//				iv_emoticons_checked.setVisibility(View.INVISIBLE);
+//			} else {
 				more.setVisibility(View.GONE);
-			}
+//			}
 
 		}
 
@@ -868,8 +950,8 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 		listView.setSelection(listView.getCount() - 1);
 		if (more.getVisibility() == View.VISIBLE) {
 			more.setVisibility(View.GONE);
-			iv_emoticons_normal.setVisibility(View.VISIBLE);
-			iv_emoticons_checked.setVisibility(View.INVISIBLE);
+//			iv_emoticons_normal.setVisibility(View.VISIBLE);
+//			iv_emoticons_checked.setVisibility(View.INVISIBLE);
 		}
 
 	}
@@ -1055,8 +1137,8 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 	public void onBackPressed() {
 		if (more.getVisibility() == View.VISIBLE) {
 			more.setVisibility(View.GONE);
-			iv_emoticons_normal.setVisibility(View.VISIBLE);
-			iv_emoticons_checked.setVisibility(View.INVISIBLE);
+//			iv_emoticons_normal.setVisibility(View.VISIBLE);
+//			iv_emoticons_checked.setVisibility(View.INVISIBLE);
 		} else {
 			super.onBackPressed();
 		}
@@ -1130,5 +1212,20 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 			startActivity(intent);
 		}
 
+	}
+
+	public static class MyHandler extends Handler {
+		WeakReference<ChatActivity> mActivity;
+
+		MyHandler(ChatActivity activity) {
+			mActivity = new WeakReference<>(activity);
+		}
+
+		@Override
+		public void handleMessage(Message msg) {
+			final ChatActivity theActivity = mActivity.get();
+			theActivity.adapter.refresh();
+
+		}
 	}
 }
