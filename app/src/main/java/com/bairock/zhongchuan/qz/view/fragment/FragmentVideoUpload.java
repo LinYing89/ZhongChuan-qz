@@ -13,8 +13,13 @@ import androidx.fragment.app.Fragment;
 
 import com.bairock.zhongchuan.qz.R;
 import com.bairock.zhongchuan.qz.view.activity.VideoUploadActivity;
+import com.bairock.zhongchuan.qz.view.activity.VideoUploadThirdActivity;
 
 public class FragmentVideoUpload extends Fragment {
+
+	public static final String SOURCE_LOCAL = "sourceLocal";
+	public static final String SOURCE_TELESCOPE = "sourceTelescope";
+	public static final String SOURCE_DRONE = "sourceDrone";
 
 	private Activity ctx;
 	private View layout;
@@ -58,17 +63,24 @@ public class FragmentVideoUpload extends Fragment {
 	private OnClickListener onClickListener = new OnClickListener() {
 		@Override
 		public void onClick(View v) {
+			String source;
+			Intent intent;
 			switch (v.getId()) {
-				case R.id.btnLocal:
-					break;
 				case R.id.btnTelescope:
+					source = SOURCE_TELESCOPE;
+					intent = new Intent(ctx, VideoUploadThirdActivity.class);
 					break;
 				case R.id.btnDrone:
+					source = SOURCE_DRONE;
+					intent = new Intent(ctx, VideoUploadThirdActivity.class);
+					break;
+				default:
+					source = SOURCE_LOCAL;
+					intent = new Intent(ctx, VideoUploadActivity.class);
 					break;
 			}
-//			Intent intent = new Intent(ctx, VideoUploadActivity.class);
-//			intent.putExtra("username", username);
-			startActivity(new Intent(ctx, VideoUploadActivity.class));
+			intent.putExtra("source", source);
+			startActivity(intent);
 		}
 	};
 }

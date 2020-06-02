@@ -12,7 +12,9 @@ import android.widget.Button;
 import androidx.fragment.app.Fragment;
 
 import com.bairock.zhongchuan.qz.R;
+import com.bairock.zhongchuan.qz.view.activity.VideoUploadThirdActivity;
 import com.bairock.zhongchuan.qz.view.activity.VoiceUploadActivity;
+import com.bairock.zhongchuan.qz.view.activity.VoiceUploadThirdActivity;
 
 public class FragmentVoiceUpload extends Fragment {
 	private static String TAG = "FragmentVoiceUpload";
@@ -53,13 +55,13 @@ public class FragmentVoiceUpload extends Fragment {
 	private OnClickListener onClickListener = new OnClickListener() {
 		@Override
 		public void onClick(View v) {
-			switch (v.getId()) {
-				case R.id.btnLocal:
-					break;
-				case R.id.btnRemoteVoice:
-					break;
+			Intent intent;
+			if (v.getId() == R.id.btnRemoteVoice) {
+				intent = new Intent(ctx, VoiceUploadThirdActivity.class);
+			} else {
+				intent = new Intent(ctx, VoiceUploadActivity.class);
 			}
-			startActivity(new Intent(ctx, VoiceUploadActivity.class));
+			startActivity(intent);
 		}
 	};
 }

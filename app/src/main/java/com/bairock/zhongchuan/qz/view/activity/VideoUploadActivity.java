@@ -36,26 +36,28 @@ public class VideoUploadActivity extends AppCompatActivity {
     private Publish publish;
     private ImageView imgHangUp;
     private TextView txtMessage;
-    private String ip;
+    private String mainServerIp;
     private AskBroadcastReceiver receiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video_upload);
-        ip = UserUtil.findMainServerIp();
-        if(ip == null){
-            Toast.makeText(this, "对方不在线", Toast.LENGTH_SHORT).show();
+        mainServerIp = UserUtil.findMainServerIp();
+        if(mainServerIp == null){
+            Toast.makeText(this, "信息处理终端不在线", Toast.LENGTH_SHORT).show();
             finish();
         }
-        findViews();
 
         // 注册接收消息广播
         receiver = new AskBroadcastReceiver();
         IntentFilter intentFilter = new IntentFilter(ConversationUtil.VIDEO_UPLOAD_ANS_ACTION);
         registerReceiver(receiver, intentFilter);
 
-        MessageBroadcaster.sendIp(UdpMessageHelper.createVideoCallMainServerAsk(UserUtil.user.getUsername()), ip);
+        findViews();
+
+        txtMessage.setText("正在请求信息处理终端...");
+        MessageBroadcaster.sendIp(UdpMessageHelper.createVideoCallMainServerAsk(UserUtil.user.getUsername()), mainServerIp);
     }
 
     private void findViews(){
@@ -67,7 +69,7 @@ public class VideoUploadActivity extends AppCompatActivity {
         imgHangUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MessageBroadcaster.sendIp(UdpMessageHelper.createCallMainServerStopAsk(UserUtil.user.getUsername()), ip);
+                MessageBroadcaster.sendIp(UdpMessageHelper.createCallMainServerStopAsk(UserUtil.user.getUsername()), mainServerIp);
                 finish();
             }
         });
@@ -95,7 +97,7 @@ public class VideoUploadActivity extends AppCompatActivity {
                     @Override
                     public byte[] Control(byte[] bytes, int offset, int length) {//bytes为udp包数据,offset为起始位,length为长度
                         //返回自定义后udp包数据,不要做耗时操作。如果调用了此方法不要将原数组返回
-                        H264Broadcaster.send(bytes, ip);
+                        H264Broadcaster.send(bytes, mainServerIp);
                         return new byte[0];
                     }
                 })
@@ -131,14 +133,13 @@ public class VideoUploadActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             // 记得把广播给终结掉
             abortBroadcast();
-
             String result = intent.getStringExtra("result");
-            if(result.equals("0")){
+            if (result.equals("0")) {
                 //接受
                 startVideo();
-            }else if(result.equals("1")){
+            } else if (result.equals("1")) {
                 //拒绝1/挂断2
-                Toast.makeText(VideoUploadActivity.this, "对方忙", Toast.LENGTH_SHORT).show();
+                Toast.makeText(VideoUploadActivity.this, "信息处理终端拒绝请求", Toast.LENGTH_SHORT).show();
                 finish();
             }
         }

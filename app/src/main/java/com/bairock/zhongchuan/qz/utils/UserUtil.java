@@ -159,6 +159,33 @@ public class UserUtil {
         return null;
     }
 
+    public static String findTelescopeIp(){
+        for(ClientBase user : clientBases){
+            if(user.getClientBaseType() == ClientBaseType.TELESCOPE){
+                return user.getIp();
+            }
+        }
+        return null;
+    }
+
+    public static String findDroneIp(){
+        for(ClientBase user : clientBases){
+            if(user.getClientBaseType() == ClientBaseType.UAV){
+                return user.getIp();
+            }
+        }
+        return null;
+    }
+
+    public static String findSoundRecorderIp(){
+        for(ClientBase user : clientBases){
+            if(user.getClientBaseType() == ClientBaseType.SOUND_RECORDER){
+                return user.getIp();
+            }
+        }
+        return null;
+    }
+
     public static ClientBase findUserByUsername(String username){
         for(ClientBase user : clientBases){
             if(user.getClientBaseType() == ClientBaseType.PHONE && user.getUsername().equals(username)){

@@ -48,9 +48,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".view.activity.MainServerChatActivity"
+        <activity android:name=".view.activity.VoiceUploadThirdActivity"
             android:theme="@style/Theme.AppCompat"/>
-        <activity android:name=".view.activity.OfflineMapActivity" />
+        <activity android:name=".view.activity.VideoUploadThirdActivity"
+            android:theme="@style/Theme.AppCompat"/>
+        <activity
+            android:name=".view.activity.MainServerChatActivity"
+            android:theme="@style/Theme.AppCompat" />
+        <activity android:name=".view.activity.OfflineMapActivity"
+            android:theme="@style/Theme.AppCompat"/>
         <activity
             android:name=".view.activity.VoiceCallActivity"
             android:theme="@style/Theme.AppCompat" />

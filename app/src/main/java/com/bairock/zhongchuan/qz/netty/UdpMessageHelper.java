@@ -10,6 +10,20 @@ public class UdpMessageHelper {
     public static final byte HEART = 0x01;
     public static final byte LOGIN = 0x03;
 
+    // 手持终端请求第三方开始推送视频流
+    public static final byte VIDEO_CALL_THIRD_ASK = 0x11;
+    // 第三方回应收到请求
+    public static final byte VIDEO_CALL_THIRD_ANS = 0x12;
+
+    // 手持终端请求第三方推送音频流
+    public static final byte VOICE_CALL_THIRD_ASK = 0x21;
+    // 第三方回应收到请求
+    public static final byte VOICE_CALL_THIRD_ANS = 0x22;
+    // 手持终端请求第三方停止推送数据流
+    public static final byte CALL_THIRD_STOP_ASK = 0x23;
+    // 第三方回应收到请求
+    public static final byte CALL_THIRD_STOP_ANS = 0x24;
+
     // 手持终端请求推送视频流给信息处理终端
     public static final byte VIDEO_CALL_MAIN_SERVER_ASK = 0x31;
     // 信息处理终端回应推送视频流
@@ -161,6 +175,33 @@ public class UdpMessageHelper {
         UdpMessage udpMessage = new UdpMessage();
         udpMessage.setMemberNumber(Short.parseShort(number));
         udpMessage.setFactionCode(CALL_MAIN_SERVER_STOP_ASK);
+        udpMessage.setDataLength((short) 0);
+        return udpMessage;
+    }
+
+    // 创建请求第三方推送视频流命令
+    public static UdpMessage createVideoCallThirdAsk(String number){
+        UdpMessage udpMessage = new UdpMessage();
+        udpMessage.setMemberNumber(Short.parseShort(number));
+        udpMessage.setFactionCode(VIDEO_CALL_THIRD_ASK);
+        udpMessage.setDataLength((short) 0);
+        return udpMessage;
+    }
+
+    // 创建请求第三方推送音频流命令
+    public static UdpMessage createVoiceCallThirdAsk(String number){
+        UdpMessage udpMessage = new UdpMessage();
+        udpMessage.setMemberNumber(Short.parseShort(number));
+        udpMessage.setFactionCode(VOICE_CALL_THIRD_ASK);
+        udpMessage.setDataLength((short) 0);
+        return udpMessage;
+    }
+
+    // 创建请求第三方停止推送数据流
+    public static UdpMessage createCallThirdStopAsk(String number){
+        UdpMessage udpMessage = new UdpMessage();
+        udpMessage.setMemberNumber(Short.parseShort(number));
+        udpMessage.setFactionCode(CALL_THIRD_STOP_ASK);
         udpMessage.setDataLength((short) 0);
         return udpMessage;
     }

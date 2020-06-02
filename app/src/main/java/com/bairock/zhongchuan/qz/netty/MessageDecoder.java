@@ -13,6 +13,8 @@ import com.bairock.zhongchuan.qz.utils.ConversationUtil;
 import com.bairock.zhongchuan.qz.utils.UserUtil;
 import com.bairock.zhongchuan.qz.utils.Util;
 import com.bairock.zhongchuan.qz.view.activity.LoginActivity;
+import com.bairock.zhongchuan.qz.view.fragment.FragmentVideoUpload;
+
 import java.util.List;
 
 import io.netty.buffer.ByteBuf;
@@ -104,12 +106,31 @@ public class MessageDecoder extends MessageToMessageDecoder<DatagramPacket> {
                 i3.putExtra("myBundle", bundle1);
                 App.getInstance().sendOrderedBroadcast(i3, ConversationUtil.CHAT_BROADCAST_PERMISSION);
                 break;
+            case UdpMessageHelper.VIDEO_CALL_THIRD_ANS:
+                // 第三方设备视频流推送应答
+                result = String.valueOf(errCode);
+                //发送应答广播
+                Intent intent = new Intent(ConversationUtil.VIDEO_UPLOAD_ANS_ACTION);
+                intent.putExtra("result", result);
+                intent.putExtra("source", "third");
+                App.getInstance().sendOrderedBroadcast(intent, ConversationUtil.CHAT_BROADCAST_PERMISSION);
+                break;
+            case UdpMessageHelper.VOICE_CALL_THIRD_ANS:
+                // 第三方设备音频流推送应答
+                result = String.valueOf(errCode);
+                //发送应答广播
+                intent = new Intent(ConversationUtil.VOICE_UPLOAD_ANS_ACTION);
+                intent.putExtra("result", result);
+                intent.putExtra("source", "third");
+                App.getInstance().sendOrderedBroadcast(intent, ConversationUtil.CHAT_BROADCAST_PERMISSION);
+                break;
             case UdpMessageHelper.VIDEO_CALL_MAIN_SERVER_ANS:
                 // 信息处理终端视频流推送应答
                 String result2 = String.valueOf(errCode);
                 //发送应答广播
                 Intent i4 = new Intent(ConversationUtil.VIDEO_UPLOAD_ANS_ACTION);
                 i4.putExtra("result", result2);
+                i4.putExtra("source", "main");
                 App.getInstance().sendOrderedBroadcast(i4, ConversationUtil.CHAT_BROADCAST_PERMISSION);
                 break;
             case UdpMessageHelper.VOICE_CALL_MAIN_SERVER_ANS:
@@ -118,6 +139,7 @@ public class MessageDecoder extends MessageToMessageDecoder<DatagramPacket> {
                 //发送应答广播
                 Intent i5 = new Intent(ConversationUtil.VOICE_UPLOAD_ANS_ACTION);
                 i5.putExtra("result", result3);
+                i5.putExtra("source", "main");
                 App.getInstance().sendOrderedBroadcast(i5, ConversationUtil.CHAT_BROADCAST_PERMISSION);
                 break;
             default: break;
