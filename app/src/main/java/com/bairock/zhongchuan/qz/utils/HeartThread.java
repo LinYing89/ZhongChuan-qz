@@ -19,8 +19,9 @@ public class HeartThread extends Thread {
     public void run() {
         while (!interrupted()) {
 //            chatTest();
-            sendHeart();
+//            sendHeart();
 //            heartTest();
+            UserUtil.sendMyHeart();
             try {
                 sleep(5000);
             } catch (InterruptedException e) {

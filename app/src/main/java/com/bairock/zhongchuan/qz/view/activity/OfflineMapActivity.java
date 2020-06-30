@@ -78,8 +78,10 @@ public class OfflineMapActivity extends AppCompatActivity implements
             switch (msg.what) {
                 case UPDATE_LIST:
                     if (mContentViewPage.getCurrentItem() == 0) {
-                        ((BaseExpandableListAdapter) adapter)
-                                .notifyDataSetChanged();
+                        if(null != adapter) {
+                            ((BaseExpandableListAdapter) adapter)
+                                    .notifyDataSetChanged();
+                        }
                     } else {
                         mDownloadedAdapter.notifyDataChange();
                     }

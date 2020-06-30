@@ -48,7 +48,7 @@ public class ChatVideoActivity extends AppCompatActivity {
                 .setPublishBitrateVC(24 * 1024)//音频推流采样率
                 .setPublishSize(480, 320)//推流分辨率，不要高于预览分辨率
                 .setPreviewSize(480, 320)//预览分辨率，决定截屏、录制文件的分辨率
-                .setRotate(true)//是否为前置摄像头,默认后置
+                .setRotate(false)//是否为前置摄像头,默认后置
                 .setScreenshotsMode(Publish.CONVERSION)//截屏模式
                 .setCenterScaleType(true)
 //                .setVideoDirPath(Environment.getExternalStorageDirectory().getPath() + File.separator + "VideoLive")//录制路径,当前为默认路径

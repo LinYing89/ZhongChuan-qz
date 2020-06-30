@@ -4,6 +4,7 @@ import com.bairock.zhongchuan.qz.bean.User;
 import com.bairock.zhongchuan.qz.utils.UserUtil;
 import com.bairock.zhongchuan.qz.view.activity.VideoCallActivity;
 import com.bairock.zhongchuan.qz.view.activity.VoiceCallActivity;
+import com.bairock.zhongchuan.qz.view.activity.VoiceUploadThirdActivity;
 
 import java.util.List;
 
@@ -22,8 +23,8 @@ public class VoiceDecoder extends MessageToMessageDecoder<DatagramPacket> {
         ByteBuf byteBuf = msg.copy().content();
         byte[] req = new byte[byteBuf.readableBytes()];
         byteBuf.readBytes(req);
-        if(null != VoiceCallActivity.listen) {
-            VoiceCallActivity.listen.write(req);
+        if(null != VoiceUploadThirdActivity.listen) {
+            VoiceUploadThirdActivity.listen.write(req);
         }else {
             UdpMessage udpMessage = UdpMessageHelper.createVoiceCallAns(UserUtil.user.getUsername(), 1);
             byte[] bytes = UdpMessageHelper.createBytes(udpMessage);

@@ -17,6 +17,7 @@ import android.os.Environment;
 import android.text.TextUtils;
 
 import com.bairock.zhongchuan.qz.utils.FileUtil;
+import com.tencent.bugly.crashreport.CrashReport;
 
 public class App extends Application {
 
@@ -30,8 +31,9 @@ public class App extends Application {
 		super.onCreate();
 		_context = getApplicationContext();
 		instance = this;
+		CrashReport.initCrashReport(getApplicationContext(), "209032e2d3", false);
 //		initEMChat();
-		// CrashHandler crashHandler = CrashHandler.getInstance();// 全局异常捕捉
+//		 CrashHandler crashHandler = CrashHandler.getInstance();// 全局异常捕捉
 		// crashHandler.init(_context);
 	}
 

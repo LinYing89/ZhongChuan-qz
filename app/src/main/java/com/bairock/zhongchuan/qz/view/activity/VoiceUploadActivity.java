@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioFormat;
 import android.os.Bundle;
+import android.speech.tts.Voice;
 import android.util.Log;
 import android.view.View;
 import android.widget.Chronometer;
@@ -31,6 +32,7 @@ import com.bairock.zhongchuan.qz.recorderlib.recorder.listener.RecordStateListen
 import com.bairock.zhongchuan.qz.recorderlib.utils.Logger;
 import com.bairock.zhongchuan.qz.utils.ConversationUtil;
 import com.bairock.zhongchuan.qz.utils.FileUtil;
+import com.bairock.zhongchuan.qz.utils.SendUdpThread;
 import com.bairock.zhongchuan.qz.utils.UserUtil;
 import com.bairock.zhongchuan.qz.widght.AudioView;
 
@@ -48,6 +50,9 @@ public class VoiceUploadActivity extends AppCompatActivity {
     private String ip;
     private RecordManager recordManager = RecordManager.getInstance();
 
+    private SendUdpThread sendUdpThread;
+    private boolean upload = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,8 +61,8 @@ public class VoiceUploadActivity extends AppCompatActivity {
 
         ip = UserUtil.findMainServerIp();
         if(ip == null){
-            Toast.makeText(this, "对方不在线", Toast.LENGTH_SHORT).show();
-            finish();
+            Toast.makeText(this, "信息处理终端不在线, 正在本地录制...", Toast.LENGTH_SHORT).show();
+//            finish();
         }
 
         findViews();
@@ -67,7 +72,23 @@ public class VoiceUploadActivity extends AppCompatActivity {
         receiver = new AskBroadcastReceiver();
         IntentFilter intentFilter = new IntentFilter(ConversationUtil.VOICE_UPLOAD_ANS_ACTION);
         registerReceiver(receiver, intentFilter);
-        MessageBroadcaster.sendIp(UdpMessageHelper.createVoiceCallMainServerAsk(UserUtil.user.getUsername()), ip);
+        sendUdpThread = new SendUdpThread(UdpMessageHelper.createVoiceCallMainServerAsk(UserUtil.user.getUsername()), ip);
+        sendUdpThread.setOnNoAnswerListener(new SendUdpThread.OnNoAnswerListener() {
+            @Override
+            public void onNoAnswer() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(VoiceUploadActivity.this, "信息处理终端无应答", Toast.LENGTH_SHORT).show();
+//                        finish();
+                    }
+                });
+
+            }
+        });
+        sendUdpThread.start();
+        startVoice();
+//        MessageBroadcaster.sendIp(UdpMessageHelper.createVoiceCallMainServerAsk(UserUtil.user.getUsername()), ip);
     }
 
     @Override
@@ -82,6 +103,10 @@ public class VoiceUploadActivity extends AppCompatActivity {
         if(null != recordManager){
             recordManager.stop();
             recordManager.setRecordDataListener(null);
+        }
+
+        if(null != sendUdpThread){
+            sendUdpThread.interrupt();
         }
     }
 
@@ -187,21 +212,28 @@ public class VoiceUploadActivity extends AppCompatActivity {
         @Override
         public void onData(byte[] data) {
 //            Log.e("Main", data.length + "?");
-            VoiceBroadcaster.send(data, ip);
+            if(upload) {
+                VoiceBroadcaster.send(data, ip);
+            }
         }
     };
 
     private class AskBroadcastReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
+            SendUdpThread.answered = true;
+            if(null != sendUdpThread) {
+                sendUdpThread.interrupt();
+            }
             String result = intent.getStringExtra("result");
             if(result.equals("0")){
                 //接受
-                startVoice();
+//                startVoice();
+                upload = true;
             }else if(result.equals("1")){
                 //拒绝1/挂断2
-                Toast.makeText(VoiceUploadActivity.this, "对方忙", Toast.LENGTH_SHORT).show();
-                finish();
+                Toast.makeText(VoiceUploadActivity.this, "信息处理终端拒接", Toast.LENGTH_SHORT).show();
+//                finish();
             }
         }
     }

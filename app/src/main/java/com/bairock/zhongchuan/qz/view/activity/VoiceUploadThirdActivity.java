@@ -17,6 +17,7 @@ import com.bairock.zhongchuan.qz.R;
 import com.bairock.zhongchuan.qz.netty.MessageBroadcaster;
 import com.bairock.zhongchuan.qz.netty.UdpMessageHelper;
 import com.bairock.zhongchuan.qz.utils.ConversationUtil;
+import com.bairock.zhongchuan.qz.utils.SendUdpThread;
 import com.bairock.zhongchuan.qz.utils.UserUtil;
 import com.library.live.Player;
 import com.library.live.stream.UdpRecive;
@@ -28,7 +29,7 @@ import com.library.talk.stream.ListenRecive;
 public class VoiceUploadThirdActivity extends AppCompatActivity {
 
     private Chronometer chronometer;
-    private Listen listen;
+    public static Listen listen;
     private ImageView imgHangUp;
     private TextView txtMessage;
     private String mainServerIp;
@@ -36,16 +37,13 @@ public class VoiceUploadThirdActivity extends AppCompatActivity {
     private String thirdIp;
     private AskBroadcastReceiver receiver;
 
+    private SendUdpThread sendUdpThread;
+    private boolean upload = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_voice_upload_third);
-
-        mainServerIp = UserUtil.findMainServerIp();
-        if (mainServerIp == null) {
-            Toast.makeText(this, "信息处理终端不在线", Toast.LENGTH_SHORT).show();
-            finish();
-        }
 
         // 注册接收消息广播
         receiver = new AskBroadcastReceiver();
@@ -58,9 +56,32 @@ public class VoiceUploadThirdActivity extends AppCompatActivity {
         if (thirdIp == null) {
             Toast.makeText(this, "便携式录音设备不在线", Toast.LENGTH_SHORT).show();
             finish();
+        }else {
+
+            mainServerIp = UserUtil.findMainServerIp();
+            if (mainServerIp == null) {
+                Toast.makeText(this, "信息处理终端不在线", Toast.LENGTH_SHORT).show();
+//            finish();
+            }
         }
+
         txtMessage.setText("正在请求便携式录音设备...");
-        MessageBroadcaster.sendIp(UdpMessageHelper.createVoiceCallThirdAsk(UserUtil.user.getUsername()), thirdIp);
+        sendUdpThread = new SendUdpThread(UdpMessageHelper.createVoiceCallThirdAsk(UserUtil.user.getUsername()), thirdIp);
+        sendUdpThread.setOnNoAnswerListener(new SendUdpThread.OnNoAnswerListener() {
+            @Override
+            public void onNoAnswer() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(VoiceUploadThirdActivity.this, "便携式录音设备无应答", Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+                });
+
+            }
+        });
+        sendUdpThread.start();
+//        MessageBroadcaster.sendIp(UdpMessageHelper.createVoiceCallThirdAsk(UserUtil.user.getUsername()), thirdIp);
 
     }
 
@@ -103,6 +124,10 @@ public class VoiceUploadThirdActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        if(null != sendUdpThread){
+            sendUdpThread.interrupt();
+        }
     }
 
     private void startVoice(){
@@ -114,16 +139,36 @@ public class VoiceUploadThirdActivity extends AppCompatActivity {
 
     private class AskBroadcastReceiver extends BroadcastReceiver {
         @Override
-        public void onReceive(Context context, Intent intent) {
+        public void onReceive(final Context context, Intent intent) {
             // 记得把广播给终结掉
             abortBroadcast();
+            SendUdpThread.answered = true;
+            if(null != sendUdpThread) {
+                sendUdpThread.interrupt();
+            }
+
             String result = intent.getStringExtra("result");
             String source = intent.getStringExtra("source");
             if(source.equals("third")){
                 if (result.equals("0")) {
                     //接受
                     txtMessage.setText("正在请求信息处理终端...");
-                    MessageBroadcaster.sendIp(UdpMessageHelper.createVoiceCallMainServerAsk(UserUtil.user.getUsername()), mainServerIp);
+                    sendUdpThread = new SendUdpThread(UdpMessageHelper.createVoiceCallMainServerAsk(UserUtil.user.getUsername()), mainServerIp);
+                    sendUdpThread.setOnNoAnswerListener(new SendUdpThread.OnNoAnswerListener() {
+                        @Override
+                        public void onNoAnswer() {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(context, "信息处理终端无应答", Toast.LENGTH_SHORT).show();
+//                                    finish();
+                                }
+                            });
+                        }
+                    });
+                    sendUdpThread.start();
+                    startVoice();
+//                    MessageBroadcaster.sendIp(UdpMessageHelper.createVoiceCallMainServerAsk(UserUtil.user.getUsername()), mainServerIp);
                 } else if (result.equals("1")) {
                     //拒绝1/挂断2
                     Toast.makeText(VoiceUploadThirdActivity.this, "第三方设备拒绝请求", Toast.LENGTH_SHORT).show();
@@ -132,11 +177,12 @@ public class VoiceUploadThirdActivity extends AppCompatActivity {
             }else {
                 if (result.equals("0")) {
                     //接受
-                    startVoice();
+                    upload = true;
+//                    startVoice();
                 } else if (result.equals("1")) {
                     //拒绝1/挂断2
                     Toast.makeText(VoiceUploadThirdActivity.this, "信息处理终端拒绝请求", Toast.LENGTH_SHORT).show();
-                    finish();
+//                    finish();
                 }
             }
         }

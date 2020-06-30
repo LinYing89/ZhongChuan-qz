@@ -20,6 +20,8 @@ public class ClientBase {
     private UserStatus userStatus = UserStatus.ONLINE;
 //    private InetSocketAddress inetSocketAddress;
 
+    private OnIpChangedListener onIpChangedListener;
+
     public String getUsername() {
         return username;
     }
@@ -44,7 +46,15 @@ public class ClientBase {
     }
 
     public void setIp(String ip) {
-        this.ip = ip;
+        if(ip == null && this.ip == null){
+            return;
+        }
+        if (this.ip == null || !this.ip.equals(ip)){
+            this.ip = ip;
+            if (null != onIpChangedListener) {
+                onIpChangedListener.onIpChanged();
+            }
+        }
     }
 
     public Marker getMarker() {
@@ -101,5 +111,17 @@ public class ClientBase {
 
     public void setUserStatus(UserStatus userStatus) {
         this.userStatus = userStatus;
+    }
+
+    public OnIpChangedListener getOnIpChangedListener() {
+        return onIpChangedListener;
+    }
+
+    public void setOnIpChangedListener(OnIpChangedListener onIpChangedListener) {
+        this.onIpChangedListener = onIpChangedListener;
+    }
+
+    public interface OnIpChangedListener{
+        void onIpChanged();
     }
 }

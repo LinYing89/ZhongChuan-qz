@@ -1,7 +1,10 @@
 package com.bairock.zhongchuan.qz.view.fragment;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -11,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -34,10 +38,12 @@ import com.bairock.zhongchuan.qz.dialog.ActionItem;
 import com.bairock.zhongchuan.qz.dialog.TitlePopup;
 import com.bairock.zhongchuan.qz.enums.ClientBaseType;
 import com.bairock.zhongchuan.qz.utils.ConversationUtil;
+import com.bairock.zhongchuan.qz.utils.SendUdpThread;
 import com.bairock.zhongchuan.qz.utils.UserUtil;
 import com.bairock.zhongchuan.qz.view.ChatActivity;
 import com.bairock.zhongchuan.qz.view.activity.MainServerChatActivity;
 import com.bairock.zhongchuan.qz.view.activity.SettingsActivity;
+import com.bairock.zhongchuan.qz.view.activity.VoiceCallActivity;
 
 //通讯录
 
@@ -51,6 +57,7 @@ public class FragmentContact extends Fragment {
 	private TextView txtName;
 	private TextView txtMember;
 	private TitlePopup groupPopup;
+	private UserAddBroadcastReceiver receiver;
 
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -86,6 +93,9 @@ public class FragmentContact extends Fragment {
 				parent.removeView(layout);
 			}
 		}
+		receiver = new UserAddBroadcastReceiver();
+		IntentFilter intentFilter = new IntentFilter(ConversationUtil.USER_ADD);
+		this.getActivity().registerReceiver(receiver, intentFilter);
 		return layout;
 	}
 
@@ -99,6 +109,12 @@ public class FragmentContact extends Fragment {
 
 	@Override
 	public void onDestroy() {
+		try {
+			this.getActivity().unregisterReceiver(receiver);
+			receiver = null;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		mapView.onDestroy();
 		super.onDestroy();
 	}
@@ -154,9 +170,9 @@ public class FragmentContact extends Fragment {
 //			if(!user.getUsername().equals(UserUtil.user.getUsername())) {
 			String name = user.getUsername();
 			if(user.getClientBaseType() == ClientBaseType.MAIN_SERVER){
-				name = name + "(信息处理终端)";
+				name = name + "(终端)";
 			}
-			groupPopup.addAction(new ActionItem(activity, name));
+			groupPopup.addAction(new ActionItem(activity, name, user));
 //			}
 		}
 	}
@@ -166,16 +182,17 @@ public class FragmentContact extends Fragment {
 		@Override
 		public void onItemClick(ActionItem item, int position) {
 			String title = item.mTitle.toString();
-			String number = title;
-			if(title.contains("信息处理终端")){
-				number = title.substring(0, title.indexOf("("));
-			}
+			ClientBaseType clientBaseType = item.getClientBase().getClientBaseType();
+			String number = item.getClientBase().getUsername();
+//			if(clientBaseType == ClientBaseType.MAIN_SERVER){
+//				number = title.substring(0, title.indexOf("("));
+//			}
 			ZCConversation conversation = ConversationUtil.activeConversation(number);
 			if (null == conversation) {
 				conversation = new ZCConversation(number);
 				ConversationUtil.addConversation(conversation);
 			}
-			if(title.contains("信息处理终端")){
+			if(clientBaseType == ClientBaseType.MAIN_SERVER){
 				Intent intent = new Intent(getActivity(), MainServerChatActivity.class);
 				intent.putExtra(Constants.NAME, title);// 设置昵称
 				intent.putExtra(Constants.TYPE, ChatActivity.CHATTYPE_SINGLE);
@@ -228,6 +245,23 @@ public class FragmentContact extends Fragment {
 					sleep(2000);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	private class UserAddBroadcastReceiver extends BroadcastReceiver {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			String username = intent.getStringExtra(Constants.NAME);
+			for(ClientBase user : UserUtil.findPhoneUser()){
+				String name = user.getUsername();
+				if(username.equals(name)) {
+					if(user.getClientBaseType() == ClientBaseType.MAIN_SERVER){
+						name = name + "(终端)";
+					}
+					groupPopup.addAction(new ActionItem(context, name, user));
+					break;
 				}
 			}
 		}

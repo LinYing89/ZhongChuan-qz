@@ -20,6 +20,7 @@ import com.bairock.zhongchuan.qz.netty.MessageBroadcaster;
 import com.bairock.zhongchuan.qz.netty.UdpMessageHelper;
 import com.bairock.zhongchuan.qz.utils.ConversationUtil;
 import com.bairock.zhongchuan.qz.utils.FileUtil;
+import com.bairock.zhongchuan.qz.utils.SendUdpThread;
 import com.bairock.zhongchuan.qz.utils.UserUtil;
 import com.bairock.zhongchuan.qz.utils.Util;
 import com.library.common.UdpControlInterface;
@@ -33,11 +34,14 @@ import java.io.File;
 public class VideoUploadActivity extends AppCompatActivity {
 
     private Chronometer chronometer;
-    private Publish publish;
+    public Publish publish;
     private ImageView imgHangUp;
     private TextView txtMessage;
     private String mainServerIp;
     private AskBroadcastReceiver receiver;
+
+    private SendUdpThread sendUdpThread;
+    private boolean upload = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +50,7 @@ public class VideoUploadActivity extends AppCompatActivity {
         mainServerIp = UserUtil.findMainServerIp();
         if(mainServerIp == null){
             Toast.makeText(this, "信息处理终端不在线", Toast.LENGTH_SHORT).show();
-            finish();
+//            finish();
         }
 
         // 注册接收消息广播
@@ -57,7 +61,23 @@ public class VideoUploadActivity extends AppCompatActivity {
         findViews();
 
         txtMessage.setText("正在请求信息处理终端...");
-        MessageBroadcaster.sendIp(UdpMessageHelper.createVideoCallMainServerAsk(UserUtil.user.getUsername()), mainServerIp);
+        sendUdpThread = new SendUdpThread(UdpMessageHelper.createVideoCallMainServerAsk(UserUtil.user.getUsername()), mainServerIp);
+        sendUdpThread.setOnNoAnswerListener(new SendUdpThread.OnNoAnswerListener() {
+            @Override
+            public void onNoAnswer() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(VideoUploadActivity.this, "信息处理终端无应答", Toast.LENGTH_SHORT).show();
+//                        finish();
+                    }
+                });
+
+            }
+        });
+        sendUdpThread.start();
+        startVideo();
+//        MessageBroadcaster.sendIp(UdpMessageHelper.createVideoCallMainServerAsk(UserUtil.user.getUsername()), mainServerIp);
     }
 
     private void findViews(){
@@ -119,13 +139,18 @@ public class VideoUploadActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        if(null != sendUdpThread){
+            sendUdpThread.interrupt();
+        }
     }
 
     private void startVideo(){
         txtMessage.setText("");
         chronometer.start();
 
-        publish.start();
+        if(upload) {
+            publish.start();
+        }
     }
 
     private class AskBroadcastReceiver extends BroadcastReceiver {
@@ -133,10 +158,15 @@ public class VideoUploadActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             // 记得把广播给终结掉
             abortBroadcast();
+            SendUdpThread.answered = true;
+            if(null != sendUdpThread) {
+                sendUdpThread.interrupt();
+            }
             String result = intent.getStringExtra("result");
             if (result.equals("0")) {
                 //接受
-                startVideo();
+                upload = true;
+//                startVideo();
             } else if (result.equals("1")) {
                 //拒绝1/挂断2
                 Toast.makeText(VideoUploadActivity.this, "信息处理终端拒绝请求", Toast.LENGTH_SHORT).show();

@@ -185,10 +185,10 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 		setListener();
 
 		ip = UserUtil.findIpByUsername(toChatUsername);
-		if(null == ip){
-			Toast.makeText(this, "对方不在线", Toast.LENGTH_SHORT).show();
-			finish();
-		}
+//		if(null == ip){
+//			Toast.makeText(this, "对方不在线", Toast.LENGTH_SHORT).show();
+//			finish();
+//		}
 
 		handler = new MyHandler(this);
 	}
@@ -604,6 +604,10 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 	 *            message content
 	 */
 	private void sendText(String content) {
+		if(null == ip){
+			Toast.makeText(this, "对方不在线", Toast.LENGTH_SHORT).show();
+			return;
+		}
 		if (content.length() > 0) {
 			MessageRoot<ZCMessage> messageRoot = ConversationUtil.createSendMessage(ZCMessageType.TXT, UserUtil.user.getUsername(), toChatUsername);
 			messageRoot.getData().setContent(content);
@@ -624,6 +628,10 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 	 * @param length
 	 */
 	private void sendVoice(String filePath, String length) {
+		if(null == ip){
+			Toast.makeText(this, "对方不在线", Toast.LENGTH_SHORT).show();
+			return;
+		}
 		if (!(new File(filePath).exists())) {
 			return;
 		}
@@ -678,6 +686,10 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 //	}
 
 	private void sendPicture(final String filePath) {
+		if(null == ip){
+			Toast.makeText(this, "对方不在线", Toast.LENGTH_SHORT).show();
+			return;
+		}
 		String msgId = UUID.randomUUID().toString();
 		final MessageRoot<ZCMessage> messageRoot = ConversationUtil.createSendMessage(ZCMessageType.IMAGE, UserUtil.user.getUsername(), toChatUsername);
 		ZCMessage message = messageRoot.getData();
@@ -776,6 +788,10 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 	 */
 	private void sendLocationMsg(double latitude, double longitude,
 			String imagePath, String locationAddress) {
+		if(null == ip){
+			Toast.makeText(this, "对方不在线", Toast.LENGTH_SHORT).show();
+			return;
+		}
 		final MessageRoot<ZCMessage> message = ConversationUtil.createSendMessage(ZCMessageType.LOCATION, "8090", "8090");
 		conversation.addMessage(message);
 		listView.setAdapter(adapter);
@@ -791,6 +807,10 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 	 * @param uri
 	 */
 	private void sendFile(Uri uri) {
+		if(null == ip){
+			Toast.makeText(this, "对方不在线", Toast.LENGTH_SHORT).show();
+			return;
+		}
 		String filePath = null;
 		if ("content".equalsIgnoreCase(uri.getScheme())) {
 			String[] projection = {MediaStore.Images.Media.DATA};
@@ -830,6 +850,10 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 	}
 
 	private void sendFile(String filePath){
+		if(null == ip){
+			Toast.makeText(this, "对方不在线", Toast.LENGTH_SHORT).show();
+			return;
+		}
 		String msgId = UUID.randomUUID().toString();
 		final MessageRoot<ZCMessage> messageRoot = ConversationUtil.createSendMessage(ZCMessageType.VIDEO, UserUtil.user.getUsername(), toChatUsername);
 		ZCMessage message = messageRoot.getData();

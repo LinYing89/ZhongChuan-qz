@@ -2,6 +2,7 @@ package com.bairock.zhongchuan.qz.netty;
 
 import com.bairock.zhongchuan.qz.utils.UserUtil;
 import com.bairock.zhongchuan.qz.view.activity.VideoCallActivity;
+import com.bairock.zhongchuan.qz.view.activity.VideoUploadThirdActivity;
 
 import java.util.List;
 
@@ -20,8 +21,8 @@ public class H264Decoder extends MessageToMessageDecoder<DatagramPacket> {
         ByteBuf byteBuf = msg.copy().content();
         byte[] req = new byte[byteBuf.readableBytes()];
         byteBuf.readBytes(req);
-        if(null != VideoCallActivity.player) {
-            VideoCallActivity.player.write(req);
+        if(null != VideoUploadThirdActivity.player) {
+            VideoUploadThirdActivity.player.write(req);
         }else {
             UdpMessage udpMessage = UdpMessageHelper.createVideoCallAns(UserUtil.user.getUsername(), 1);
             byte[] bytes = UdpMessageHelper.createBytes(udpMessage);

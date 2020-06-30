@@ -21,6 +21,7 @@ import com.bairock.zhongchuan.qz.netty.UdpMessageHelper;
 import com.bairock.zhongchuan.qz.recorderlib.utils.Logger;
 import com.bairock.zhongchuan.qz.utils.ConversationUtil;
 import com.bairock.zhongchuan.qz.utils.FileUtil;
+import com.bairock.zhongchuan.qz.utils.SendUdpThread;
 import com.bairock.zhongchuan.qz.utils.UserUtil;
 import com.bairock.zhongchuan.qz.utils.Util;
 import com.library.common.UdpControlInterface;
@@ -38,7 +39,7 @@ public class VideoCallActivity extends AppCompatActivity {
     private static String TAG = "VideoCallActivity";
 
     private Chronometer chronometer;
-    public static Player player;
+    private Player player;
     private Publish publishMe;
 //    private TextView txtTo;
     private ImageView imgMute;
@@ -50,10 +51,12 @@ public class VideoCallActivity extends AppCompatActivity {
     private LinearLayout layoutAsk;
     private LinearLayout layoutAns;
 
-    private String name;
+    public static String name = "";
     private String ip;
 
     private AskBroadcastReceiver receiver;
+
+    private SendUdpThread sendUdpThread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,11 +66,31 @@ public class VideoCallActivity extends AppCompatActivity {
         String videoType = getIntent().getStringExtra(Constants.VIDEO_TYPE);
         findViews();
 
+        ip = UserUtil.findIpByUsername(name);
+        if(ip == null || ip.isEmpty()){
+            Toast.makeText(VideoCallActivity.this, "对方不在线", Toast.LENGTH_SHORT).show();
+            finish();
+        }
         if(videoType.equals(Constants.VIDEO_ASK)){
             // 主动发起请求, 等待对方应答界面
             layoutAsk.setVisibility(View.VISIBLE);
             layoutAns.setVisibility(View.GONE);
-            MessageBroadcaster.send(UdpMessageHelper.createVideoCallAsk(UserUtil.user.getUsername()), name);
+            sendUdpThread = new SendUdpThread(UdpMessageHelper.createVideoCallAsk(UserUtil.user.getUsername()), ip);
+            sendUdpThread.setOnNoAnswerListener(new SendUdpThread.OnNoAnswerListener() {
+                @Override
+                public void onNoAnswer() {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(VideoCallActivity.this, "对方无应答", Toast.LENGTH_SHORT).show();
+                            finish();
+                        }
+                    });
+
+                }
+            });
+            sendUdpThread.start();
+//            MessageBroadcaster.send(UdpMessageHelper.createVideoCallAsk(UserUtil.user.getUsername()), name);
         }else {
             // 被动接听界面
             layoutAsk.setVisibility(View.GONE);
@@ -97,6 +120,7 @@ public class VideoCallActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        name = "";
 //        publishHe.stopRecode();//停止录制
         // 注销广播
         try {
@@ -118,6 +142,10 @@ public class VideoCallActivity extends AppCompatActivity {
 
         if(null != chronometer) {
             chronometer.stop();
+        }
+
+        if(null != sendUdpThread){
+            sendUdpThread.interrupt();
         }
     }
 
@@ -203,7 +231,9 @@ public class VideoCallActivity extends AppCompatActivity {
                 case R.id.imgSpeaker:
                     break;
                 case R.id.imgOk:
-                    MessageBroadcaster.send(UdpMessageHelper.createVideoCallAns(UserUtil.user.getUsername(), 0), name);
+                    sendUdpThread = new SendUdpThread(UdpMessageHelper.createVideoCallAns(UserUtil.user.getUsername(), 0), ip);
+                    sendUdpThread.start();
+//                    MessageBroadcaster.send(UdpMessageHelper.createVideoCallAns(UserUtil.user.getUsername(), 0), name);
                     layoutAns.setVisibility(View.GONE);
                     layoutAsk.setVisibility(View.VISIBLE);
                     startVideo();
@@ -224,6 +254,10 @@ public class VideoCallActivity extends AppCompatActivity {
             // 记得把广播给终结掉
             abortBroadcast();
 
+            SendUdpThread.answered = true;
+            if(null != sendUdpThread) {
+                sendUdpThread.interrupt();
+            }
             String result = intent.getStringExtra("result");
             if(result.equals("0")){
                 //接受

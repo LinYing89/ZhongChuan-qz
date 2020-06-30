@@ -1,5 +1,10 @@
 package com.bairock.zhongchuan.qz.utils;
 
+import android.content.Intent;
+import android.os.Bundle;
+
+import com.bairock.zhongchuan.qz.App;
+import com.bairock.zhongchuan.qz.Constants;
 import com.bairock.zhongchuan.qz.bean.ClientBase;
 import com.bairock.zhongchuan.qz.bean.Location;
 import com.bairock.zhongchuan.qz.enums.ClientBaseType;
@@ -10,6 +15,8 @@ import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.netty.handler.codec.mqtt.MqttMessageBuilders;
+
 public class UserUtil {
 
     public static Location MY_LOCATION = new Location();
@@ -17,6 +24,8 @@ public class UserUtil {
     public static ClientBase user = new ClientBase();
 
     public static List<ClientBase> clientBases = new ArrayList<>();
+
+    public static final String MAIN_SERVER_TITLE = "终端";
 
 //    public static List<User> users = new ArrayList<>();
 //
@@ -226,12 +235,20 @@ public class UserUtil {
             }
         }
 
-        if(null != clientBase){
-            clientBase.setIp(ip);
-            clientBase.setLocation(location);
-            if(clientBase.getClientBaseType() == ClientBaseType.PHONE) {
-                TcpClientUtil.tryLink(clientBase);
-            }
+        if(null == clientBase){
+            clientBase = new ClientBase();
+            clientBase.setClientBaseType(ClientBaseType.PHONE);
+            clientBase.setUsername(memberNumber);
+            addClientBase(clientBase);
+            Intent i1 = new Intent(ConversationUtil.USER_ADD);
+            i1.putExtra(Constants.NAME, memberNumber);
+            App.getInstance().sendOrderedBroadcast(i1, ConversationUtil.CHAT_BROADCAST_PERMISSION);
+        }
+
+        clientBase.setIp(ip);
+        clientBase.setLocation(location);
+        if(clientBase.getClientBaseType() == ClientBaseType.PHONE) {
+            TcpClientUtil.tryLink(clientBase);
         }
     }
 

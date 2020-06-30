@@ -157,7 +157,7 @@
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:gravity="center"
-				android:text="@string/attach_location"
+				android:text="视频通话"
 				android:textColor="@color/black1"
 				android:textSize="12sp" />
 		</LinearLayout>

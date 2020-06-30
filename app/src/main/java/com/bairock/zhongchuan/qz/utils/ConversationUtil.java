@@ -16,6 +16,7 @@ import java.util.UUID;
 
 public class ConversationUtil {
 
+    public static String USER_ADD = "com.bairock.zhongchuan.qz.user_add";
     public static String LOGOUT_ACTION = "com.bairock.zhongchuan.qz.logout";
     public static String CHAT_ACTION = "com.bairock.zhongchuan.qz.chat";
     public static String VOICE_ASK_ACTION = "com.bairock.zhongchuan.qz.voice_ask";

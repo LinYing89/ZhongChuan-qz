@@ -34,6 +34,7 @@ import com.bairock.zhongchuan.qz.dialog.TitlePopup;
 import com.bairock.zhongchuan.qz.netty.H264Broadcaster;
 import com.bairock.zhongchuan.qz.netty.MessageBroadcaster;
 import com.bairock.zhongchuan.qz.netty.TcpServer;
+import com.bairock.zhongchuan.qz.netty.UdpMessageHelper;
 import com.bairock.zhongchuan.qz.netty.VoiceBroadcaster;
 import com.bairock.zhongchuan.qz.netty.file.FileUploadServer;
 import com.bairock.zhongchuan.qz.utils.ConversationUtil;
@@ -162,19 +163,19 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
         img_right.setVisibility(View.GONE);
         switch (view.getId()) {
             case R.id.re_weixin:
-                img_right.setVisibility(View.VISIBLE);
+//                img_right.setVisibility(View.VISIBLE);
                 index = 1;
                 if (fragmentMsg != null) {
                     fragmentMsg.refresh();
                 }
                 txt_title.setText(R.string.message);
-                img_right.setImageResource(R.drawable.icon_add);
+//                img_right.setImageResource(R.drawable.icon_add);
                 break;
             case R.id.re_contact_list:
                 index = 0;
                 txt_title.setText(R.string.contacts);
-                img_right.setVisibility(View.VISIBLE);
-                img_right.setImageResource(R.drawable.icon_titleaddfriend);
+//                img_right.setVisibility(View.VISIBLE);
+//                img_right.setImageResource(R.drawable.icon_titleaddfriend);
                 break;
             case R.id.re_find:
                 index = 2;
@@ -231,12 +232,12 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
 
     private void initViews() {
         // 设置消息页面为初始页面
-        img_right.setVisibility(View.VISIBLE);
-        img_right.setImageResource(R.drawable.icon_add);
+//        img_right.setVisibility(View.VISIBLE);
+//        img_right.setImageResource(R.drawable.icon_add);
     }
 
     private void setOnListener() {
-        img_right.setOnClickListener(this);
+//        img_right.setOnClickListener(this);
     }
 
     private int keyBackClickCount = 0;
@@ -271,7 +272,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
         switch (v.getId()) {
             case R.id.img_right:
                 if (index == 0) {
-                    titlePopup.show(findViewById(R.id.layout_bar));
+//                    titlePopup.show(findViewById(R.id.layout_bar));
                 } else {
 //                    Utils.start_Activity(MainActivity.this, PublicActivity.class,
 //                            new BasicNameValuePair(Constants.NAME, "添加朋友"));
@@ -388,21 +389,29 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
             String name = bundle.getString(Constants.NAME);
             if(type.equals(Constants.MEDIA_TYPE_VOICE)){
                 // 收到语音请求
-                if(VoiceCallActivity.listen == null) {
+                if(VoiceCallActivity.name.isEmpty()) {
                     Intent intent1 = new Intent(MainActivity.this, VoiceCallActivity.class);
                     // 进入应答界面
                     intent1.putExtra(Constants.VOICE_TYPE, Constants.VOICE_ANS);
                     intent1.putExtra(Constants.NAME, name);
                     MainActivity.this.startActivity(intent1);
+                }else{
+                    if(!VoiceCallActivity.name.equals(name)) {
+                        MessageBroadcaster.send(UdpMessageHelper.createVoiceCallAns(UserUtil.user.getUsername(), 1), name);
+                    }
                 }
             }else if(type.equals(Constants.MEDIA_TYPE_VIDEO)){
                 // 收到视频请求
-                if(VideoCallActivity.player == null) {
+                if(VideoCallActivity.name.isEmpty()) {
                     Intent intent1 = new Intent(MainActivity.this, VideoCallActivity.class);
                     // 进入应答界面
                     intent1.putExtra(Constants.VIDEO_TYPE, Constants.VIDEO_ANS);
                     intent1.putExtra(Constants.NAME, name);
                     MainActivity.this.startActivity(intent1);
+                }else{
+                    if(!VideoCallActivity.name.equals(name)) {
+                        MessageBroadcaster.send(UdpMessageHelper.createVideoCallAns(UserUtil.user.getUsername(), 1), name);
+                    }
                 }
             }
         }

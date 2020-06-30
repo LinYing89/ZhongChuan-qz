@@ -7,7 +7,7 @@
   
     <ListView  
         android:id="@+id/title_list"  
-        android:layout_width="150dp"  
+        android:layout_width="match_parent"
         android:layout_height="fill_parent"  
       android:dividerHeight="1dp"
 		android:divider="#3E3E3E"

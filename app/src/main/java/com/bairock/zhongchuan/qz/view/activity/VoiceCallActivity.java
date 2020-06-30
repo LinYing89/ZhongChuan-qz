@@ -21,6 +21,7 @@ import com.bairock.zhongchuan.qz.netty.UdpMessageHelper;
 import com.bairock.zhongchuan.qz.netty.VoiceBroadcaster;
 import com.bairock.zhongchuan.qz.recorderlib.utils.Logger;
 import com.bairock.zhongchuan.qz.utils.ConversationUtil;
+import com.bairock.zhongchuan.qz.utils.SendUdpThread;
 import com.bairock.zhongchuan.qz.utils.UserUtil;
 import com.bairock.zhongchuan.qz.view.ChatActivity;
 import com.library.common.UdpControlInterface;
@@ -47,12 +48,16 @@ public class VoiceCallActivity extends AppCompatActivity {
     private LinearLayout layoutAsk;
     private LinearLayout layoutAns;
 
-    private String name;
+    public static String name = "";
     private String ip;
 
     private Speak speak;
-    public static Listen listen;
+    private Listen listen;
     private AskBroadcastReceiver receiver;
+
+    private SendUdpThread sendUdpThread;
+
+    private boolean started = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,11 +67,32 @@ public class VoiceCallActivity extends AppCompatActivity {
         String voiceType = getIntent().getStringExtra(Constants.VOICE_TYPE);
         findViews();
 
+        ip = UserUtil.findIpByUsername(name);
+        if(ip == null || ip.isEmpty()){
+            Toast.makeText(VoiceCallActivity.this, "对方不在线", Toast.LENGTH_SHORT).show();
+            finish();
+        }
+
         if(voiceType.equals(Constants.VOICE_ASK)){
             // 主动发起请求, 等待对方应答界面
             layoutAsk.setVisibility(View.VISIBLE);
             layoutAns.setVisibility(View.GONE);
-            MessageBroadcaster.send(UdpMessageHelper.createVoiceCallAsk(UserUtil.user.getUsername()), name);
+            sendUdpThread = new SendUdpThread(UdpMessageHelper.createVoiceCallAsk(UserUtil.user.getUsername()), ip);
+            sendUdpThread.setOnNoAnswerListener(new SendUdpThread.OnNoAnswerListener() {
+                @Override
+                public void onNoAnswer() {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(VoiceCallActivity.this, "对方无应答", Toast.LENGTH_SHORT).show();
+                            finish();
+                        }
+                    });
+
+                }
+            });
+            sendUdpThread.start();
+//            MessageBroadcaster.send(UdpMessageHelper.createVoiceCallAsk(UserUtil.user.getUsername()), name);
         }else {
             // 被动接听界面
             txtMessage.setText("");
@@ -95,6 +121,7 @@ public class VoiceCallActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        name = "";
 //        publishHe.stopRecode();//停止录制
         // 注销广播
         try {
@@ -116,6 +143,9 @@ public class VoiceCallActivity extends AppCompatActivity {
 
         if(null != chronometer) {
             chronometer.stop();
+        }
+        if(null != sendUdpThread){
+            sendUdpThread.interrupt();
         }
     }
 
@@ -154,7 +184,9 @@ public class VoiceCallActivity extends AppCompatActivity {
                 case R.id.imgSpeaker:
                     break;
                 case R.id.imgOk:
-                    MessageBroadcaster.send(UdpMessageHelper.createVoiceCallAns(UserUtil.user.getUsername(), 0), name);
+                    sendUdpThread = new SendUdpThread(UdpMessageHelper.createVoiceCallAns(UserUtil.user.getUsername(), 0), ip);
+                    sendUdpThread.start();
+//                    MessageBroadcaster.send(UdpMessageHelper.createVoiceCallAns(UserUtil.user.getUsername(), 0), name);
                     layoutAns.setVisibility(View.GONE);
                     layoutAsk.setVisibility(View.VISIBLE);
                     startVoice();
@@ -164,6 +196,7 @@ public class VoiceCallActivity extends AppCompatActivity {
     };
 
     private void startVoice(){
+        started = true;
         txtMessage.setText("");
         chronometer.start();
         speak = new Speak.Buider()
@@ -191,9 +224,17 @@ public class VoiceCallActivity extends AppCompatActivity {
     private class AskBroadcastReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
+
+            SendUdpThread.answered = true;
+            if(null != sendUdpThread) {
+                sendUdpThread.interrupt();
+            }
             String result = intent.getStringExtra("result");
             if(result.equals("0")){
                 //接受
+                if(started){
+                    return;
+                }
                 startVoice();
             }else if(result.equals("1")){
                 //拒绝1/挂断2

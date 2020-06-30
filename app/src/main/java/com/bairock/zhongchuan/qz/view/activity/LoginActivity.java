@@ -24,6 +24,7 @@ import com.bairock.zhongchuan.qz.common.DES;
 import com.bairock.zhongchuan.qz.common.Utils;
 import com.bairock.zhongchuan.qz.netty.MessageBroadcaster;
 import com.bairock.zhongchuan.qz.netty.UdpMessageHelper;
+import com.bairock.zhongchuan.qz.utils.SendUdpThread;
 import com.bairock.zhongchuan.qz.utils.UserUtil;
 import com.bairock.zhongchuan.qz.utils.Util;
 import com.bairock.zhongchuan.qz.view.BaseActivity;
@@ -35,11 +36,13 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 	private TextView txt_title;
 	private ImageView img_back;
 	private Button btn_login;
+	private Button btnLocalLogin;
 	private EditText et_usertel, et_password;
 	private boolean loging = false;
 	private ProgressDialog loginDialog;
 
 	public static MyHandler handler;
+	private SendUdpThread sendUdpThread;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -56,6 +59,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 		img_back = findViewById(R.id.img_back);
 		img_back.setVisibility(View.VISIBLE);
 		btn_login = findViewById(R.id.btn_login);
+		btnLocalLogin = findViewById(R.id.btnLocalLogin);
 		et_usertel = findViewById(R.id.et_usertel);
 		et_password = findViewById(R.id.et_password);
 		et_usertel.setText("8080");
@@ -75,6 +79,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 	protected void setListener() {
 		img_back.setOnClickListener(this);
 		btn_login.setOnClickListener(this);
+		btnLocalLogin.setOnClickListener(this);
 		et_usertel.addTextChangedListener(new TextChange());
 		et_password.addTextChangedListener(new TextChange());
 	}
@@ -104,6 +109,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
+					loging = false;
 					//登录超时
 					runOnUiThread(new Runnable() {
 						@Override
@@ -114,6 +120,19 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 					});
 				}
 			}).start();
+			break;
+		case R.id.btnLocalLogin :
+			String userName = et_usertel.getText().toString().trim();
+			if (!TextUtils.isEmpty(userName)) {
+				UserUtil.user.setUsername(userName);
+				loging = true;
+				Intent intent = new Intent(LoginActivity.this,
+						MainActivity.class);
+				startActivity(intent);
+				finish();
+			} else {
+				Utils.showLongToast(LoginActivity.this, "请填写账号！");
+			}
 			break;
 		default:
 			break;
@@ -143,6 +162,8 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 		if (!TextUtils.isEmpty(userName) && !TextUtils.isEmpty(password)) {
 			UserUtil.user.setUsername(userName);
 			loging = true;
+			sendUdpThread = new SendUdpThread(UdpMessageHelper.createLogin(userName, password), null);
+			sendUdpThread.start();
 			MessageBroadcaster.sendBroadcast(UdpMessageHelper.createLogin(userName, password));
 
 //			Intent intent = new Intent(LoginActivity.this,
@@ -214,6 +235,10 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 			final LoginActivity theActivity = mActivity.get();
 			if(!theActivity.loging){
 				return;
+			}
+			SendUdpThread.answered = true;
+			if(null != theActivity.sendUdpThread) {
+				theActivity.sendUdpThread.interrupt();
 			}
 			theActivity.closeDialog();
 			theActivity.loging = false;

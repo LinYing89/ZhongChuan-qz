@@ -1,6 +1,7 @@
 package com.bairock.zhongchuan.qz.dialog;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.view.Gravity;
@@ -12,12 +13,20 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
+import com.bairock.zhongchuan.qz.Constants;
 import com.bairock.zhongchuan.qz.R;
+import com.bairock.zhongchuan.qz.bean.ClientBase;
+import com.bairock.zhongchuan.qz.bean.ZCConversation;
 import com.bairock.zhongchuan.qz.common.ViewHolder;
+import com.bairock.zhongchuan.qz.utils.ConversationUtil;
+import com.bairock.zhongchuan.qz.view.ChatActivity;
+import com.bairock.zhongchuan.qz.view.activity.VideoCallActivity;
+import com.bairock.zhongchuan.qz.view.activity.VoiceCallActivity;
 
 import java.util.ArrayList;
 
@@ -76,7 +85,7 @@ public class TitlePopup extends PopupWindow {
 		mScreenHeight = wm.getDefaultDisplay().getHeight();
 
 		// 设置弹窗的宽度和高度
-		setWidth(width);
+		setWidth(400);
 		setHeight(height);
 
 		setBackgroundDrawable(new BitmapDrawable());
@@ -139,23 +148,31 @@ public class TitlePopup extends PopupWindow {
 		mListView.setAdapter(new BaseAdapter() {
 			@Override
 			public View getView(int position, View convertView, ViewGroup parent) {
-				if (convertView == null) {
+//				if (convertView == null) {
 					convertView = LayoutInflater.from(mContext).inflate(
 							R.layout.layout_item_pop, parent, false);
-				}
+//				}
 				TextView textView = ViewHolder.get(convertView, R.id.txt_title);
+				final ImageView imgChat = ViewHolder.get(convertView, R.id.image_chat);
+				final ImageView imgVoice = ViewHolder.get(convertView, R.id.image_voice);
+				final ImageView imgVideo = ViewHolder.get(convertView, R.id.image_video);
 				textView.setTextColor(mContext.getResources().getColor(
 						android.R.color.white));
 				textView.setTextSize(16);
 				// 设置文本居中
-				 textView.setGravity(Gravity.CENTER_VERTICAL);
+//				 textView.setGravity(Gravity.CENTER_VERTICAL);
 				// // 设置文本域的范围
 				// textView.setPadding(0, 10, 0, 10);
 				// 设置文本在一行内显示（不换行）
 				textView.setSingleLine(true);
 
-				ActionItem item = mActionItems.get(position);
+				final ActionItem item = mActionItems.get(position);
 
+				if(item.getClientBase().getIp() != null && !item.getClientBase().getIp().isEmpty()){
+					imgChat.setImageResource(R.drawable.ic_baseline_chat_24);
+					imgVoice.setImageResource(R.drawable.ic_baseline_local_phone_24);
+					imgVideo.setImageResource(R.drawable.ic_baseline_videocam_24);
+				}
 				// 设置文本文字
 				textView.setText(item.mTitle);
 				if (item.mDrawable != null) {
@@ -164,6 +181,52 @@ public class TitlePopup extends PopupWindow {
 					// 设置在文字的左边放一个图标
 					textView.setCompoundDrawablesWithIntrinsicBounds(
 							item.mDrawable, null, null, null);
+				}
+				imgChat.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						String number = item.getClientBase().getUsername();
+						ZCConversation conversation = ConversationUtil.activeConversation(number);
+						if (null == conversation) {
+							conversation = new ZCConversation(number);
+							ConversationUtil.addConversation(conversation);
+						}
+						Intent intent1 = new Intent(mContext, ChatActivity.class);
+						intent1.putExtra(Constants.NAME, number);// 设置昵称
+						intent1.putExtra(Constants.TYPE, ChatActivity.CHATTYPE_SINGLE);
+						intent1.putExtra(Constants.User_ID, number);
+						mContext.startActivity(intent1);
+					}
+				});
+				imgVoice.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						String number = item.getClientBase().getUsername();
+						Intent intent1 = new Intent(mContext, VoiceCallActivity.class);
+						intent1.putExtra(Constants.VOICE_TYPE, Constants.VOICE_ASK);
+						intent1.putExtra(Constants.NAME, number);
+						mContext.startActivity(intent1);
+					}
+				});
+				imgVideo.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						String number = item.getClientBase().getUsername();
+						Intent intent1 = new Intent(mContext, VideoCallActivity.class);
+						intent1.putExtra(Constants.VIDEO_TYPE, Constants.VIDEO_ASK);
+						intent1.putExtra(Constants.NAME, number);
+						mContext.startActivity(intent1);
+					}
+				});
+				if(null == item.getClientBase().getOnIpChangedListener()){
+					item.getClientBase().setOnIpChangedListener(new ClientBase.OnIpChangedListener() {
+						@Override
+						public void onIpChanged() {
+							imgChat.setImageResource(R.drawable.ic_baseline_chat_24);
+							imgVoice.setImageResource(R.drawable.ic_baseline_local_phone_24);
+							imgVideo.setImageResource(R.drawable.ic_baseline_videocam_24);
+						}
+					});
 				}
 				return convertView;
 			}
