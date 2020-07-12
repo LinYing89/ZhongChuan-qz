@@ -14,10 +14,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Environment;
+import android.os.PowerManager;
 import android.text.TextUtils;
 
 import com.bairock.zhongchuan.qz.utils.FileUtil;
-import com.tencent.bugly.crashreport.CrashReport;
+import com.bairock.zhongchuan.qz.utils.MyCrashHandler;
 
 public class App extends Application {
 
@@ -31,10 +32,12 @@ public class App extends Application {
 		super.onCreate();
 		_context = getApplicationContext();
 		instance = this;
-		CrashReport.initCrashReport(getApplicationContext(), "209032e2d3", false);
+//		CrashReport.initCrashReport(getApplicationContext(), "209032e2d3", false);
 //		initEMChat();
 //		 CrashHandler crashHandler = CrashHandler.getInstance();// 全局异常捕捉
 		// crashHandler.init(_context);
+		MyCrashHandler mycrashHandler = new MyCrashHandler(this);
+		Thread.setDefaultUncaughtExceptionHandler(mycrashHandler);
 	}
 
 	private void initEMChat() {
@@ -120,6 +123,11 @@ public class App extends Application {
 		} finally {
 			System.exit(0);
 		}
+	}
+
+	public static boolean isScreenLocked2(Context context) {
+		PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+		return !pm.isInteractive();
 	}
 
 	public static String getHJYCacheDir() {

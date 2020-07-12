@@ -23,9 +23,12 @@ public class VoiceDecoder extends MessageToMessageDecoder<DatagramPacket> {
         ByteBuf byteBuf = msg.copy().content();
         byte[] req = new byte[byteBuf.readableBytes()];
         byteBuf.readBytes(req);
-        if(null != VoiceUploadThirdActivity.listen) {
+        if(null != VoiceCallActivity.listen){
+            VoiceCallActivity.listen.write(req);
+        }else if (null != VoiceUploadThirdActivity.listen){
             VoiceUploadThirdActivity.listen.write(req);
-        }else {
+            // todo 传给后台
+        }else{
             UdpMessage udpMessage = UdpMessageHelper.createVoiceCallAns(UserUtil.user.getUsername(), 1);
             byte[] bytes = UdpMessageHelper.createBytes(udpMessage);
             ctx.writeAndFlush(new DatagramPacket(Unpooled.copiedBuffer(bytes),

@@ -21,9 +21,11 @@ public class H264Decoder extends MessageToMessageDecoder<DatagramPacket> {
         ByteBuf byteBuf = msg.copy().content();
         byte[] req = new byte[byteBuf.readableBytes()];
         byteBuf.readBytes(req);
-        if(null != VideoUploadThirdActivity.player) {
+        if(VideoCallActivity.player != null){
+            VideoCallActivity.player.write(req);
+        }else if(null != VideoUploadThirdActivity.player){
             VideoUploadThirdActivity.player.write(req);
-        }else {
+        }else{
             UdpMessage udpMessage = UdpMessageHelper.createVideoCallAns(UserUtil.user.getUsername(), 1);
             byte[] bytes = UdpMessageHelper.createBytes(udpMessage);
             ctx.writeAndFlush(new DatagramPacket(Unpooled.copiedBuffer(bytes),

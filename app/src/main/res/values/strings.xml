@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">qz</string>
+    <string name="app_name">单兵取证</string>
     <string name="message">短消息</string>
     <string name="contacts">通讯录</string>
     <string name="voice_upload">语音上报</string>

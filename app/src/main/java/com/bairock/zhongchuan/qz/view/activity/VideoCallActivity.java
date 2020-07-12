@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.bairock.zhongchuan.qz.App;
 import com.bairock.zhongchuan.qz.Constants;
 import com.bairock.zhongchuan.qz.R;
 import com.bairock.zhongchuan.qz.netty.H264Broadcaster;
@@ -39,7 +40,7 @@ public class VideoCallActivity extends AppCompatActivity {
     private static String TAG = "VideoCallActivity";
 
     private Chronometer chronometer;
-    private Player player;
+    public static Player player;
     private Publish publishMe;
 //    private TextView txtTo;
     private ImageView imgMute;
@@ -62,6 +63,7 @@ public class VideoCallActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video_call);
+        App.getInstance2().addActivity(this);
         name = getIntent().getStringExtra(Constants.NAME);
         String videoType = getIntent().getStringExtra(Constants.VIDEO_TYPE);
         findViews();

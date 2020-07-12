@@ -42,30 +42,23 @@
     <application
         android:name=".App"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/launcher"
         android:label="@string/app_name"
         android:largeHeap="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".view.activity.VoiceUploadThirdActivity"
-            android:theme="@style/Theme.AppCompat"/>
-        <activity android:name=".view.activity.VideoUploadThirdActivity"
-            android:theme="@style/Theme.AppCompat"/>
-        <activity
-            android:name=".view.activity.MainServerChatActivity"
-            android:theme="@style/Theme.AppCompat" />
-        <activity android:name=".view.activity.OfflineMapActivity"
-            android:theme="@style/Theme.AppCompat"/>
-        <activity
-            android:name=".view.activity.VoiceCallActivity"
-            android:theme="@style/Theme.AppCompat" />
-        <activity
-            android:name=".view.activity.VideoCallActivity"
-            android:theme="@style/Theme.AppCompat" />
-        <activity
-            android:name=".view.activity.ChatVideoActivity"
-            android:theme="@style/Theme.AppCompat" />
+
+
+        <meta-data
+            android:name="com.amap.api.v2.apikey"
+            android:value="f6a819f355addf96a28966778589d128" />
+
+        <service android:name="com.amap.api.location.APSService" />
+        <service
+            android:name=".recorderlib.recorder.RecordService"
+            android:enabled="true"
+            android:exported="false" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -77,48 +70,78 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <service
-            android:name=".recorderlib.recorder.RecordService"
-            android:enabled="true"
-            android:exported="false" />
-
+        <activity android:name=".view.activity.VideoUploadActivity2"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat"/>
+        <activity
+            android:name=".view.activity.VoiceUploadThirdActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat" />
+        <activity
+            android:name=".view.activity.VideoUploadThirdActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat" />
+        <activity
+            android:name=".view.activity.MainServerChatActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat" />
+        <activity
+            android:name=".view.activity.OfflineMapActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat" />
+        <activity
+            android:name=".view.activity.VoiceCallActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat" />
+        <activity
+            android:name=".view.activity.VideoCallActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat" />
+        <activity
+            android:name=".view.activity.ChatVideoActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat" />
         <activity
             android:name=".view.activity.SettingsActivity"
-            android:screenOrientation="fullSensor"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat" />
         <activity
             android:name=".view.activity.VoiceUploadActivity"
-            android:screenOrientation="fullSensor"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat" />
         <activity
             android:name=".view.activity.VideoUploadActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat" />
-
-        <meta-data
-            android:name="com.amap.api.v2.apikey"
-            android:value="f6a819f355addf96a28966778589d128" />
-
         <activity
             android:name=".SplashActivity"
-            android:label="@string/app_name">
+            android:label="@string/app_name"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity">
+        <activity
+            android:name=".MainActivity"
+            android:screenOrientation="portrait">
 
             <!-- <intent-filter> -->
             <!-- <action android:name="android.intent.action.MAIN" /> -->
             <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
             <!-- </intent-filter> -->
         </activity>
-        <activity android:name=".view.activity.LoginActivity" />
+        <activity
+            android:name=".view.activity.LoginActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".view.ChatActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat" />
-        <activity android:name=".view.ShowBigImage" />
+        <activity
+            android:name=".view.ShowBigImage"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

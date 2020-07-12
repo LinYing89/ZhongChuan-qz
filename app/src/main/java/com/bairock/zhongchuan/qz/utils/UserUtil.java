@@ -225,7 +225,7 @@ public class UserUtil {
         return null;
     }
 
-    public static void setHeartInfo(String memberNumber, String ip, Location location){
+    public static void setHeartInfo(String memberNumber, int userType, String ip, Location location){
 
         ClientBase clientBase = null;
         for(ClientBase user : clientBases){
@@ -236,8 +236,26 @@ public class UserUtil {
         }
 
         if(null == clientBase){
+            ClientBaseType clientBaseType;
+            switch (userType){
+                case 2:
+                    clientBaseType = ClientBaseType.TELESCOPE;
+                    break;
+                case 3:
+                    clientBaseType = ClientBaseType.UAV;
+                    break;
+                case 4:
+                    clientBaseType = ClientBaseType.SOUND_RECORDER;
+                    break;
+                case 5:
+                    clientBaseType = ClientBaseType.MAIN_SERVER;
+                    break;
+                default:
+                    clientBaseType = ClientBaseType.PHONE;
+                    break;
+            }
             clientBase = new ClientBase();
-            clientBase.setClientBaseType(ClientBaseType.PHONE);
+            clientBase.setClientBaseType(clientBaseType);
             clientBase.setUsername(memberNumber);
             addClientBase(clientBase);
             Intent i1 = new Intent(ConversationUtil.USER_ADD);

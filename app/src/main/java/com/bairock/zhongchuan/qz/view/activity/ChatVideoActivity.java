@@ -7,9 +7,10 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.Chronometer;
+import android.widget.ImageView;
 
+import com.bairock.zhongchuan.qz.App;
 import com.bairock.zhongchuan.qz.R;
 import com.bairock.zhongchuan.qz.utils.FileUtil;
 import com.library.common.WriteFileCallback;
@@ -24,19 +25,20 @@ public class ChatVideoActivity extends AppCompatActivity {
 
     private Chronometer chronometer;
     private Publish publish;
-    private Button btnStart;
+    private boolean recording = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_video);
         findViews();
+        App.getInstance2().addActivity(this);
     }
 
     private void findViews(){
-        btnStart = findViewById(R.id.btnStart);
+        final ImageView imgRecorder = findViewById(R.id.imgRecorder);
         chronometer = findViewById(R.id.chronometer);
-        chronometer.start();
+
         publish = new Publish.Buider(this, (PublishView) findViewById(R.id.publishView))
                 .setPushMode(new UdpSend("192.168.1.6", 8765))
                 .setFrameRate(15)//帧率
@@ -74,15 +76,19 @@ public class ChatVideoActivity extends AppCompatActivity {
             }
         });
 
-        btnStart.setOnClickListener(new View.OnClickListener() {
+        imgRecorder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(btnStart.getText().equals("开始录制")){
-                    btnStart.setText("结束录制");
-                    publish.startRecode();
-                }else{
-                    btnStart.setText("开始录制");
+                if(recording){
+                    imgRecorder.setImageResource(R.drawable.luxiang_green);
+                    chronometer.stop();
+                    recording = false;
                     publish.stopRecode();
+                }else{
+                    imgRecorder.setImageResource(R.drawable.luxiang_red);
+                    chronometer.start();
+                    recording = true;
+                    publish.startRecode();
                 }
             }
         });

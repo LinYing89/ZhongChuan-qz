@@ -13,6 +13,8 @@ import com.bairock.zhongchuan.qz.recorderlib.recorder.listener.RecordSoundSizeLi
 import com.bairock.zhongchuan.qz.recorderlib.recorder.listener.RecordStateListener;
 import com.bairock.zhongchuan.qz.recorderlib.utils.FileUtils;
 import com.bairock.zhongchuan.qz.recorderlib.utils.Logger;
+import com.bairock.zhongchuan.qz.utils.FileUtil;
+import com.bairock.zhongchuan.qz.utils.UserUtil;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -209,7 +211,12 @@ public class RecordService extends Service {
             Logger.w(TAG, "文件夹创建失败：%s", fileDir);
             return null;
         }
-        String fileName = String.format(Locale.getDefault(), "record_%s", FileUtils.getNowString(new SimpleDateFormat("yyyyMMdd_HH_mm_ss", Locale.SIMPLIFIED_CHINESE)));
+        String username = "0000";
+        if(UserUtil.user != null && UserUtil.user.getUsername() != null && !UserUtil.user.getUsername().isEmpty()){
+            username = UserUtil.user.getUsername();
+        }
+//        String fileName = String.format(Locale.getDefault(), username + "-%s", FileUtils.getNowString(new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.SIMPLIFIED_CHINESE)));
+        String fileName = FileUtil.getPoliceFileName();
         return String.format(Locale.getDefault(), "%s%s%s", fileDir, fileName, currentConfig.getFormat().getExtension());
     }
 

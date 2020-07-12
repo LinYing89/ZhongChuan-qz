@@ -14,6 +14,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bairock.zhongchuan.qz.App;
 import com.bairock.zhongchuan.qz.Constants;
 import com.bairock.zhongchuan.qz.R;
 import com.bairock.zhongchuan.qz.netty.MessageBroadcaster;
@@ -52,7 +53,7 @@ public class VoiceCallActivity extends AppCompatActivity {
     private String ip;
 
     private Speak speak;
-    private Listen listen;
+    public static Listen listen;
     private AskBroadcastReceiver receiver;
 
     private SendUdpThread sendUdpThread;
@@ -63,6 +64,7 @@ public class VoiceCallActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_voice_call);
+        App.getInstance2().addActivity(this);
         name = getIntent().getStringExtra(Constants.NAME);
         String voiceType = getIntent().getStringExtra(Constants.VOICE_TYPE);
         findViews();

@@ -31,6 +31,7 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+        App.getInstance2().addActivity(this);
         findViews();
         setListener();
     }
@@ -99,6 +100,7 @@ public class SettingsActivity extends AppCompatActivity {
                 SharedHelper sharedHelper = new SharedHelper();
                 sharedHelper.putUser();
                 Intent i3 = new Intent(ConversationUtil.LOGOUT_ACTION);
+                i3.putExtra("exit", 0);
                 App.getInstance().sendOrderedBroadcast(i3, ConversationUtil.CHAT_BROADCAST_PERMISSION);
                 return true;
             }catch (Exception e){

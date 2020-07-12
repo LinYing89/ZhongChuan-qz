@@ -95,6 +95,7 @@ public class TcpServerHandler extends ChannelInboundHandlerAdapter {
 
                         Intent i = new Intent(ConversationUtil.CHAT_ACTION);
                         i.putExtra("from", messageRoot.getFrom());
+                        i.putExtra("content", messageRoot.getData().getContent());
                         App.getInstance().sendOrderedBroadcast(i, ConversationUtil.CHAT_BROADCAST_PERMISSION);
                     }
                 }

@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bairock.zhongchuan.qz.App;
 import com.bairock.zhongchuan.qz.R;
 import com.bairock.zhongchuan.qz.netty.MessageBroadcaster;
 import com.bairock.zhongchuan.qz.netty.UdpMessageHelper;
@@ -43,9 +44,10 @@ public class VideoUploadThirdActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video_upload_third);
+        App.getInstance2().addActivity(this);
         mainServerIp = UserUtil.findMainServerIp();
         if (mainServerIp == null) {
-            Toast.makeText(this, "信息处理终端不在线", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "信息处理设备不在线", Toast.LENGTH_SHORT).show();
 //            finish();
         }
 
@@ -181,7 +183,7 @@ public class VideoUploadThirdActivity extends AppCompatActivity {
             if(source.equals("third")){
                 if (result.equals("0")) {
                     //接受
-                    txtMessage.setText("正在请求信息处理终端...");
+                    txtMessage.setText("正在请求信息处理设备...");
                     sendUdpThread = new SendUdpThread(UdpMessageHelper.createVideoCallMainServerAsk(UserUtil.user.getUsername()), mainServerIp);
                     sendUdpThread.setOnNoAnswerListener(new SendUdpThread.OnNoAnswerListener() {
                         @Override
@@ -189,7 +191,7 @@ public class VideoUploadThirdActivity extends AppCompatActivity {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    Toast.makeText(context, "信息处理终端无应答", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(context, "信息处理设备无应答", Toast.LENGTH_SHORT).show();
                                     finish();
                                 }
                             });
@@ -210,7 +212,7 @@ public class VideoUploadThirdActivity extends AppCompatActivity {
 //                    startVideo();
                 } else if (result.equals("1")) {
                     //拒绝1/挂断2
-                    Toast.makeText(VideoUploadThirdActivity.this, "信息处理终端拒绝请求", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(VideoUploadThirdActivity.this, "信息处理设备拒绝请求", Toast.LENGTH_SHORT).show();
                     finish();
                 }
             }

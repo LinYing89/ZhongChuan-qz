@@ -6,6 +6,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import android.Manifest;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -21,6 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
@@ -42,6 +46,7 @@ import com.bairock.zhongchuan.qz.utils.FileUtil;
 import com.bairock.zhongchuan.qz.utils.HeartThread;
 import com.bairock.zhongchuan.qz.utils.TcpClientUtil;
 import com.bairock.zhongchuan.qz.utils.UserUtil;
+import com.bairock.zhongchuan.qz.view.ChatActivity;
 import com.bairock.zhongchuan.qz.view.activity.VideoCallActivity;
 import com.bairock.zhongchuan.qz.view.activity.VoiceCallActivity;
 import com.bairock.zhongchuan.qz.view.fragment.FragmentVoiceUpload;
@@ -222,6 +227,11 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
             unregisterReceiver(logoutBroadcastReceiver);
             logoutBroadcastReceiver = null;
         }
+        if(null != mLocationClient) {
+            mLocationClient.stopLocation();//停止定位后，本地定位服务并不会被销毁
+            mLocationClient.onDestroy();//销毁定位客户端，同时销毁本地定位服务。
+            mLocationClient = null;
+        }
         super.onDestroy();
     }
 
@@ -308,8 +318,8 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
         mLocationClient.setLocationListener(mAMapLocationListener);
         AMapLocationClientOption mLocationOption = new AMapLocationClientOption();
         //设置定位模式为AMapLocationMode.Hight_Accuracy，高精度模式。
-//        mLocationOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy);
-        mLocationOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Device_Sensors);
+        mLocationOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy);
+//        mLocationOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Device_Sensors);
         mLocationOption.setSensorEnable(true);
         //设置定位间隔,单位毫秒,默认为2000ms，最低1000ms。
         mLocationOption.setInterval(5000);
@@ -364,8 +374,36 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
             // 主页面收到消息后，主要为了提示未读，实际消息内容需要到chat页面查看
 
             String from = intent.getStringExtra("from");
+            String content = intent.getStringExtra("content");
             // 消息id
             String msgId = intent.getStringExtra("msgid");
+
+            if(App.isScreenLocked2(context)){
+                //如果在短消息发送界面，则关闭短消息发送界面
+                //如此是为了防止用户没有点击通知栏而直接开屏进入短消息发送界面，造成下面的将短消息界面的MsgNumBean改掉了引起的错误
+//                if(null != MsgSenderActivity.myHandler){
+//                    MsgSenderActivity.myHandler.obtainMessage(MsgSenderActivity.CLOSE).sendToTarget();
+//                }
+
+                //获取PendingIntent
+//                MsgSenderActivity.msgNumBean = msgNumBean;
+                Intent mainIntent = new Intent(context, ChatActivity.class);
+                PendingIntent mainPendingIntent = PendingIntent.getActivity(context, 0, mainIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                mainIntent.putExtra(Constants.NAME, from);// 设置昵称
+                mainIntent.putExtra(Constants.TYPE, ChatActivity.CHATTYPE_SINGLE);
+                mainIntent.putExtra(Constants.User_ID, from);
+
+                NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                Notification notification = new NotificationCompat.Builder(context)
+                        .setContentText(content)
+                        .setContentTitle("海关缉私新短消息")
+                        .setSmallIcon(R.mipmap.head)
+                        .setContentIntent(mainPendingIntent)
+                        .setAutoCancel(true)//点击通知头自动取消
+                        .setDefaults(Notification.DEFAULT_ALL)
+                        .build();
+                manager.notify(1,notification);
+            }
 
             // 注销广播接收者，否则在ChatActivity中会收到这个广播
             abortBroadcast();
@@ -420,18 +458,18 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
     private class LogoutBroadcastReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
+            if(intent.getStringExtra("exit").equals("1")){
+                Toast.makeText(context, "很抱歉，程序出现异常，请联系管理员, 即将退出", Toast.LENGTH_SHORT).show();
+            }
             MessageBroadcaster.getIns().stop();
             H264Broadcaster.getIns().stop();
             VoiceBroadcaster.getIns().stop();
             FileUploadServer.getIns().close();
             TcpServer.getIns().close();
             TcpClientUtil.close();
-            if(null != mLocationClient) {
-                mLocationClient.stopLocation();//停止定位后，本地定位服务并不会被销毁
-                mLocationClient.onDestroy();//销毁定位客户端，同时销毁本地定位服务。
-                mLocationClient = null;
-            }
+
             finish();
+//            System.exit(0);
         }
     }
 

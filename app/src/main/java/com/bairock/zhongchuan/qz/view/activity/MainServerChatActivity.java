@@ -41,6 +41,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bairock.zhongchuan.qz.App;
 import com.bairock.zhongchuan.qz.Constants;
 import com.bairock.zhongchuan.qz.R;
 import com.bairock.zhongchuan.qz.adapter.MessageAdapter;
@@ -107,6 +108,7 @@ public class MainServerChatActivity extends AppCompatActivity implements View.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_server_chat);
+        App.getInstance2().addActivity(this);
         getSupportActionBar().hide();
         initView();
         setUpView();

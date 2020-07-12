@@ -17,17 +17,20 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <Button
-            android:id="@+id/btnStart"
-            android:layout_width="match_parent"
+        <ImageView
+            android:id="@+id/imgRecorder"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="开始录制" />
+            android:layout_marginBottom="8dp"
+            app:srcCompat="@drawable/luxiang_green" />
+
     </LinearLayout>
 
     <Chronometer

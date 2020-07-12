@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bairock.zhongchuan.qz.App;
 import com.bairock.zhongchuan.qz.R;
 import com.bairock.zhongchuan.qz.netty.MessageBroadcaster;
 import com.bairock.zhongchuan.qz.netty.UdpMessageHelper;
@@ -44,7 +45,7 @@ public class VoiceUploadThirdActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_voice_upload_third);
-
+        App.getInstance2().addActivity(this);
         // 注册接收消息广播
         receiver = new AskBroadcastReceiver();
         IntentFilter intentFilter = new IntentFilter(ConversationUtil.VOICE_UPLOAD_ANS_ACTION);
@@ -60,7 +61,7 @@ public class VoiceUploadThirdActivity extends AppCompatActivity {
 
             mainServerIp = UserUtil.findMainServerIp();
             if (mainServerIp == null) {
-                Toast.makeText(this, "信息处理终端不在线", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "信息处理设备不在线", Toast.LENGTH_SHORT).show();
 //            finish();
             }
         }
@@ -152,7 +153,7 @@ public class VoiceUploadThirdActivity extends AppCompatActivity {
             if(source.equals("third")){
                 if (result.equals("0")) {
                     //接受
-                    txtMessage.setText("正在请求信息处理终端...");
+                    txtMessage.setText("正在请求信息处理设备...");
                     sendUdpThread = new SendUdpThread(UdpMessageHelper.createVoiceCallMainServerAsk(UserUtil.user.getUsername()), mainServerIp);
                     sendUdpThread.setOnNoAnswerListener(new SendUdpThread.OnNoAnswerListener() {
                         @Override
@@ -160,7 +161,7 @@ public class VoiceUploadThirdActivity extends AppCompatActivity {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    Toast.makeText(context, "信息处理终端无应答", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(context, "信息处理设备无应答", Toast.LENGTH_SHORT).show();
 //                                    finish();
                                 }
                             });
@@ -181,7 +182,7 @@ public class VoiceUploadThirdActivity extends AppCompatActivity {
 //                    startVoice();
                 } else if (result.equals("1")) {
                     //拒绝1/挂断2
-                    Toast.makeText(VoiceUploadThirdActivity.this, "信息处理终端拒绝请求", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(VoiceUploadThirdActivity.this, "信息处理设备拒绝请求", Toast.LENGTH_SHORT).show();
 //                    finish();
                 }
             }

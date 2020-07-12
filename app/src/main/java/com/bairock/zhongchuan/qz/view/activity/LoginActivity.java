@@ -91,35 +91,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 			Utils.finish(LoginActivity.this);
 			break;
 		case R.id.btn_login:
-			showDialog();
 			getLogin();
-			new Thread(new Runnable() {
-				@Override
-				public void run() {
-					try {
-						int i = 0;
-						while (i < 10) {
-							Thread.sleep(1000);
-							if (!loging) {
-								//登录已返回
-								return;
-							}
-							i++;
-						}
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-					loging = false;
-					//登录超时
-					runOnUiThread(new Runnable() {
-						@Override
-						public void run() {
-							Toast.makeText(LoginActivity.this, "登录超时", Toast.LENGTH_SHORT).show();
-							closeDialog();
-						}
-					});
-				}
-			}).start();
 			break;
 		case R.id.btnLocalLogin :
 			String userName = et_usertel.getText().toString().trim();
@@ -162,9 +134,37 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 		if (!TextUtils.isEmpty(userName) && !TextUtils.isEmpty(password)) {
 			UserUtil.user.setUsername(userName);
 			loging = true;
+			showDialog();
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						int i = 0;
+						while (i < 10) {
+							Thread.sleep(1000);
+							if (!loging) {
+								//登录已返回
+								return;
+							}
+							i++;
+						}
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					loging = false;
+					//登录超时
+					runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							Toast.makeText(LoginActivity.this, "登录超时", Toast.LENGTH_SHORT).show();
+							closeDialog();
+						}
+					});
+				}
+			}).start();
 			sendUdpThread = new SendUdpThread(UdpMessageHelper.createLogin(userName, password), null);
 			sendUdpThread.start();
-			MessageBroadcaster.sendBroadcast(UdpMessageHelper.createLogin(userName, password));
+//			MessageBroadcaster.sendBroadcast(UdpMessageHelper.createLogin(userName, password));
 
 //			Intent intent = new Intent(LoginActivity.this,
 //					MainActivity.class);

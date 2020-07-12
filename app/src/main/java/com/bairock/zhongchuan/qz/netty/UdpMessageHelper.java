@@ -8,7 +8,8 @@ import java.nio.charset.StandardCharsets;
 public class UdpMessageHelper {
 
     public static final byte HEART = 0x01;
-    public static final byte LOGIN = 0x03;
+    public static final byte LOGIN_ASK = 0x02;
+    public static final byte LOGIN_ANS = 0x03;
 
     // 手持终端请求第三方开始推送视频流
     public static final byte VIDEO_CALL_THIRD_ASK = 0x11;
@@ -72,23 +73,24 @@ public class UdpMessageHelper {
         UdpMessage udpMessage = new UdpMessage();
         udpMessage.setMemberNumber(Short.parseShort(number));
         udpMessage.setFactionCode(HEART);
-        udpMessage.setDataLength((short)12);
-        byte[] data = new byte[12];
+        udpMessage.setDataLength((short)13);
+        byte[] data = new byte[13];
+        data[0] = 0x01;
         if(null != ip) {
             String[] ips = ip.split("\\.");
             if (ips.length == 4) {
-                data[0] = (byte) Integer.parseInt(ips[0]);
-                data[1] = (byte) Integer.parseInt(ips[1]);
-                data[2] = (byte) Integer.parseInt(ips[2]);
-                data[3] = (byte) Integer.parseInt(ips[3]);
+                data[1] = (byte) Integer.parseInt(ips[0]);
+                data[2] = (byte) Integer.parseInt(ips[1]);
+                data[3] = (byte) Integer.parseInt(ips[2]);
+                data[4] = (byte) Integer.parseInt(ips[3]);
             }
         }
         int lng = (int)(location.getLng() * 10000000);
         int lat = (int)(location.getLat() * 10000000);
         byte[] byteLng = intToBytes(lng);
         byte[] byteLat = intToBytes(lat);
-        System.arraycopy(byteLng, 0, data, 4, byteLng.length);
-        System.arraycopy(byteLat, 0, data, 8, byteLng.length);
+        System.arraycopy(byteLng, 0, data, 5, byteLng.length);
+        System.arraycopy(byteLat, 0, data, 9, byteLng.length);
         udpMessage.setData(data);
         return udpMessage;
     }
@@ -96,7 +98,7 @@ public class UdpMessageHelper {
     public static UdpMessage createLogin(String number, String password){
         UdpMessage udpMessage = new UdpMessage();
         udpMessage.setMemberNumber(Short.parseShort(number));
-        udpMessage.setFactionCode(LOGIN);
+        udpMessage.setFactionCode(LOGIN_ASK);
         char[] cPassword = password.toCharArray();
         byte [] byteNum = intToBytes(Integer.parseInt(number));
         byte[] data = new byte[4 + cPassword.length];

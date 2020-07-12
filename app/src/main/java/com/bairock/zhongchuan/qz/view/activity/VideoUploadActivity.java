@@ -8,12 +8,14 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.view.View;
 import android.widget.Chronometer;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bairock.zhongchuan.qz.App;
 import com.bairock.zhongchuan.qz.R;
 import com.bairock.zhongchuan.qz.netty.H264Broadcaster;
 import com.bairock.zhongchuan.qz.netty.MessageBroadcaster;
@@ -24,6 +26,7 @@ import com.bairock.zhongchuan.qz.utils.SendUdpThread;
 import com.bairock.zhongchuan.qz.utils.UserUtil;
 import com.bairock.zhongchuan.qz.utils.Util;
 import com.library.common.UdpControlInterface;
+import com.library.common.WriteFileCallback;
 import com.library.live.Publish;
 import com.library.live.stream.UdpSend;
 import com.library.live.vd.VDEncoder;
@@ -47,9 +50,10 @@ public class VideoUploadActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video_upload);
+        App.getInstance2().addActivity(this);
         mainServerIp = UserUtil.findMainServerIp();
         if(mainServerIp == null){
-            Toast.makeText(this, "信息处理终端不在线", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "信息处理设备不在线", Toast.LENGTH_SHORT).show();
 //            finish();
         }
 
@@ -60,7 +64,7 @@ public class VideoUploadActivity extends AppCompatActivity {
 
         findViews();
 
-        txtMessage.setText("正在请求信息处理终端...");
+        txtMessage.setText("正在请求信息处理设备...");
         sendUdpThread = new SendUdpThread(UdpMessageHelper.createVideoCallMainServerAsk(UserUtil.user.getUsername()), mainServerIp);
         sendUdpThread.setOnNoAnswerListener(new SendUdpThread.OnNoAnswerListener() {
             @Override
@@ -68,7 +72,7 @@ public class VideoUploadActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(VideoUploadActivity.this, "信息处理终端无应答", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(VideoUploadActivity.this, "信息处理设备无应答", Toast.LENGTH_SHORT).show();
 //                        finish();
                     }
                 });
@@ -113,6 +117,7 @@ public class VideoUploadActivity extends AppCompatActivity {
 //                .setVideoDirPath(Environment.getExternalStorageDirectory().getPath() + File.separator + "VideoLive")//录制路径,当前为默认路径
                 .setPictureDirPath(Environment.getExternalStorageDirectory().getPath() + File.separator + "VideoPicture")//拍照路径,当前为默认路径
                 .setVideoDirPath(FileUtil.getPoliceVideoPath())//录制路径,当前为默认路径
+                .setVideoFileName(FileUtil.getPoliceFileName())
                 .setUdpControl(new UdpControlInterface() {
                     @Override
                     public byte[] Control(byte[] bytes, int offset, int length) {//bytes为udp包数据,offset为起始位,length为长度
@@ -122,6 +127,18 @@ public class VideoUploadActivity extends AppCompatActivity {
                     }
                 })
                 .build();
+
+        publish.setWriteFileCallback(new WriteFileCallback() {
+            @Override
+            public void success(String s) {
+                Log.e("VideoUploadAct", s);
+            }
+
+            @Override
+            public void failure(String s) {
+                finish();
+            }
+        });
     }
 
     @Override
@@ -147,7 +164,7 @@ public class VideoUploadActivity extends AppCompatActivity {
     private void startVideo(){
         txtMessage.setText("");
         chronometer.start();
-
+        publish.startRecode();
         if(upload) {
             publish.start();
         }
@@ -169,7 +186,7 @@ public class VideoUploadActivity extends AppCompatActivity {
 //                startVideo();
             } else if (result.equals("1")) {
                 //拒绝1/挂断2
-                Toast.makeText(VideoUploadActivity.this, "信息处理终端拒绝请求", Toast.LENGTH_SHORT).show();
+                Toast.makeText(VideoUploadActivity.this, "信息处理设备拒绝请求", Toast.LENGTH_SHORT).show();
                 finish();
             }
         }

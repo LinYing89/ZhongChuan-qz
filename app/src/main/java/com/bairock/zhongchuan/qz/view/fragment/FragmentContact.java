@@ -69,7 +69,7 @@ public class FragmentContact extends Fragment {
 			setListener();
 			txtName.setText(UserUtil.user.getUsername());
 			txtMember.setText(UserUtil.user.getUsername());
-			initPopWindow();
+//			initPopWindow();
 			mapView.onCreate(savedInstanceState);
 
 			aMap = mapView.getMap();
@@ -85,7 +85,13 @@ public class FragmentContact extends Fragment {
 //        myLocationStyle.myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATE) ;//定位一次，且将视角移动到地图中心点。
 			myLocationStyle.myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE_NO_CENTER);
 			aMap.setMyLocationStyle(myLocationStyle);
-
+//			aMap.setOnMyLocationChangeListener(new AMap.OnMyLocationChangeListener() {
+//				@Override
+//				public void onMyLocationChange(android.location.Location location) {
+//					UserUtil.MY_LOCATION.setLat(location.getLatitude());
+//					UserUtil.MY_LOCATION.setLng(location.getLongitude());
+//				}
+//			});
 			new UpdateMapThread().start();
 		} else {
 			ViewGroup parent = (ViewGroup) layout.getParent();
@@ -147,6 +153,7 @@ public class FragmentContact extends Fragment {
 		public void onClick(View v) {
 			switch (v.getId()) {
 				case R.id.layoutGroupMember:
+					initPopWindow();
 					groupPopup.show(layoutGroupMember);
 					break;
 				case R.id.imgHead:
@@ -170,7 +177,7 @@ public class FragmentContact extends Fragment {
 //			if(!user.getUsername().equals(UserUtil.user.getUsername())) {
 			String name = user.getUsername();
 			if(user.getClientBaseType() == ClientBaseType.MAIN_SERVER){
-				name = name + "(终端)";
+				name = name + "(后台)";
 			}
 			groupPopup.addAction(new ActionItem(activity, name, user));
 //			}
@@ -258,9 +265,11 @@ public class FragmentContact extends Fragment {
 				String name = user.getUsername();
 				if(username.equals(name)) {
 					if(user.getClientBaseType() == ClientBaseType.MAIN_SERVER){
-						name = name + "(终端)";
+						name = name + "(后台)";
 					}
-					groupPopup.addAction(new ActionItem(context, name, user));
+					if(null != groupPopup) {
+						groupPopup.addAction(new ActionItem(context, name, user));
+					}
 					break;
 				}
 			}

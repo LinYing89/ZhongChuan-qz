@@ -58,10 +58,11 @@ public class VoiceUploadActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_voice_upload);
         context = this.getBaseContext();
+        App.getInstance2().addActivity(this);
 
         ip = UserUtil.findMainServerIp();
         if(ip == null){
-            Toast.makeText(this, "信息处理终端不在线, 正在本地录制...", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "信息处理设备不在线, 正在本地录制...", Toast.LENGTH_SHORT).show();
 //            finish();
         }
 
@@ -79,7 +80,7 @@ public class VoiceUploadActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(VoiceUploadActivity.this, "信息处理终端无应答", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(VoiceUploadActivity.this, "信息处理设备无应答", Toast.LENGTH_SHORT).show();
 //                        finish();
                     }
                 });
@@ -232,7 +233,7 @@ public class VoiceUploadActivity extends AppCompatActivity {
                 upload = true;
             }else if(result.equals("1")){
                 //拒绝1/挂断2
-                Toast.makeText(VoiceUploadActivity.this, "信息处理终端拒接", Toast.LENGTH_SHORT).show();
+                Toast.makeText(VoiceUploadActivity.this, "信息处理设备拒接", Toast.LENGTH_SHORT).show();
 //                finish();
             }
         }

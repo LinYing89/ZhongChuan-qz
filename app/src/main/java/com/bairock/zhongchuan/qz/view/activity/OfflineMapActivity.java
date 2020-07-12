@@ -24,6 +24,7 @@ import com.amap.api.maps.offlinemap.OfflineMapCity;
 import com.amap.api.maps.offlinemap.OfflineMapManager;
 import com.amap.api.maps.offlinemap.OfflineMapProvince;
 import com.amap.api.maps.offlinemap.OfflineMapStatus;
+import com.bairock.zhongchuan.qz.App;
 import com.bairock.zhongchuan.qz.R;
 import com.bairock.zhongchuan.qz.adapter.OfflineListAdapter;
 import com.bairock.zhongchuan.qz.view.activity.map.OfflineDownloadedAdapter;
@@ -115,6 +116,7 @@ public class OfflineMapActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_offline_map);
+        App.getInstance2().addActivity(this);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         init();
     }

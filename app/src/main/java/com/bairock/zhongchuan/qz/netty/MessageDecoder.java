@@ -2,7 +2,6 @@ package com.bairock.zhongchuan.qz.netty;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.bairock.zhongchuan.qz.App;
 import com.bairock.zhongchuan.qz.Constants;
@@ -13,7 +12,6 @@ import com.bairock.zhongchuan.qz.utils.ConversationUtil;
 import com.bairock.zhongchuan.qz.utils.UserUtil;
 import com.bairock.zhongchuan.qz.utils.Util;
 import com.bairock.zhongchuan.qz.view.activity.LoginActivity;
-import com.bairock.zhongchuan.qz.view.fragment.FragmentVideoUpload;
 
 import java.util.List;
 
@@ -58,18 +56,19 @@ public class MessageDecoder extends MessageToMessageDecoder<DatagramPacket> {
         switch (factionCode){
             case UdpMessageHelper.HEART:
                 //自己的心跳已在上面过滤掉了
-                int ip1 = data[0] & 0xff;
-                int ip2 = data[1] & 0xff;
-                int ip3 = data[2] & 0xff;
-                int ip4 = data[3] & 0xff;
+                int userType = data[0];
+                int ip1 = data[1] & 0xff;
+                int ip2 = data[2] & 0xff;
+                int ip3 = data[3] & 0xff;
+                int ip4 = data[4] & 0xff;
                 String ip = ip1 + "." + ip2 + "." + ip3 + "." + ip4;
-                int lng = UdpMessageHelper.bytesToInt(new byte[]{data[4], data[5], data[6], data[7]});
-                int lat = UdpMessageHelper.bytesToInt(new byte[]{data[8], data[9], data[10], data[11]});
+                int lng = UdpMessageHelper.bytesToInt(new byte[]{data[5], data[6], data[7], data[8]});
+                int lat = UdpMessageHelper.bytesToInt(new byte[]{data[9], data[10], data[11], data[12]});
                 double dlng = lng / 10000000d;
                 double dlat = lat / 10000000d;
-                UserUtil.setHeartInfo(String.valueOf(memberNumber), ip, new Location(dlng, dlat));
+                UserUtil.setHeartInfo(String.valueOf(memberNumber), userType, ip, new Location(dlng, dlat));
                 break;
-            case UdpMessageHelper.LOGIN:
+            case UdpMessageHelper.LOGIN_ANS:
                 handleLogin(errCode, data);
                 break;
             case UdpMessageHelper.VOICE_CALL_ANS:

@@ -58,6 +58,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 import androidx.viewpager.widget.ViewPager;
 
+import com.bairock.zhongchuan.qz.App;
 import com.bairock.zhongchuan.qz.Constants;
 import com.bairock.zhongchuan.qz.MainActivity;
 import com.bairock.zhongchuan.qz.R;
@@ -179,6 +180,7 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_chat);
+		App.getInstance2().addActivity(this);
 		getSupportActionBar().hide();
 		initView();
 		setUpView();

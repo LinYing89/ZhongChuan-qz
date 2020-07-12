@@ -8,7 +8,9 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 
+import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 
 import com.bairock.zhongchuan.qz.R;
@@ -23,9 +25,12 @@ public class FragmentVideoUpload extends Fragment {
 
 	private Activity ctx;
 	private View layout;
-	private Button btnLocal;
-	private Button btnTelescope;
-	private Button btnDrone;
+//	private Button btnLocal;
+//	private Button btnTelescope;
+//	private Button btnDrone;
+	private CardView cardLocal;
+	private CardView cardTelescope;
+	private CardView cardUav;
 
 //	private String username = "";
 
@@ -49,15 +54,18 @@ public class FragmentVideoUpload extends Fragment {
 	}
 
 	private void findViews() {
-		btnLocal = layout.findViewById(R.id.btnLocal);
-		btnTelescope = layout.findViewById(R.id.btnTelescope);
-		btnDrone = layout.findViewById(R.id.btnDrone);
+//		btnLocal = layout.findViewById(R.id.btnLocal);
+//		btnTelescope = layout.findViewById(R.id.btnTelescope);
+//		btnDrone = layout.findViewById(R.id.btnDrone);
+		cardLocal = layout.findViewById(R.id.cardLocal);
+		cardTelescope = layout.findViewById(R.id.cardTelescope);
+		cardUav = layout.findViewById(R.id.cardUav);
 	}
 
 	private void setListener() {
-		btnLocal.setOnClickListener(onClickListener);
-		btnTelescope.setOnClickListener(onClickListener);
-		btnDrone.setOnClickListener(onClickListener);
+		cardLocal.setOnClickListener(onClickListener);
+		cardTelescope.setOnClickListener(onClickListener);
+		cardUav.setOnClickListener(onClickListener);
 	}
 
 	private OnClickListener onClickListener = new OnClickListener() {
@@ -66,11 +74,11 @@ public class FragmentVideoUpload extends Fragment {
 			String source;
 			Intent intent;
 			switch (v.getId()) {
-				case R.id.btnTelescope:
+				case R.id.cardTelescope:
 					source = SOURCE_TELESCOPE;
 					intent = new Intent(ctx, VideoUploadThirdActivity.class);
 					break;
-				case R.id.btnDrone:
+				case R.id.cardUav:
 					source = SOURCE_DRONE;
 					intent = new Intent(ctx, VideoUploadThirdActivity.class);
 					break;

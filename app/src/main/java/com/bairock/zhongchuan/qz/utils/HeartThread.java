@@ -22,6 +22,7 @@ public class HeartThread extends Thread {
 //            sendHeart();
 //            heartTest();
             UserUtil.sendMyHeart();
+            FileUtil.saveLocation(UserUtil.MY_LOCATION.getLat(), UserUtil.MY_LOCATION.getLng());
             try {
                 sleep(5000);
             } catch (InterruptedException e) {
