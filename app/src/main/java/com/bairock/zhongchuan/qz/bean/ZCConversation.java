@@ -95,7 +95,7 @@ public class ZCConversation {
         return messages.size();
     }
 
-    public MessageRoot getLastMessage() {
+    public MessageRoot<ZCMessage> getLastMessage() {
         return messages.size() == 0 ? null : messages.get(messages.size() - 1);
     }
 

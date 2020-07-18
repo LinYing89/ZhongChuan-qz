@@ -21,7 +21,7 @@ public class VoiceBroadcaster {
 
     private static VoiceBroadcaster ins = new VoiceBroadcaster();
 
-    public static final int PORT = 10002;
+    public static final int PORT = 10001;
 
     private final EventLoopGroup group;
     private final Bootstrap bootstrap;

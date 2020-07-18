@@ -208,7 +208,9 @@ public class VoiceCallActivity extends AppCompatActivity {
                 .setUdpControl(new UdpControlInterface() {
                     @Override
                     public byte[] Control(byte[] bytes, int offset, int length) {
-                        VoiceBroadcaster.send(bytes, ip);
+                        byte[] bytes1 = new byte[length];
+                        System.arraycopy(bytes, 0, bytes1, 0, length);
+                        VoiceBroadcaster.send(bytes1, ip);
                         return new byte[0];
 //                        return Arrays.copyOf(bytes, length);
                     }

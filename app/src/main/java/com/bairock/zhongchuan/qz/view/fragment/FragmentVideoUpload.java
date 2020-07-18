@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment;
 import com.bairock.zhongchuan.qz.R;
 import com.bairock.zhongchuan.qz.view.activity.VideoUploadActivity;
 import com.bairock.zhongchuan.qz.view.activity.VideoUploadThirdActivity;
+import com.example.wfsample.TelescopeActivity;
 
 public class FragmentVideoUpload extends Fragment {
 
@@ -76,7 +77,7 @@ public class FragmentVideoUpload extends Fragment {
 			switch (v.getId()) {
 				case R.id.cardTelescope:
 					source = SOURCE_TELESCOPE;
-					intent = new Intent(ctx, VideoUploadThirdActivity.class);
+					intent = new Intent(ctx, TelescopeActivity.class);
 					break;
 				case R.id.cardUav:
 					source = SOURCE_DRONE;

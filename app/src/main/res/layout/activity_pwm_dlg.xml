@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" 
+    android:layout_width="fill_parent" 
+    android:layout_height="fill_parent" 
+    android:orientation="vertical" > 
+   
+    <TextView 
+        android:id="@+id/textView1" 
+        android:layout_margin="5dp"
+        android:layout_width="wrap_content" 
+        android:layout_height="wrap_content" 
+        android:text="@string/pwm_channel" /> 
+   
+    <EditText 
+        android:id="@+id/edtPwmChannel" 
+        android:layout_margin="5dp"
+        android:inputType="number"
+        android:layout_width="match_parent" 
+        android:layout_height="wrap_content"
+        android:singleLine="true">
+        <requestFocus /> 
+    </EditText> 
+   
+    <TextView 
+        android:id="@+id/textView2" 
+        android:layout_margin="5dp"
+        android:layout_width="wrap_content" 
+        android:layout_height="wrap_content" 
+        android:text="pwd使能(0 or 1)" />    
+    <EditText 
+        android:id="@+id/edtPwdEnable" 
+        android:layout_margin="5dp"
+        android:inputType="number"
+        android:layout_width="match_parent" 
+        android:layout_height="wrap_content" 
+        android:singleLine="true"/>
+    
+    <TextView 
+        android:id="@+id/textView3" 
+        android:layout_margin="5dp"
+        android:layout_width="wrap_content" 
+        android:layout_height="wrap_content" 
+        android:text="pwd周期[1,20000000]" />    
+    <EditText 
+        android:id="@+id/edtPwdPeriod" 
+        android:layout_margin="5dp"
+        android:inputType="number"
+        android:layout_width="match_parent" 
+        android:layout_height="wrap_content" 
+        android:singleLine="true"/>
+    
+    <TextView 
+        android:id="@+id/textView4" 
+        android:layout_margin="5dp"
+        android:layout_width="wrap_content" 
+        android:layout_height="wrap_content" 
+        android:text="pwm占空比[0,100]" />    
+    <EditText 
+        android:id="@+id/edtPwmDuty" 
+        android:inputType="number"
+        android:layout_margin="5dp"
+        android:layout_width="match_parent" 
+        android:layout_height="wrap_content" 
+        android:singleLine="true"/>
+   
+</LinearLayout>
+

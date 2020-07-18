@@ -1,0 +1,71 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout android:orientation="horizontal"
+        android:layout_width="fill_parent" android:layout_height="wrap_content">
+        <TextView android:layout_width="70dip" android:layout_height="wrap_content" android:text="URL:"/>
+        <EditText android:layout_width="fill_parent" android:layout_height="wrap_content"
+            android:id="@+id/edt_url" android:singleLine="true"/>
+    </LinearLayout>
+
+    <LinearLayout android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="wrap_content" android:gravity="center_vertical|right">
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginRight="10dp"
+            android:text="record and snap file location at: WFSample/ folder"/>
+    </LinearLayout>
+
+    <LinearLayout android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="wrap_content">
+        <CheckBox android:layout_width="100dip" android:layout_height="wrap_content"
+            android:id="@+id/btn_chk1" android:text="@string/btn_chk1"
+            android:checked="true"/>
+        <CheckBox android:layout_width="100dip" android:layout_height="wrap_content"
+            android:id="@+id/btn_chk2" android:text="@string/btn_chk2"/>
+    </LinearLayout>
+
+    <LinearLayout android:orientation="horizontal" android:layout_width="wrap_content" android:layout_height="95dip">
+        <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="match_parent">
+            <Button android:layout_width="95dip" android:layout_height="match_parent" android:id="@+id/btn_connect" android:text="@string/btn_connect"/>
+        </LinearLayout>
+
+        <LinearLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="wrap_content">
+            <LinearLayout android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="wrap_content">
+                <Button android:layout_width="70dip" android:layout_height="wrap_content"  android:id="@+id/btn_getip" android:text="@string/btn_getip"/>
+                <Button android:layout_width="140dip" android:layout_height="wrap_content" android:id="@+id/btn_startRecord" android:text="@string/btn_start_rec"/>
+                <Button android:layout_width="70dip" android:layout_height="wrap_content"  android:id="@+id/btn_snapshot" android:text="@string/btn_snapshot"/>
+            </LinearLayout>
+
+            <LinearLayout android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="wrap_content">
+                <Button android:layout_width="95dip" android:layout_height="wrap_content" android:id="@+id/btn_getwifi" android:text="@string/btn_getwifi"/>
+                <Button android:layout_width="95dip" android:layout_height="wrap_content" android:id="@+id/btn_setwifi" android:text="@string/btn_setwifi"/>
+                <Button android:layout_width="110dip" android:layout_height="wrap_content" android:id="@+id/btn_setPwm" android:text="@string/btn_setPwm"/>
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="wrap_content">
+        <Button android:layout_width="110dip" android:layout_height="wrap_content" android:id="@+id/btn_serialPort" android:text="@string/btn_serialPort"/>
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width ="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="#FF000000"
+        android:orientation="vertical">
+        <com.example.wfsample.WFSurfaceView
+            android:id="@+id/my_gl_surfaceview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center" />
+
+        <com.example.wfsample.WFImageView1083
+            android:id="@+id/wf_imageview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:visibility="gone"/>
+    </LinearLayout>
+</LinearLayout>

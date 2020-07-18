@@ -37,4 +37,33 @@
 
     <string name="all_offline">所有城市</string>
     <string name="download_offline">下载管理</string>
+
+    <string name="btn_getip">GetIP</string>
+    <string name="btn_connect">Connect</string>
+    <string name="btn_disconnect">Disconnect</string>
+    <string name="btn_start_rec">Start Record</string>
+    <string name="btn_stop_rec">Stop Record</string>
+    <string name="btn_chk1">over udp</string>
+    <string name="btn_chk2">over tcp</string>
+    <string name="btn_snapshot">snap</string>
+    <string name="btn_getwifi">GetWifi</string>
+    <string name="btn_setwifi">SetWifi</string>
+    <string name="btn_open_usb">Open Usb</string>
+
+    <string name="btn_search">Search</string>
+    <string name="btn_connect_dev">Connect Dev</string>
+    <string name="btn_disconnect_dev">Disconnect Dev</string>
+    <string name="btn_set">Set</string>
+    <string name="tip_devchan">Please first connect the Wi-Fi of this device on system setting of android.</string>
+    <string name="tip_enter_ipport">Please enter IP:Port. The port can be ignored.</string>
+
+    <string name="pwm_channel">PWM 通道(支持2路, 0 or 1)</string>
+    <string name="btn_setPwm">设置PWM</string>
+
+    <string name="tip_serial">先【连接设备】，再输入要发送的字符串点击【发送】按钮。关闭该界面，断开连接</string>
+    <string name="tip_txt_16">16进制字符串(e.g:a-->0a)</string>
+    <string name="btn_serialPort">串口透传</string>
+    <string name="btn_serial_connect">连接设备</string>
+    <string name="btn_serial_send">发送</string>
+    <string name="btn_serial_back">返回</string>
 </resources>

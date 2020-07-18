@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" 
+    android:layout_width="fill_parent" 
+    android:layout_height="fill_parent" 
+    android:orientation="vertical" > 
+   
+    <TextView 
+        android:id="@+id/textView1" 
+        android:layout_margin="5dp"
+        android:layout_width="wrap_content" 
+        android:layout_height="wrap_content" 
+        android:text="WiFi SSID" /> 
+   
+    <EditText 
+        android:id="@+id/edtWiFiSSID" 
+        android:layout_margin="5dp"
+        android:layout_width="match_parent" 
+        android:layout_height="wrap_content"
+        android:singleLine="true">
+        <requestFocus /> 
+    </EditText> 
+   
+    <TextView 
+        android:id="@+id/textView2" 
+        android:layout_margin="5dp"
+        android:layout_width="wrap_content" 
+        android:layout_height="wrap_content" 
+        android:text="WiFi密码" />    
+    <EditText 
+        android:id="@+id/edtWiFiPwd" 
+        android:layout_margin="5dp"
+        android:layout_width="match_parent" 
+        android:layout_height="wrap_content" 
+        android:singleLine="true"/>
+    
+    <TextView 
+        android:id="@+id/textView3" 
+        android:layout_margin="5dp"
+        android:layout_width="wrap_content" 
+        android:layout_height="wrap_content" 
+        android:text="加密类型" />    
+    <EditText 
+        android:id="@+id/edtEncType" 
+        android:layout_margin="5dp"
+        android:inputType="number"
+        android:layout_width="match_parent" 
+        android:layout_height="wrap_content" 
+        android:singleLine="true"/>
+    
+    <TextView 
+        android:id="@+id/textView4" 
+        android:layout_margin="5dp"
+        android:layout_width="wrap_content" 
+        android:layout_height="wrap_content" 
+        android:text="WiFi模式" />    
+    <EditText 
+        android:id="@+id/edtWifiMode" 
+        android:inputType="number"
+        android:layout_margin="5dp"
+        android:layout_width="match_parent" 
+        android:layout_height="wrap_content" 
+        android:singleLine="true"/>
+   
+</LinearLayout>
+

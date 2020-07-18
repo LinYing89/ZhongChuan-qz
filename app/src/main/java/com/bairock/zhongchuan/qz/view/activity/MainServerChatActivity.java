@@ -120,6 +120,7 @@ public class MainServerChatActivity extends AppCompatActivity implements View.On
             finish();
         }
 
+//        ip = "192.168.137.1";
     }
 
     @Override

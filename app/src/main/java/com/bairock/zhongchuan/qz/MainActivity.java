@@ -7,6 +7,7 @@ import java.util.concurrent.Executors;
 
 import android.Manifest;
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -14,6 +15,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -23,6 +25,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
@@ -210,6 +213,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
 
     @Override
     protected void onResume() {
+        updateUnreadLabel();
         super.onResume();
     }
 
@@ -369,6 +373,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
      * 新消息广播接收者
      */
     private class NewMessageBroadcastReceiver extends BroadcastReceiver {
+        @RequiresApi(api = Build.VERSION_CODES.O)
         @Override
         public void onReceive(Context context, Intent intent) {
             // 主页面收到消息后，主要为了提示未读，实际消息内容需要到chat页面查看
@@ -384,19 +389,23 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
 //                if(null != MsgSenderActivity.myHandler){
 //                    MsgSenderActivity.myHandler.obtainMessage(MsgSenderActivity.CLOSE).sendToTarget();
 //                }
+                String channelID = "1";
+                String channelName = "channel_name";
+                NotificationChannel channel = new NotificationChannel(channelID, channelName, NotificationManager.IMPORTANCE_HIGH);
 
                 //获取PendingIntent
 //                MsgSenderActivity.msgNumBean = msgNumBean;
                 Intent mainIntent = new Intent(context, ChatActivity.class);
-                PendingIntent mainPendingIntent = PendingIntent.getActivity(context, 0, mainIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                 mainIntent.putExtra(Constants.NAME, from);// 设置昵称
                 mainIntent.putExtra(Constants.TYPE, ChatActivity.CHATTYPE_SINGLE);
                 mainIntent.putExtra(Constants.User_ID, from);
+                PendingIntent mainPendingIntent = PendingIntent.getActivity(context, 0, mainIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
                 NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                Notification notification = new NotificationCompat.Builder(context)
+                manager.createNotificationChannel(channel);
+                Notification notification = new NotificationCompat.Builder(context, channelID)
                         .setContentText(content)
-                        .setContentTitle("海关缉私新短消息")
+                        .setContentTitle("单兵取证新短消息")
                         .setSmallIcon(R.mipmap.head)
                         .setContentIntent(mainPendingIntent)
                         .setAutoCancel(true)//点击通知头自动取消

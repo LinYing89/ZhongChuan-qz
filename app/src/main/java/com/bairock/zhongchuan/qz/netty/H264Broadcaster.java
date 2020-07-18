@@ -18,7 +18,7 @@ public class H264Broadcaster {
 
     private static H264Broadcaster ins = new H264Broadcaster();
 
-    public static final int PORT = 10001;
+    public static final int PORT = 10002;
     private final EventLoopGroup group;
     private final Bootstrap bootstrap;
     public static Channel channel;

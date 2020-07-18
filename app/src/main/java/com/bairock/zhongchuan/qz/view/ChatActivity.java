@@ -10,6 +10,10 @@ import java.util.UUID;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -54,7 +58,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
 import androidx.core.content.FileProvider;
 import androidx.viewpager.widget.ViewPager;
 
@@ -312,6 +318,7 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 				.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "demo");
 		// 判断单聊还是群聊
 		chatType = getIntent().getIntExtra(Constants.TYPE, CHATTYPE_SINGLE);
+		Intent intent = getIntent();
 		Name = getIntent().getStringExtra(Constants.NAME);
 		img_right.setVisibility(View.VISIBLE);
 		toChatUsername = getIntent().getStringExtra(Constants.User_ID);
@@ -319,7 +326,7 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 		txt_title.setText(Name);
 		conversation = ConversationUtil.activeConversation(toChatUsername);
 		// 把此会话的未读数置为0
-//		conversation.setUnreadCount(0);
+		conversation.setUnreadCount(0);
 		adapter = new MessageAdapter(this, toChatUsername);
 		// 显示消息
 		listView.setAdapter(adapter);
@@ -987,6 +994,7 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 	 * 
 	 */
 	private class NewMessageBroadcastReceiver extends BroadcastReceiver {
+		@RequiresApi(api = Build.VERSION_CODES.O)
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			// 记得把广播给终结掉
@@ -1006,6 +1014,37 @@ public class ChatActivity extends AppCompatActivity implements OnClickListener {
 			// 通知adapter有新消息，更新ui
 			adapter.refresh();
 			listView.setSelection(listView.getCount() - 1);
+
+			if(App.isScreenLocked2(context)){
+				//如果在短消息发送界面，则关闭短消息发送界面
+				//如此是为了防止用户没有点击通知栏而直接开屏进入短消息发送界面，造成下面的将短消息界面的MsgNumBean改掉了引起的错误
+//                if(null != MsgSenderActivity.myHandler){
+//                    MsgSenderActivity.myHandler.obtainMessage(MsgSenderActivity.CLOSE).sendToTarget();
+//                }
+				String channelID = "1";
+				String channelName = "channel_name";
+				NotificationChannel channel = new NotificationChannel(channelID, channelName, NotificationManager.IMPORTANCE_HIGH);
+
+				//获取PendingIntent
+//                MsgSenderActivity.msgNumBean = msgNumBean;
+				Intent mainIntent = new Intent(context, ChatActivity.class);
+				mainIntent.putExtra(Constants.NAME, username);// 设置昵称
+				mainIntent.putExtra(Constants.TYPE, ChatActivity.CHATTYPE_SINGLE);
+				mainIntent.putExtra(Constants.User_ID, username);
+				PendingIntent mainPendingIntent = PendingIntent.getActivity(context, 0, mainIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+				NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+				manager.createNotificationChannel(channel);
+				Notification notification = new NotificationCompat.Builder(context, channelID)
+						.setContentText(conversation.getLastMessage().getData().getContent())
+						.setContentTitle("单兵取证新短消息")
+						.setSmallIcon(R.mipmap.head)
+						.setContentIntent(mainPendingIntent)
+						.setAutoCancel(true)//点击通知头自动取消
+						.setDefaults(Notification.DEFAULT_ALL)
+						.build();
+				manager.notify(1,notification);
+			}
 		}
 	}
 

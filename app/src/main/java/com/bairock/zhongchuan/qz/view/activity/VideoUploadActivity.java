@@ -28,7 +28,9 @@ import com.bairock.zhongchuan.qz.utils.Util;
 import com.library.common.UdpControlInterface;
 import com.library.common.WriteFileCallback;
 import com.library.live.Publish;
+import com.library.live.stream.UdpRecive;
 import com.library.live.stream.UdpSend;
+import com.library.live.stream.VideoCallback;
 import com.library.live.vd.VDEncoder;
 import com.library.live.view.PublishView;
 
@@ -46,6 +48,8 @@ public class VideoUploadActivity extends AppCompatActivity {
     private SendUdpThread sendUdpThread;
     private boolean upload = false;
 
+    private UdpRecive myUdpReceiver = new UdpRecive();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,6 +60,8 @@ public class VideoUploadActivity extends AppCompatActivity {
             Toast.makeText(this, "信息处理设备不在线", Toast.LENGTH_SHORT).show();
 //            finish();
         }
+
+//        mainServerIp = "192.168.137.1";
 
         // 注册接收消息广播
         receiver = new AskBroadcastReceiver();
@@ -81,6 +87,12 @@ public class VideoUploadActivity extends AppCompatActivity {
         });
         sendUdpThread.start();
         startVideo();
+        myUdpReceiver.setVideoCallback(new VideoCallback() {
+            @Override
+            public void videoCallback(byte[] bytes) {
+                H264Broadcaster.send(bytes, mainServerIp);
+            }
+        });
 //        MessageBroadcaster.sendIp(UdpMessageHelper.createVideoCallMainServerAsk(UserUtil.user.getUsername()), mainServerIp);
     }
 
@@ -122,7 +134,15 @@ public class VideoUploadActivity extends AppCompatActivity {
                     @Override
                     public byte[] Control(byte[] bytes, int offset, int length) {//bytes为udp包数据,offset为起始位,length为长度
                         //返回自定义后udp包数据,不要做耗时操作。如果调用了此方法不要将原数组返回
-                        H264Broadcaster.send(bytes, mainServerIp);
+                        if(upload) {
+                            myUdpReceiver.write(bytes);
+//                            byte[] bytes1 = new byte[length];
+//                            System.arraycopy(bytes, 0, bytes1, 0, length);
+//                            if(bytes[0] == (byte)0x01) {
+//                                byte[] data = Arrays.copyOfRange(bytes, 13, ByteUtil.byte_to_short(bytes[11], bytes[12]) + 13);
+//                                H264Broadcaster.send(data, mainServerIp);
+//                            }
+                        }
                         return new byte[0];
                     }
                 })
@@ -165,9 +185,9 @@ public class VideoUploadActivity extends AppCompatActivity {
         txtMessage.setText("");
         chronometer.start();
         publish.startRecode();
-        if(upload) {
-            publish.start();
-        }
+//        if(upload) {
+//            publish.start();
+//        }
     }
 
     private class AskBroadcastReceiver extends BroadcastReceiver {
@@ -183,6 +203,8 @@ public class VideoUploadActivity extends AppCompatActivity {
             if (result.equals("0")) {
                 //接受
                 upload = true;
+                myUdpReceiver.startRevice();
+                publish.start();
 //                startVideo();
             } else if (result.equals("1")) {
                 //拒绝1/挂断2

@@ -35,7 +35,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_marginStart="50dp"
+                android:layout_marginStart="36dp"
                 android:gravity="center_vertical"
                 android:text="本机音频"
                 android:textColor="@color/bgcolor"
@@ -73,7 +73,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_marginStart="50dp"
+                android:layout_marginStart="36dp"
                 android:gravity="center_vertical"
                 android:text="便携语音获取设备"
                 android:textColor="@color/bgcolor"

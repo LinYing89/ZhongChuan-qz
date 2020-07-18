@@ -194,7 +194,9 @@ public class VideoCallActivity extends AppCompatActivity {
                     public byte[] Control(byte[] bytes, int offset, int length) {//bytes为udp包数据,offset为起始位,length为长度
                         //返回自定义后udp包数据,不要做耗时操作。如果调用了此方法不要将原数组返回
 //                            player.write(bytes);
-                        H264Broadcaster.send(bytes, ip);
+                        byte[] bytes1 = new byte[length];
+                        System.arraycopy(bytes, 0, bytes1, 0, length);
+                        H264Broadcaster.send(bytes1, ip);
 //                        H264bRoadcaster.send(bytes, "192.168.1.6");
                         return new byte[0];
                     }
