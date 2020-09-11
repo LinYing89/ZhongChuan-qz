@@ -17,6 +17,7 @@ import com.bairock.zhongchuan.qz.R;
 import com.bairock.zhongchuan.qz.view.activity.VideoUploadActivity;
 import com.bairock.zhongchuan.qz.view.activity.VideoUploadThirdActivity;
 import com.example.wfsample.TelescopeActivity;
+import com.example.wfsample.TelescopeVideoUploadActivity;
 
 public class FragmentVideoUpload extends Fragment {
 
@@ -77,7 +78,7 @@ public class FragmentVideoUpload extends Fragment {
 			switch (v.getId()) {
 				case R.id.cardTelescope:
 					source = SOURCE_TELESCOPE;
-					intent = new Intent(ctx, TelescopeActivity.class);
+					intent = new Intent(ctx, TelescopeVideoUploadActivity.class);
 					break;
 				case R.id.cardUav:
 					source = SOURCE_DRONE;
@@ -88,6 +89,7 @@ public class FragmentVideoUpload extends Fragment {
 					intent = new Intent(ctx, VideoUploadActivity.class);
 					break;
 			}
+			intent.putExtra("askMainServer", true);
 			intent.putExtra("source", source);
 			startActivity(intent);
 		}

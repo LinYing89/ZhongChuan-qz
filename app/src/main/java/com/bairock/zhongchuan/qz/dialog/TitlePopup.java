@@ -23,8 +23,10 @@ import com.bairock.zhongchuan.qz.R;
 import com.bairock.zhongchuan.qz.bean.ClientBase;
 import com.bairock.zhongchuan.qz.bean.ZCConversation;
 import com.bairock.zhongchuan.qz.common.ViewHolder;
+import com.bairock.zhongchuan.qz.enums.ClientBaseType;
 import com.bairock.zhongchuan.qz.utils.ConversationUtil;
 import com.bairock.zhongchuan.qz.view.ChatActivity;
+import com.bairock.zhongchuan.qz.view.activity.MainServerChatActivity;
 import com.bairock.zhongchuan.qz.view.activity.VideoCallActivity;
 import com.bairock.zhongchuan.qz.view.activity.VoiceCallActivity;
 
@@ -168,6 +170,12 @@ public class TitlePopup extends PopupWindow {
 
 				final ActionItem item = mActionItems.get(position);
 
+				ClientBaseType clientBaseType = item.getClientBase().getClientBaseType();
+				if(clientBaseType == ClientBaseType.MAIN_SERVER){
+					imgVoice.setVisibility(View.INVISIBLE);
+					imgVideo.setVisibility(View.INVISIBLE);
+				}
+
 				if(item.getClientBase().getIp() != null && !item.getClientBase().getIp().isEmpty()){
 					imgChat.setImageResource(R.drawable.ic_baseline_chat_24);
 					imgVoice.setImageResource(R.drawable.ic_baseline_local_phone_24);
@@ -191,11 +199,20 @@ public class TitlePopup extends PopupWindow {
 							conversation = new ZCConversation(number);
 							ConversationUtil.addConversation(conversation);
 						}
-						Intent intent1 = new Intent(mContext, ChatActivity.class);
-						intent1.putExtra(Constants.NAME, number);// 设置昵称
-						intent1.putExtra(Constants.TYPE, ChatActivity.CHATTYPE_SINGLE);
-						intent1.putExtra(Constants.User_ID, number);
-						mContext.startActivity(intent1);
+						ClientBaseType clientBaseType = item.getClientBase().getClientBaseType();
+						if(clientBaseType == ClientBaseType.MAIN_SERVER){
+							Intent intent = new Intent(mContext, MainServerChatActivity.class);
+							intent.putExtra(Constants.NAME, number);// 设置昵称
+							intent.putExtra(Constants.TYPE, ChatActivity.CHATTYPE_SINGLE);
+							intent.putExtra(Constants.User_ID, conversation.getUsername());
+							mContext.startActivity(intent);
+						}else {
+							Intent intent1 = new Intent(mContext, ChatActivity.class);
+							intent1.putExtra(Constants.NAME, number);// 设置昵称
+							intent1.putExtra(Constants.TYPE, ChatActivity.CHATTYPE_SINGLE);
+							intent1.putExtra(Constants.User_ID, number);
+							mContext.startActivity(intent1);
+						}
 					}
 				});
 				imgVoice.setOnClickListener(new View.OnClickListener() {

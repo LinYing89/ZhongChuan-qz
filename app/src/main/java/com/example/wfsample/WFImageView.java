@@ -16,7 +16,7 @@ import android.widget.ImageView;
 import com.wifi.IDataFromDevice;
 import com.wifi.WF_NetAPI;
 
-public class WFImageView extends ImageView implements IDataFromDevice
+public class WFImageView extends androidx.appcompat.widget.AppCompatImageView implements IDataFromDevice
 {
 	private static final int WHAT_UPDATE_MJPEG = 2;
 	
@@ -127,5 +127,10 @@ public class WFImageView extends ImageView implements IDataFromDevice
 	@Override
 	public void OnMsg(Object o, int nCmdType, byte[] pData, int nDataSize) {
 		
+	}
+
+	@Override
+	public void OnH264(byte[] bytAVData, int nDataSize) {
+
 	}
 }

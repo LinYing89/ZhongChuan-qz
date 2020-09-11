@@ -16,7 +16,7 @@ import android.widget.ImageView;
 import com.utility.IStreamJpeg;
 import com.utility.Mjpeg2Jpeg;
 
-public class WFImageView1083 extends ImageView implements IStreamJpeg
+public class WFImageView1083 extends androidx.appcompat.widget.AppCompatImageView implements IStreamJpeg
 {
 	private static final int WHAT_UPDATE_MJPEG = 2;
 	

@@ -125,6 +125,14 @@ public class FileUtil {
         return null;
     }
 
+    public static String getPoliceTelescopeVideoPath(){
+        String path = getPolicePath();
+        if(null != path){
+            return path + "video" + File.separator + "望远镜" + File.separator ;
+        }
+        return null;
+    }
+
     public static String getPoliceFileName(){
         String policeNum;
         if(UserUtil.user.getUsername() != null && !UserUtil.user.getUsername().isEmpty()){
@@ -228,6 +236,10 @@ public class FileUtil {
             File file3 = new File(getLocationPath());
             if(!file3.exists()){
                 file3.mkdir();
+            }
+            File file4 = new File(getPoliceTelescopeVideoPath());
+            if(!file4.exists()){
+                file4.mkdir();
             }
         }
     }

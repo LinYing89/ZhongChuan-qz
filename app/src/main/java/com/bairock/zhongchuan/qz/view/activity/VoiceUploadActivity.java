@@ -8,8 +8,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioFormat;
 import android.os.Bundle;
-import android.speech.tts.Voice;
-import android.util.Log;
 import android.view.View;
 import android.widget.Chronometer;
 import android.widget.ImageView;
@@ -73,21 +71,28 @@ public class VoiceUploadActivity extends AppCompatActivity {
         receiver = new AskBroadcastReceiver();
         IntentFilter intentFilter = new IntentFilter(ConversationUtil.VOICE_UPLOAD_ANS_ACTION);
         registerReceiver(receiver, intentFilter);
-        sendUdpThread = new SendUdpThread(UdpMessageHelper.createVoiceCallMainServerAsk(UserUtil.user.getUsername()), ip);
-        sendUdpThread.setOnNoAnswerListener(new SendUdpThread.OnNoAnswerListener() {
-            @Override
-            public void onNoAnswer() {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(VoiceUploadActivity.this, "信息处理设备无应答", Toast.LENGTH_SHORT).show();
-//                        finish();
-                    }
-                });
 
-            }
-        });
-        sendUdpThread.start();
+        // 是否请求信息处理设备, 如果试主动上传则需要请求, 如果是被动上传(信息处理设备主动请求)则不需要请求
+        boolean askMainServer = getIntent().getBooleanExtra("askMainServer", true);
+        if(askMainServer) {
+            sendUdpThread = new SendUdpThread(UdpMessageHelper.createVoiceCallMainServerAsk(UserUtil.user.getUsername()), ip);
+            sendUdpThread.setOnNoAnswerListener(new SendUdpThread.OnNoAnswerListener() {
+                @Override
+                public void onNoAnswer() {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(VoiceUploadActivity.this, "信息处理设备无应答", Toast.LENGTH_SHORT).show();
+//                        finish();
+                        }
+                    });
+
+                }
+            });
+            sendUdpThread.start();
+        }else{
+            upload = true;
+        }
         startVoice();
 //        MessageBroadcaster.sendIp(UdpMessageHelper.createVoiceCallMainServerAsk(UserUtil.user.getUsername()), ip);
     }
@@ -95,6 +100,9 @@ public class VoiceUploadActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if(null != ip) {
+            MessageBroadcaster.sendIp(UdpMessageHelper.createCallMainServerStopAsk(UserUtil.user.getUsername()), ip);
+        }
         try {
             unregisterReceiver(receiver);
             receiver = null;
@@ -193,8 +201,7 @@ public class VoiceUploadActivity extends AppCompatActivity {
         public void onClick(View v) {
             switch (v.getId()){
                 case R.id.imgHangUp :
-                    MessageBroadcaster.sendIp(UdpMessageHelper.createCallMainServerStopAsk(UserUtil.user.getUsername()), ip);
-
+//                    MessageBroadcaster.sendIp(UdpMessageHelper.createCallMainServerStopAsk(UserUtil.user.getUsername()), ip);
                     finish();
                     break;
             }
@@ -223,6 +230,7 @@ public class VoiceUploadActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             SendUdpThread.answered = true;
+            txtMessage.setText("");
             if(null != sendUdpThread) {
                 sendUdpThread.interrupt();
             }

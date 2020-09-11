@@ -77,6 +77,19 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@color/light_notes_color" />
+    <TextView
+        android:id="@+id/txtTelescopeWifi"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:minHeight="?android:attr/listPreferredItemHeightSmall"
+        android:text="设置望远镜WIFI信息"
+        android:textAppearance="@android:style/TextAppearance.Widget.TextView"
+        android:textColor="@color/blacky" />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/light_notes_color" />
 
     <Button
         android:id="@+id/btnLogout"

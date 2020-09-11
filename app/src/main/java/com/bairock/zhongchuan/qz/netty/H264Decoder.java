@@ -21,6 +21,7 @@ public class H264Decoder extends MessageToMessageDecoder<DatagramPacket> {
         ByteBuf byteBuf = msg.copy().content();
         byte[] req = new byte[byteBuf.readableBytes()];
         byteBuf.readBytes(req);
+        byteBuf.release();
         if(VideoCallActivity.player != null){
             VideoCallActivity.player.write(req);
         }else if(null != VideoUploadThirdActivity.player){

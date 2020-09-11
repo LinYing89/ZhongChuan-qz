@@ -48,8 +48,12 @@ import com.bairock.zhongchuan.qz.utils.ConversationUtil;
 import com.bairock.zhongchuan.qz.utils.FileUtil;
 import com.bairock.zhongchuan.qz.utils.HeartThread;
 import com.bairock.zhongchuan.qz.utils.TcpClientUtil;
+import com.bairock.zhongchuan.qz.utils.TipSoundPlayer;
 import com.bairock.zhongchuan.qz.utils.UserUtil;
+import com.bairock.zhongchuan.qz.utils.VideoCallSoundPlayer;
 import com.bairock.zhongchuan.qz.view.ChatActivity;
+import com.bairock.zhongchuan.qz.view.activity.MainServerVideoAskActivity;
+import com.bairock.zhongchuan.qz.view.activity.MainServerVoiceAskActivity;
 import com.bairock.zhongchuan.qz.view.activity.VideoCallActivity;
 import com.bairock.zhongchuan.qz.view.activity.VoiceCallActivity;
 import com.bairock.zhongchuan.qz.view.fragment.FragmentVoiceUpload;
@@ -92,6 +96,8 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
 //        initReceiver();
 
 //        UserUtil.initUsers();
+        TipSoundPlayer.getInstance().init(this);
+        VideoCallSoundPlayer.init(this);
 
         H264Broadcaster.getIns().bind();
         VoiceBroadcaster.getIns().bind();
@@ -236,6 +242,8 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
             mLocationClient.onDestroy();//销毁定位客户端，同时销毁本地定位服务。
             mLocationClient = null;
         }
+        TipSoundPlayer.getInstance().exit();
+        VideoCallSoundPlayer.release();
         super.onDestroy();
     }
 
@@ -378,6 +386,9 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
         public void onReceive(Context context, Intent intent) {
             // 主页面收到消息后，主要为了提示未读，实际消息内容需要到chat页面查看
 
+            TipSoundPlayer.getInstance().play(TipSoundPlayer.Sound.MESSAGE_DINGDONG);
+
+
             String from = intent.getStringExtra("from");
             String content = intent.getStringExtra("content");
             // 消息id
@@ -434,31 +445,44 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
             Bundle bundle = intent.getBundleExtra("myBundle");
             String type = bundle.getString(Constants.MEDIA_TYPE);
             String name = bundle.getString(Constants.NAME);
+            int clientType = bundle.getInt(Constants.CLIENT_TYPE);
             if(type.equals(Constants.MEDIA_TYPE_VOICE)){
                 // 收到语音请求
-                if(VoiceCallActivity.name.isEmpty()) {
-                    Intent intent1 = new Intent(MainActivity.this, VoiceCallActivity.class);
-                    // 进入应答界面
-                    intent1.putExtra(Constants.VOICE_TYPE, Constants.VOICE_ANS);
-                    intent1.putExtra(Constants.NAME, name);
-                    MainActivity.this.startActivity(intent1);
-                }else{
-                    if(!VoiceCallActivity.name.equals(name)) {
-                        MessageBroadcaster.send(UdpMessageHelper.createVoiceCallAns(UserUtil.user.getUsername(), 1), name);
+                if(clientType == 1) {
+                    if (VoiceCallActivity.name.isEmpty()) {
+                        Intent intent1 = new Intent(MainActivity.this, VoiceCallActivity.class);
+                        // 进入应答界面
+                        intent1.putExtra(Constants.VOICE_TYPE, Constants.VOICE_ANS);
+                        intent1.putExtra(Constants.NAME, name);
+                        MainActivity.this.startActivity(intent1);
+                    } else {
+                        if (!VoiceCallActivity.name.equals(name)) {
+                            MessageBroadcaster.send(UdpMessageHelper.createVoiceCallAns(UserUtil.user.getUsername(), 1), name);
+                        }
                     }
+                }else if(clientType == 5){
+                    // 信息处理设备
+                    Intent intent1 = new Intent(MainActivity.this, MainServerVoiceAskActivity.class);
+                    MainActivity.this.startActivity(intent1);
                 }
             }else if(type.equals(Constants.MEDIA_TYPE_VIDEO)){
                 // 收到视频请求
-                if(VideoCallActivity.name.isEmpty()) {
-                    Intent intent1 = new Intent(MainActivity.this, VideoCallActivity.class);
-                    // 进入应答界面
-                    intent1.putExtra(Constants.VIDEO_TYPE, Constants.VIDEO_ANS);
-                    intent1.putExtra(Constants.NAME, name);
-                    MainActivity.this.startActivity(intent1);
-                }else{
-                    if(!VideoCallActivity.name.equals(name)) {
-                        MessageBroadcaster.send(UdpMessageHelper.createVideoCallAns(UserUtil.user.getUsername(), 1), name);
+                if(clientType == 1) {
+                    if (VideoCallActivity.name.isEmpty()) {
+                        Intent intent1 = new Intent(MainActivity.this, VideoCallActivity.class);
+                        // 进入应答界面
+                        intent1.putExtra(Constants.VIDEO_TYPE, Constants.VIDEO_ANS);
+                        intent1.putExtra(Constants.NAME, name);
+                        MainActivity.this.startActivity(intent1);
+                    } else {
+                        if (!VideoCallActivity.name.equals(name)) {
+                            MessageBroadcaster.send(UdpMessageHelper.createVideoCallAns(UserUtil.user.getUsername(), 1), name);
+                        }
                     }
+                }else if(clientType == 5){
+                    // 信息处理设备
+                    Intent intent1 = new Intent(MainActivity.this, MainServerVideoAskActivity.class);
+                    MainActivity.this.startActivity(intent1);
                 }
             }
         }

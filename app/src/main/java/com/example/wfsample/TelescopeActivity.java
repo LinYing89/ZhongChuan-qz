@@ -590,6 +590,11 @@ public class TelescopeActivity extends AppCompatActivity implements IDataFromDev
     }
 
     @Override
+    public void OnH264(byte[] bytAVData, int nDataSize) {
+
+    }
+
+    @Override
     public void OnStream(int eAVCodecID, byte[] bytAVData, int nDataSize) {
         if(!m_bRecvDeviceData){
             m_bRecvDeviceData=true;

@@ -27,6 +27,7 @@ import com.bairock.zhongchuan.qz.Constants;
 import com.bairock.zhongchuan.qz.MainActivity;
 import com.bairock.zhongchuan.qz.R;
 import com.bairock.zhongchuan.qz.adapter.NewMsgAdpter;
+import com.bairock.zhongchuan.qz.bean.ClientBase;
 import com.bairock.zhongchuan.qz.bean.MessageRoot;
 import com.bairock.zhongchuan.qz.bean.MessageRootType;
 import com.bairock.zhongchuan.qz.bean.ZCConversation;
@@ -34,8 +35,11 @@ import com.bairock.zhongchuan.qz.bean.ZCMessage;
 import com.bairock.zhongchuan.qz.bean.ZCMessageDirect;
 import com.bairock.zhongchuan.qz.bean.ZCMessageType;
 import com.bairock.zhongchuan.qz.common.NetUtil;
+import com.bairock.zhongchuan.qz.enums.ClientBaseType;
 import com.bairock.zhongchuan.qz.utils.ConversationUtil;
+import com.bairock.zhongchuan.qz.utils.UserUtil;
 import com.bairock.zhongchuan.qz.view.ChatActivity;
+import com.bairock.zhongchuan.qz.view.activity.MainServerChatActivity;
 
 //消息
 public class FragmentMsg extends Fragment implements OnClickListener,
@@ -165,9 +169,18 @@ public class FragmentMsg extends Fragment implements OnClickListener,
         ZCConversation conversation = conversationList.get(position);
         conversation.setUnreadCount(0);
         ((MainActivity) getActivity()).updateUnreadLabel();
-        Intent intent = new Intent(getActivity(), ChatActivity.class);
-        Hashtable<String, String> ChatRecord = adpter.getChatRecord();
-        if (ChatRecord != null) {
+        ClientBase clientBase = UserUtil.findUserByUsername(conversation.getUsername());
+        if(clientBase.getClientBaseType() == ClientBaseType.PHONE) {
+            Intent intent = new Intent(getActivity(), ChatActivity.class);
+            Hashtable<String, String> ChatRecord = adpter.getChatRecord();
+            if (ChatRecord != null) {
+                intent.putExtra(Constants.NAME, conversation.getUsername());// 设置昵称
+                intent.putExtra(Constants.TYPE, ChatActivity.CHATTYPE_SINGLE);
+                intent.putExtra(Constants.User_ID, conversation.getUsername());
+                getActivity().startActivity(intent);
+            }
+        }else {
+            Intent intent = new Intent(getActivity(), MainServerChatActivity.class);
             intent.putExtra(Constants.NAME, conversation.getUsername());// 设置昵称
             intent.putExtra(Constants.TYPE, ChatActivity.CHATTYPE_SINGLE);
             intent.putExtra(Constants.User_ID, conversation.getUsername());

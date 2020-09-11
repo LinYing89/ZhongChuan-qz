@@ -23,6 +23,7 @@ public class VoiceDecoder extends MessageToMessageDecoder<DatagramPacket> {
         ByteBuf byteBuf = msg.copy().content();
         byte[] req = new byte[byteBuf.readableBytes()];
         byteBuf.readBytes(req);
+        byteBuf.release();
         if(null != VoiceCallActivity.listen){
             VoiceCallActivity.listen.write(req);
         }else if (null != VoiceUploadThirdActivity.listen){

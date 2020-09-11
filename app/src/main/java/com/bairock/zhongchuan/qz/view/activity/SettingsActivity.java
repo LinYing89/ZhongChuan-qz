@@ -17,6 +17,7 @@ import com.bairock.zhongchuan.qz.R;
 import com.bairock.zhongchuan.qz.utils.Config;
 import com.bairock.zhongchuan.qz.utils.ConversationUtil;
 import com.bairock.zhongchuan.qz.utils.SharedHelper;
+import com.example.wfsample.TelescopeWifiActivity;
 
 import java.lang.ref.WeakReference;
 
@@ -24,6 +25,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     private Switch switchRunOnPowerOn;
     private TextView txtMap;
+    private TextView txtTelescopeWifi;
     private Button btnLogout;
     private ProgressDialog progressDialog;
 
@@ -47,6 +49,7 @@ public class SettingsActivity extends AppCompatActivity {
     private void findViews(){
         switchRunOnPowerOn = findViewById(R.id.switchRunOnPowerOn);
         txtMap = findViewById(R.id.txtMap);
+        txtTelescopeWifi = findViewById(R.id.txtTelescopeWifi);
         btnLogout = findViewById(R.id.btnLogout);
     }
 
@@ -63,6 +66,7 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
         txtMap.setOnClickListener(onClickListener);
+        txtTelescopeWifi.setOnClickListener(onClickListener);
         btnLogout.setOnClickListener(onClickListener);
     }
 
@@ -72,6 +76,9 @@ public class SettingsActivity extends AppCompatActivity {
             switch (v.getId()){
                 case R.id.txtMap:
                     startActivity(new Intent(SettingsActivity.this, OfflineMapActivity.class));
+                    break;
+                case R.id.txtTelescopeWifi:
+                    startActivity(new Intent(SettingsActivity.this, TelescopeWifiActivity.class));
                     break;
                 case R.id.btnLogout:
                     progressDialog = new ProgressDialog(SettingsActivity.this);

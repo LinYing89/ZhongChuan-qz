@@ -19,6 +19,7 @@ import android.text.TextUtils;
 
 import com.bairock.zhongchuan.qz.utils.FileUtil;
 import com.bairock.zhongchuan.qz.utils.MyCrashHandler;
+import com.example.wfsample.WF_AVObj;
 
 public class App extends Application {
 
@@ -38,6 +39,13 @@ public class App extends Application {
 		// crashHandler.init(_context);
 		MyCrashHandler mycrashHandler = new MyCrashHandler(this);
 		Thread.setDefaultUncaughtExceptionHandler(mycrashHandler);
+		WF_AVObj.API_Init();
+	}
+
+	@Override
+	public void onTerminate() {
+		super.onTerminate();
+		WF_AVObj.API_Uninit();
 	}
 
 	private void initEMChat() {

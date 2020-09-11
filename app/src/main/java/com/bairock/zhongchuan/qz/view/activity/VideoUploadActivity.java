@@ -70,31 +70,45 @@ public class VideoUploadActivity extends AppCompatActivity {
 
         findViews();
 
-        txtMessage.setText("正在请求信息处理设备...");
-        sendUdpThread = new SendUdpThread(UdpMessageHelper.createVideoCallMainServerAsk(UserUtil.user.getUsername()), mainServerIp);
-        sendUdpThread.setOnNoAnswerListener(new SendUdpThread.OnNoAnswerListener() {
-            @Override
-            public void onNoAnswer() {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(VideoUploadActivity.this, "信息处理设备无应答", Toast.LENGTH_SHORT).show();
-//                        finish();
-                    }
-                });
-
-            }
-        });
-        sendUdpThread.start();
         startVideo();
         myUdpReceiver.setVideoCallback(new VideoCallback() {
             @Override
             public void videoCallback(byte[] bytes) {
-                H264Broadcaster.send(bytes, mainServerIp);
+                if(null != mainServerIp) {
+                    H264Broadcaster.send(bytes, mainServerIp);
+                }
             }
         });
+
+        // 是否请求信息处理设备, 如果试主动上传则需要请求, 如果是被动上传(信息处理设备主动请求)则不需要请求
+        boolean askMainServer = getIntent().getBooleanExtra("askMainServer", true);
+        if(askMainServer) {
+            if(null != mainServerIp) {
+                txtMessage.setText("正在请求信息处理设备...");
+                sendUdpThread = new SendUdpThread(UdpMessageHelper.createVideoCallMainServerAsk(UserUtil.user.getUsername()), mainServerIp);
+                sendUdpThread.setOnNoAnswerListener(new SendUdpThread.OnNoAnswerListener() {
+                    @Override
+                    public void onNoAnswer() {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(VideoUploadActivity.this, "信息处理设备无应答", Toast.LENGTH_SHORT).show();
+//                        finish();
+                            }
+                        });
+
+                    }
+                });
+                sendUdpThread.start();
+            }
+        }else{
+            upload = true;
+            myUdpReceiver.startRevice();
+            publish.start();
+        }
 //        MessageBroadcaster.sendIp(UdpMessageHelper.createVideoCallMainServerAsk(UserUtil.user.getUsername()), mainServerIp);
     }
+
 
     private void findViews(){
         txtMessage = findViewById(R.id.txtMessage);
@@ -105,7 +119,7 @@ public class VideoUploadActivity extends AppCompatActivity {
         imgHangUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MessageBroadcaster.sendIp(UdpMessageHelper.createCallMainServerStopAsk(UserUtil.user.getUsername()), mainServerIp);
+//                MessageBroadcaster.sendIp(UdpMessageHelper.createCallMainServerStopAsk(UserUtil.user.getUsername()), mainServerIp);
                 finish();
             }
         });
@@ -169,6 +183,9 @@ public class VideoUploadActivity extends AppCompatActivity {
             publish.stop();
             publish.destroy();
         }
+        if(null != mainServerIp) {
+            MessageBroadcaster.sendIp(UdpMessageHelper.createCallMainServerStopAsk(UserUtil.user.getUsername()), mainServerIp);
+        }
         chronometer.stop();
         try {
             unregisterReceiver(receiver);
@@ -195,6 +212,7 @@ public class VideoUploadActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             // 记得把广播给终结掉
             abortBroadcast();
+            txtMessage.setText("");
             SendUdpThread.answered = true;
             if(null != sendUdpThread) {
                 sendUdpThread.interrupt();
@@ -209,7 +227,6 @@ public class VideoUploadActivity extends AppCompatActivity {
             } else if (result.equals("1")) {
                 //拒绝1/挂断2
                 Toast.makeText(VideoUploadActivity.this, "信息处理设备拒绝请求", Toast.LENGTH_SHORT).show();
-                finish();
             }
         }
     }

@@ -7,15 +7,24 @@ import com.bairock.zhongchuan.qz.App;
 import com.bairock.zhongchuan.qz.Constants;
 import com.bairock.zhongchuan.qz.bean.ClientBase;
 import com.bairock.zhongchuan.qz.bean.Location;
+import com.bairock.zhongchuan.qz.bean.MessageRoot;
+import com.bairock.zhongchuan.qz.bean.MessageRootType;
+import com.bairock.zhongchuan.qz.bean.ZCMessage;
+import com.bairock.zhongchuan.qz.bean.ZCMessageDirect;
+import com.bairock.zhongchuan.qz.bean.ZCMessageType;
 import com.bairock.zhongchuan.qz.enums.ClientBaseType;
 import com.bairock.zhongchuan.qz.utils.ConversationUtil;
 import com.bairock.zhongchuan.qz.utils.UserUtil;
 import com.bairock.zhongchuan.qz.utils.Util;
 import com.bairock.zhongchuan.qz.view.activity.LoginActivity;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
 import java.util.List;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.socket.DatagramPacket;
 import io.netty.handler.codec.MessageToMessageDecoder;
@@ -34,6 +43,7 @@ public class MessageDecoder extends MessageToMessageDecoder<DatagramPacket> {
         }
         byte[] req = new byte[byteBuf.readableBytes()];
         byteBuf.readBytes(req);
+        byteBuf.release();
 //        Log.e(TAG, "bytes " + Util.bytesToHexString(req));
 
         int memberNumber = Util.bytesToInt(new byte[]{req[0], req[1]});
@@ -85,6 +95,7 @@ public class MessageDecoder extends MessageToMessageDecoder<DatagramPacket> {
                 Bundle bundle = new Bundle();
                 bundle.putString(Constants.MEDIA_TYPE, Constants.MEDIA_TYPE_VOICE);
                 bundle.putString(Constants.NAME, String.valueOf(memberNumber));
+                bundle.putInt(Constants.CLIENT_TYPE, 1);
                 i1.putExtra("myBundle", bundle);
                 App.getInstance().sendOrderedBroadcast(i1, ConversationUtil.CHAT_BROADCAST_PERMISSION);
                 break;
@@ -102,6 +113,7 @@ public class MessageDecoder extends MessageToMessageDecoder<DatagramPacket> {
                 Bundle bundle1 = new Bundle();
                 bundle1.putString(Constants.MEDIA_TYPE, Constants.MEDIA_TYPE_VIDEO);
                 bundle1.putString(Constants.NAME, String.valueOf(memberNumber));
+                bundle1.putInt(Constants.CLIENT_TYPE, 1);
                 i3.putExtra("myBundle", bundle1);
                 App.getInstance().sendOrderedBroadcast(i3, ConversationUtil.CHAT_BROADCAST_PERMISSION);
                 break;
@@ -141,6 +153,59 @@ public class MessageDecoder extends MessageToMessageDecoder<DatagramPacket> {
                 i5.putExtra("source", "main");
                 App.getInstance().sendOrderedBroadcast(i5, ConversationUtil.CHAT_BROADCAST_PERMISSION);
                 break;
+            case UdpMessageHelper.MAIN_SERVER_TEXT_MESSAGE:
+                String text = new String(data, StandardCharsets.UTF_8);
+                MessageRoot<ZCMessage> messageRoot = new MessageRoot<>();
+                messageRoot.setFrom(String.valueOf(memberNumber));
+                messageRoot.setTime(new Date().getTime());
+                messageRoot.setTo(UserUtil.user.getUsername());
+                messageRoot.setType(MessageRootType.CHAT);
+                ZCMessage zcMessage = new ZCMessage();
+                messageRoot.setData(zcMessage);
+                zcMessage.setContent(text);
+                zcMessage.setDirect(ZCMessageDirect.RECEIVE);
+                zcMessage.setMessageType(ZCMessageType.TXT);
+                zcMessage.setUnread(true);
+
+                ConversationUtil.addReceivedMessage(messageRoot);
+                Intent i6 = new Intent(ConversationUtil.CHAT_ACTION);
+                i6.putExtra("from", messageRoot.getFrom());
+                i6.putExtra("content", messageRoot.getData().getContent());
+                App.getInstance().sendOrderedBroadcast(i6, ConversationUtil.CHAT_BROADCAST_PERMISSION);
+                UdpMessage udpMessage = UdpMessageHelper.createMainServerTextMessageAns(UserUtil.user.getUsername(), 0);
+                byte[] bytes = UdpMessageHelper.createBytes(udpMessage);
+                ctx.writeAndFlush(new DatagramPacket(Unpooled.copiedBuffer(bytes),
+                        msg.sender()));
+                break;
+            case UdpMessageHelper.MAIN_SERVER_VIDEO_CALL_ASK:
+                UdpMessage udpMessage2 = UdpMessageHelper.createMainServerVideoCallAns(UserUtil.user.getUsername(), 0);
+                byte[] bytes2 = UdpMessageHelper.createBytes(udpMessage2);
+                ctx.writeAndFlush(new DatagramPacket(Unpooled.copiedBuffer(bytes2),
+                        msg.sender()));
+
+                Intent i7 = new Intent(ConversationUtil.VIDEO_ASK_ACTION);
+                Bundle bundle7 = new Bundle();
+                bundle7.putString(Constants.MEDIA_TYPE, Constants.MEDIA_TYPE_VIDEO);
+                bundle7.putString(Constants.NAME, String.valueOf(memberNumber));
+                bundle7.putInt(Constants.CLIENT_TYPE, 5);
+                i7.putExtra("myBundle", bundle7);
+                App.getInstance().sendOrderedBroadcast(i7, ConversationUtil.CHAT_BROADCAST_PERMISSION);
+                break;
+            case UdpMessageHelper.MAIN_SERVER_VOICE_CALL_ASK:
+                UdpMessage udpMessage3 = UdpMessageHelper.createMainServerVoiceCallAns(UserUtil.user.getUsername(), 0);
+                byte[] bytes3 = UdpMessageHelper.createBytes(udpMessage3);
+                ctx.writeAndFlush(new DatagramPacket(Unpooled.copiedBuffer(bytes3),
+                        msg.sender()));
+
+                Intent i8 = new Intent(ConversationUtil.VOICE_ASK_ACTION);
+                Bundle bundle8 = new Bundle();
+                bundle8.putString(Constants.MEDIA_TYPE, Constants.MEDIA_TYPE_VOICE);
+                bundle8.putString(Constants.NAME, String.valueOf(memberNumber));
+                bundle8.putInt(Constants.CLIENT_TYPE, 5);
+                i8.putExtra("myBundle", bundle8);
+                App.getInstance().sendOrderedBroadcast(i8, ConversationUtil.CHAT_BROADCAST_PERMISSION);
+                break;
+
             default: break;
         }
         out.add(byteBuf);

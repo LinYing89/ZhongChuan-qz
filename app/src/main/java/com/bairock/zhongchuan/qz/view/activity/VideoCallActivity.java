@@ -1,11 +1,14 @@
 package com.bairock.zhongchuan.qz.view.activity;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.media.AudioManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Chronometer;
@@ -25,6 +28,7 @@ import com.bairock.zhongchuan.qz.utils.FileUtil;
 import com.bairock.zhongchuan.qz.utils.SendUdpThread;
 import com.bairock.zhongchuan.qz.utils.UserUtil;
 import com.bairock.zhongchuan.qz.utils.Util;
+import com.bairock.zhongchuan.qz.utils.VideoCallSoundPlayer;
 import com.library.common.UdpControlInterface;
 import com.library.live.Player;
 import com.library.live.Publish;
@@ -54,6 +58,7 @@ public class VideoCallActivity extends AppCompatActivity {
 
     public static String name = "";
     private String ip;
+    private boolean muted;
 
     private AskBroadcastReceiver receiver;
 
@@ -67,6 +72,8 @@ public class VideoCallActivity extends AppCompatActivity {
         name = getIntent().getStringExtra(Constants.NAME);
         String videoType = getIntent().getStringExtra(Constants.VIDEO_TYPE);
         findViews();
+
+        VideoCallSoundPlayer.play();
 
         ip = UserUtil.findIpByUsername(name);
         if(ip == null || ip.isEmpty()){
@@ -122,9 +129,11 @@ public class VideoCallActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        MessageBroadcaster.send(UdpMessageHelper.createVideoCallAns(UserUtil.user.getUsername(), 1), name);
         name = "";
 //        publishHe.stopRecode();//停止录制
         // 注销广播
+        VideoCallSoundPlayer.stop();
         try {
             unregisterReceiver(receiver);
             receiver = null;
@@ -149,6 +158,9 @@ public class VideoCallActivity extends AppCompatActivity {
         if(null != sendUdpThread){
             sendUdpThread.interrupt();
         }
+
+        AudioManager mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        mAudioManager.adjustSuggestedStreamVolume(AudioManager.ADJUST_UNMUTE, AudioManager.STREAM_MUSIC, 0);
     }
 
     private void findViews(){
@@ -222,19 +234,34 @@ public class VideoCallActivity extends AppCompatActivity {
     }
 
     private View.OnClickListener onClickListener = new View.OnClickListener() {
+        @RequiresApi(api = Build.VERSION_CODES.M)
         @Override
         public void onClick(View v) {
             switch (v.getId()){
                 case R.id.imgMute:
+                    if(muted){
+                        AudioManager mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+                        mAudioManager.adjustSuggestedStreamVolume(AudioManager.ADJUST_UNMUTE, AudioManager.STREAM_MUSIC, 0);
+                        muted = false;
+                        imgMute.setImageResource(R.drawable.icon_mute_normal);
+                    }else {
+                        muted = true;
+                        AudioManager mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+                        //静音 并显示UI  第三个参数 flags=1
+                        mAudioManager.adjustSuggestedStreamVolume(AudioManager.ADJUST_TOGGLE_MUTE, AudioManager.STREAM_MUSIC, 0);
+                        imgMute.setImageResource(R.drawable.icon_mute_on);
+                    }
                     break;
                 case R.id.imgHangUp:
                 case R.id.imgHangUp2:
-                    MessageBroadcaster.send(UdpMessageHelper.createVideoCallAns(UserUtil.user.getUsername(), 1), name);
+//                    MessageBroadcaster.send(UdpMessageHelper.createVideoCallAns(UserUtil.user.getUsername(), 1), name);
                     finish();
                     break;
                 case R.id.imgSpeaker:
+                    publishMe.rotate();
                     break;
                 case R.id.imgOk:
+                    VideoCallSoundPlayer.stop();
                     sendUdpThread = new SendUdpThread(UdpMessageHelper.createVideoCallAns(UserUtil.user.getUsername(), 0), ip);
                     sendUdpThread.start();
 //                    MessageBroadcaster.send(UdpMessageHelper.createVideoCallAns(UserUtil.user.getUsername(), 0), name);
@@ -257,7 +284,7 @@ public class VideoCallActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             // 记得把广播给终结掉
             abortBroadcast();
-
+            VideoCallSoundPlayer.stop();
             SendUdpThread.answered = true;
             if(null != sendUdpThread) {
                 sendUdpThread.interrupt();

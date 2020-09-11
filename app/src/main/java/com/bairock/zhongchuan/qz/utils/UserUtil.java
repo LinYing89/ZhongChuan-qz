@@ -197,7 +197,7 @@ public class UserUtil {
 
     public static ClientBase findUserByUsername(String username){
         for(ClientBase user : clientBases){
-            if(user.getClientBaseType() == ClientBaseType.PHONE && user.getUsername().equals(username)){
+            if(user.getUsername().equals(username)){
                 return user;
             }
         }

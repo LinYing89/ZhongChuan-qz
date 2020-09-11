@@ -11,6 +11,7 @@ import android.media.AudioTrack;
 import android.os.Handler;
 import android.os.Message;
 
+import com.bairock.zhongchuan.qz.netty.H264Broadcaster;
 import com.utility.WF_ACodec;
 import com.utility.WF_AVRecord;
 import com.utility.WF_VCodec;
@@ -559,6 +560,8 @@ public class WF_AVObj implements IStream, IMsg{
 									null,null,
 									null,null,//out_bmp565, out_bmp565Size,
 									out_width, out_heigh);
+
+//					H264Broadcaster.send(new byte[]{0x00, 0x01}, "192.168.1.101");
 					//System.out.println("WFVC_Decode="+nRet+",len="+stRawHead.getRawDataLen()+", wXh="+out_width[0]+"X"+out_heigh[0]);
 					//System.out.println("WFVC_Decode, bytH264=0x"+Integer.toString(bytH264[3]&0xFF, 16)+" "+Integer.toString(bytH264[4]&0xFF, 16)+" "+
 					//					Integer.toString(bytH264[5]&0xFF, 16)+" "+Integer.toString(bytH264[6]&0xFF, 16)+" "+Integer.toString(bytH264[7]&0xFF, 16));
@@ -889,6 +892,10 @@ public class WF_AVObj implements IStream, IMsg{
 			}else {
 				//System.out.println("OnCallbackStream, nDataSize="+nDataSize);
 				m_fifoVideo.addLast(pData, nDataSize);
+				for(int i = 0; i < m_listIStream.size(); i++) {
+					m_listIStream.get(i).OnH264(pData, nDataSize);
+				}
+//				H264Broadcaster.send(pData, "192.168.1.101");
 			}
 		}else if(head.getAVCodecID()==WF_NetAPI.WF_AV_CODEC_ID_G711A) m_fifoAudio.addLast(pData, nDataSize);
 		else if(head.getAVCodecID()==WF_NetAPI.WF_AV_CODEC_ID_AAC) m_fifoAudio.addLast(pData, nDataSize);

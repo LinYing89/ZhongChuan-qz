@@ -12,6 +12,7 @@ public interface Constants {
 	String ID = "id";
 	String NAME = "NAME";
 	String MEDIA_TYPE = "mediaType";
+	String CLIENT_TYPE = "clientType";
 	String MEDIA_TYPE_VOICE = "mediaTypeVoice";
 	String MEDIA_TYPE_VIDEO = "mediaTypeVideo";
 	String VOICE_TYPE = "voiceType";

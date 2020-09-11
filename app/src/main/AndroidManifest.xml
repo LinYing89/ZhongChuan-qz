@@ -48,9 +48,29 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="com.example.wfsample.TelescopeActivity"
+        <activity android:name="com.example.wfsample.TelescopeWifiActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat"/>
+        <activity
+            android:name=".view.activity.MainServerVoiceAskActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat" />
+        <activity
+            android:name=".view.activity.MainServerVideoAskActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat" />
+        <activity
+            android:name="com.example.wfsample.ActivityFullLiveView"
+            android:screenOrientation="landscape"
+            android:theme="@style/Theme.AppCompat" />
+        <activity
+            android:name="com.example.wfsample.TelescopeVideoUploadActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat" />
+        <activity
+            android:name="com.example.wfsample.TelescopeActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat" />
 
         <meta-data
             android:name="com.amap.api.v2.apikey"
@@ -72,10 +92,6 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <activity
-            android:name=".view.activity.VideoUploadActivity2"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat" />
         <activity
             android:name=".view.activity.VoiceUploadThirdActivity"
             android:screenOrientation="portrait"

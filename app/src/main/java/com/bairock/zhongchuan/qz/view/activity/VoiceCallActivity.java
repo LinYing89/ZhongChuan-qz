@@ -24,6 +24,7 @@ import com.bairock.zhongchuan.qz.recorderlib.utils.Logger;
 import com.bairock.zhongchuan.qz.utils.ConversationUtil;
 import com.bairock.zhongchuan.qz.utils.SendUdpThread;
 import com.bairock.zhongchuan.qz.utils.UserUtil;
+import com.bairock.zhongchuan.qz.utils.VideoCallSoundPlayer;
 import com.bairock.zhongchuan.qz.view.ChatActivity;
 import com.library.common.UdpControlInterface;
 import com.library.talk.Listen;
@@ -68,6 +69,8 @@ public class VoiceCallActivity extends AppCompatActivity {
         name = getIntent().getStringExtra(Constants.NAME);
         String voiceType = getIntent().getStringExtra(Constants.VOICE_TYPE);
         findViews();
+
+        VideoCallSoundPlayer.play();
 
         ip = UserUtil.findIpByUsername(name);
         if(ip == null || ip.isEmpty()){
@@ -124,6 +127,7 @@ public class VoiceCallActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         name = "";
+        VideoCallSoundPlayer.stop();
 //        publishHe.stopRecode();//停止录制
         // 注销广播
         try {
@@ -186,6 +190,7 @@ public class VoiceCallActivity extends AppCompatActivity {
                 case R.id.imgSpeaker:
                     break;
                 case R.id.imgOk:
+                    VideoCallSoundPlayer.stop();
                     sendUdpThread = new SendUdpThread(UdpMessageHelper.createVoiceCallAns(UserUtil.user.getUsername(), 0), ip);
                     sendUdpThread.start();
 //                    MessageBroadcaster.send(UdpMessageHelper.createVoiceCallAns(UserUtil.user.getUsername(), 0), name);
@@ -230,6 +235,7 @@ public class VoiceCallActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
 
             SendUdpThread.answered = true;
+            VideoCallSoundPlayer.stop();
             if(null != sendUdpThread) {
                 sendUdpThread.interrupt();
             }

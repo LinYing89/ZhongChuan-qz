@@ -46,6 +46,15 @@ public class UdpMessageHelper {
     public static final byte VIDEO_CALL_ANS = 0x54;
     public static final byte TEXT_MESSAGE = 0x61;
     public static final byte IMAGE_MESSAGE = 0x63;
+    // 信息处理设备发送的文本消息
+    public static final byte MAIN_SERVER_TEXT_MESSAGE = 0x65;
+    public static final byte MAIN_SERVER_TEXT_MESSAGE_ANS = 0x66;
+    // 信息处理设备请求手持终端上传视频
+    public static final byte MAIN_SERVER_VIDEO_CALL_ASK = 0x67;
+    public static final byte MAIN_SERVER_VIDEO_CALL_ANS = 0x68;
+    // 信息处理设备请求手持终端上传音频
+    public static final byte MAIN_SERVER_VOICE_CALL_ASK = 0x69;
+    public static final byte MAIN_SERVER_VOICE_CALL_ANS = 0x70;
 
     public static byte[] createBytes(UdpMessage udpMessage){
         int length = 6;
@@ -241,6 +250,34 @@ public class UdpMessageHelper {
         udpMessage.setErrorCode((byte)errorCode);
         udpMessage.setDataLength((short) imageBytes.length);
         udpMessage.setData(imageBytes);
+        return udpMessage;
+    }
+
+    //创建视频呼叫回应命令
+    public static UdpMessage createMainServerTextMessageAns(String number, int errorCode){
+        UdpMessage udpMessage = new UdpMessage();
+        udpMessage.setMemberNumber(Short.parseShort(number));
+        udpMessage.setFactionCode(MAIN_SERVER_TEXT_MESSAGE_ANS);
+        udpMessage.setErrorCode((byte) errorCode);
+        udpMessage.setDataLength((short) 0);
+        return udpMessage;
+    }
+
+    public static UdpMessage createMainServerVideoCallAns(String number, int errorCode){
+        UdpMessage udpMessage = new UdpMessage();
+        udpMessage.setMemberNumber(Short.parseShort(number));
+        udpMessage.setFactionCode(MAIN_SERVER_VIDEO_CALL_ANS);
+        udpMessage.setErrorCode((byte) errorCode);
+        udpMessage.setDataLength((short) 0);
+        return udpMessage;
+    }
+
+    public static UdpMessage createMainServerVoiceCallAns(String number, int errorCode){
+        UdpMessage udpMessage = new UdpMessage();
+        udpMessage.setMemberNumber(Short.parseShort(number));
+        udpMessage.setFactionCode(MAIN_SERVER_VOICE_CALL_ANS);
+        udpMessage.setErrorCode((byte) errorCode);
+        udpMessage.setDataLength((short) 0);
         return udpMessage;
     }
 

@@ -103,13 +103,13 @@
                     android:id="@+id/imgSpeaker"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:srcCompat="@drawable/icon_speaker_normal" />
+                    app:srcCompat="@drawable/rotate_video" />
 
                 <TextView
                     android:id="@+id/textView6"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="免提"
+                    android:text="切换摄像头"
                     android:textAlignment="center"
                     android:layout_marginTop="8dp"
                     android:textColor="@color/bgcolor" />
